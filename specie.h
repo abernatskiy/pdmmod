@@ -12,5 +12,4 @@ public:
     int m_length;
     bool ifCatalyst;
     bool ifCatalyst();
-    
 };

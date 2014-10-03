@@ -2,13 +2,12 @@
 #include <map>
 #include parameter.h
 
-//std::map<std::string,Parameter> globParams;
-
+std::map<std::string,Parameter> globParams;
 
 class Specie
 {
 public:
     Specie();
-    int length;
+    int m_length;
     bool ifCatalyst;
 };

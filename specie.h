@@ -3,6 +3,6 @@
 class Specie
 {
 public:
-    Species();
+    Specie();
     
 };

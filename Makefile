@@ -12,6 +12,8 @@ objects   =	specie.o main.o
 specie: ${objects}
 	${CC} ${LDFLAGS} -o $@ $^ ${libs}
 
+testParam: testParam.o parameter.o
+	${CC} ${LDFLAGS} -o $@ testParam.o parameter.o
 
 clean:
 	${RM} ${objects} specie

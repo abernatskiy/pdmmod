@@ -15,4 +15,6 @@ bool Specie::ifCatalyst(){
         return 0;
 }
 
-
+Specie::~Specie(){
+    
+}

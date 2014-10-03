@@ -8,6 +8,9 @@ class Specie
 {
 public:
     Specie();
+    ~Specie();
     int m_length;
     bool ifCatalyst;
+    bool ifCatalyst();
+    
 };

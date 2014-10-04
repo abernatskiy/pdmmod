@@ -1,4 +1,5 @@
 #include <map>
+#include <string>
 #include "specie.h"
 
 std::map<std::string,Parameter> globParams;
@@ -13,7 +14,6 @@ Specie::Specie(std::string id){
 }
 
 
-
 bool Specie::ifCatalyst(){
     int X = (globParams[std::string("X")]).getInt();
     if(m_length > X)
@@ -21,9 +21,46 @@ bool Specie::ifCatalyst(){
     else
         return false;
 }
+//Defining reactions here
 
 std::list<Reaction> Specie::reactions(Specie specie){
+    //all the reactions two species can have
     std::list<Reaction> allReactions;
+    
+    
+    if (m_id==std::string("")){}
+    //if our specie is an activated monomer
+    else if(m_id==std::string("a")){
+        //it cannot react with itself of decay
+        if ( (specie.m_id!=std::string("")) && (specie.m_id!=std::string("a")) ){}
+        //in the reaction with a regular molecule
+        else{
+            //it elongates the molecule by one.
+            Reaction elongation(m_id, 1, specie.m_id, 1, globParams[std::string("a")].getFloat());
+            elongation.addProduct(std::to_string(specie.m_length+1), 1);
+            allReactions.push_back(elongation);
+        }
+    }
+    //if our specie is a regular molecule (n-mer)
+    else{
+        //it can reat with "vacuum" 
+        if (specie.m_id==std::string("")){
+            //and decay
+            Reaction decay(m_id,1,std::string(""),1,globParams[std::string("d")].getFloat());
+        }
+        //it can react with an activated monomer
+        else if(specie.m_id==std::string("a")){
+            //and elongate itself by one.
+            Reaction elongation(m_id, 1, specie.m_id, 1, globParams[std::string("a")].getFloat());
+            elongation.addProduct(std::to_string(m_length+1), 1);
+            allReactions.push_back(elongation);
+        }
+        //it can react with a regular molecule only if it is a catalyst
+        else{
+            
+        }
+    }
+    
     return allReactions;
 }
 

@@ -1,5 +1,7 @@
+#include <map>
 #include "specie.h"
 
+std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
     m_id = id;
@@ -13,11 +15,11 @@ Specie::Specie(std::string id){
 
 
 bool Specie::ifCatalyst(){
-//    int X = (globParams[std::string("X")]).getInt();
-//    if(m_length > X)
+    int X = (globParams[std::string("X")]).getInt();
+    if(m_length > X)
        return true;
-//    else
-//        return false;
+    else
+        return false;
 }
 
 std::list<Reaction> Specie::reactions(Specie specie){

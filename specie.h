@@ -1,11 +1,8 @@
 #include <vector>
-#include <map>
 #include <string>
 #include <list>
 #include "parameter.h"
 #include "reaction.h"
-
-std::map<std::string,Parameter> globParams;
 
 class Specie
 {

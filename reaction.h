@@ -1,5 +1,0 @@
-class Reaction
-{
-public:
-	Reaction();
-};

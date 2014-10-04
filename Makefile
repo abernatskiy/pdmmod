@@ -3,7 +3,8 @@ CC        = g++
 CFLAGS    = -g -ggdb -Wall
 LDFLAGS   = -g -ggdb -Wall
 CPPFLAGS  = ${CFLAGS}
-objects   =	specie.o main.o reaction.o
+objects   =	specie.o main.o
+
 
 .cpp.o:
 	${CC} -o $@ -c ${CPPFLAGS} $<

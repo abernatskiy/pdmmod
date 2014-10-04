@@ -1,6 +1,4 @@
-#include <string>
 #include "specie.h"
-
 
 
 Specie::Specie(std::string id){
@@ -15,15 +13,16 @@ Specie::Specie(std::string id){
 
 
 bool Specie::ifCatalyst(){
-    int X = (globParams[std::string("X")]).getInt();
-    if(m_length > X)
-        return true;
-    else
-        return false;
+//    int X = (globParams[std::string("X")]).getInt();
+//    if(m_length > X)
+       return true;
+//    else
+//        return false;
 }
 
-Reaction Specie::reactions(Specie specie){
-    
+std::list<Reaction> Specie::reactions(Specie specie){
+    std::list<Reaction> allReactions;
+    return allReactions;
 }
 
 Specie::~Specie(){

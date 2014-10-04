@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <list>
 #include "parameter.h"
 #include "reaction.h"
 
@@ -17,5 +18,5 @@ public:
 
     std::string str();
     bool ifCatalyst();
-    Reaction reactions(Specie specie);
+    std::list<Reaction> reactions(Specie specie);
 };

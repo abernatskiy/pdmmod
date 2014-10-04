@@ -2,5 +2,5 @@
 
 
 int main (int argc, char** argv){
-    Specie sp= Specie();//TODO
+    Specie sp= Specie("a");//TODO
 }

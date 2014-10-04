@@ -1,6 +1,6 @@
 .SUFFIXES = .cpp .o
 CC        = g++
-CFLAGS    = -g -ggdb -Wall
+CFLAGS    = -g -ggdb -Wall -std=c++11
 LDFLAGS   = -g -ggdb -Wall
 CPPFLAGS  = ${CFLAGS}
 objects   =	specie.o main.o reaction.o

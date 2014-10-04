@@ -5,19 +5,17 @@
 
 Specie::Specie(std::string id){
     m_id = id;
-    /*if m_id==std::string("a"){
+    if (m_id==std::string("a")){
         m_length=1;
     }
-    else:
-        m_length = std::atoi(m_id.c_str());*/
+    else
+        m_length = std::atoi(m_id.c_str());
 }
 
-/*std::string Specie::str(){
-    return std::string("Specie ")+m_id+std::string(" with length ")+std::to_string(length);
-}*/
+
 
 bool Specie::ifCatalyst(){
-    int X = globParams(std::string("X"));
+    int X = (globParams[std::string("X")]).getInt();
     if(m_length > X)
         return true;
     else
@@ -25,7 +23,7 @@ bool Specie::ifCatalyst(){
 }
 
 Reaction Specie::reactions(Specie specie){
-    if (if)
+    
 }
 
 Specie::~Specie(){

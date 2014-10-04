@@ -10,6 +10,6 @@ private:
 	void addSpecie(std::string specie, int stoichiometry);
 
 public:
-	Species(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, float rate);
+	Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, float rate);
 	void addProduct(std::string product, int stoichiometry){addSpecie(product, stoichiometry);};
 };

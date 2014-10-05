@@ -14,6 +14,8 @@ specie: ${objects}
 testParam: testParam.o parameter.o
 	${CC} ${LDFLAGS} -o $@ testParam.o parameter.o
 
+testSpecie: testSpecie.o specie.o reaction.o parameter.o
+
 clean:
 	${RM} ${objects} specie
 

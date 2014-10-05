@@ -1,6 +1,7 @@
 #include <map>
 #include <string>
 #include "specie.h"
+#include <iostream>
 
 std::map<std::string,Parameter> globParams;
 
@@ -12,7 +13,13 @@ Specie::Specie(std::string id){
     else
         m_length = std::atoi(m_id.c_str());
 }
-
+//Overloading <<
+std::ostream& operator<<(std::ostream& os, const Specie& sp)
+{
+    os << sp.m_id << " : with length " << sp.m_length;
+    return os;
+}
+//methods
 
 bool Specie::ifCatalyst(){
     int X = (globParams[std::string("X")]).getInt();
@@ -63,6 +70,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
     
     return allReactions;
 }
+
+
+
 
 Specie::~Specie(){
     

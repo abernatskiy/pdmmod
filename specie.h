@@ -16,4 +16,5 @@ public:
     std::string str();
     bool ifCatalyst();
     std::list<Reaction> reactions(Specie specie);
+    friend std::ostream& operator<<(std::ostream& os, const Specie& sp);
 };

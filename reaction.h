@@ -14,7 +14,5 @@ public:
 	Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, float rate);
     
     friend std::ostream& operator<<(std::ostream& os, const Reaction& rc);
-    std::vector<std::string> getReactants(std::vector<std::string> *reacts, std::vector<std::string> * prodts);
     void addProduct(std::string product, int stoichiometry){addSpecie(product, stoichiometry);};
-    void getReactants();
 };

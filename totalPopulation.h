@@ -1,7 +1,7 @@
 #include <string>
 #include <list>
 #include "population.h"
-#include "reaction.h"
+//#include "reaction.h"
 
 class TotalPopulation
 {
@@ -16,7 +16,7 @@ private:
     std::list<Reaction>::iterator samplePopulation();
     float sampleTime();
 public:
-    TotalPopulation();
+//    TotalPopulation(); // parameter-less constructor is supposed to never be required
     void stepSimulation();
-    ~TotalPopulation();
+//    ~TotalPopulation(); // default compiler-defined destructor should be fine, as long as we do not add any pointers here
 };

@@ -1,5 +1,6 @@
 #include <string>
 #include <list>
+#include "types.h"
 //#include "reaction.h"
 #include "specie.h"
 

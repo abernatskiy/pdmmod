@@ -7,6 +7,7 @@
 class Specie
 {
 public:
+    Specie(){};
     Specie(std::string id);
     ~Specie();
     std::string m_id;

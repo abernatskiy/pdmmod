@@ -20,6 +20,8 @@ testPopulation: testPopulation.o population.o specie.o parameter.o
 
 totalPopulation: totalPopulation.o 
 
+lisaTestst: lisaTestst.o
+
 clean:
 	${RM} ${objects} specie
 

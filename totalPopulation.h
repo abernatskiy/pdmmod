@@ -3,7 +3,7 @@
 #include "population.h"
 #include "reaction.h"
 
-class TotalPopulation()
+class TotalPopulation
 {
 private:
     std::list<Population> m_listOfPopulations;
@@ -16,6 +16,7 @@ private:
     std::list<Reaction>::iterator samplePopulation();
     float sampleTime();
 public:
-//    totalPopulation(file??)
+    TotalPopulation();
     void stepSimulation();
-}
+    ~TotalPopulation();
+};

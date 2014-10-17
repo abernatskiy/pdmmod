@@ -16,7 +16,8 @@ private:
 
 public:
     Population(std::string id, int initPop);
+    ~Population();
     void removeReaction(std::list<Reaction>::iterator ptrReaction);
     void addAllReactions(Specie* ptrOtherReagent);
 
-}
+};

@@ -14,13 +14,14 @@ specie: ${objects} main.o
 testParam: testParam.o parameter.o
 	${CC} ${LDFLAGS} -o $@ $^
 
-#testSpecie: testSpecie.o ${objects}
-#	${CC} ${LDFLAGS} -o $@ $^
+testSpecie: testSpecie.o ${objects}
+	${CC} ${LDFLAGS} -o $@ $^
 
 testPopulation: testPopulation.o ${objects}
 	${CC} ${LDFLAGS} -o $@ $^
 
-totalPopulation: totalPopulation.o 
+testTotalPopulation: testTotalPopulation.o ${objects}
+	${CC} ${LDFLAGS} -o $@ $^
 
 clean:
 	${RM} ${objects} specie

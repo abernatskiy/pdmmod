@@ -1,7 +1,5 @@
-#include "specie.h"
-
+#include "totalPopulation.h"
 
 int main (int argc, char** argv){
-    Specie sp= Specie("a");//TODO
     return 0;
 }

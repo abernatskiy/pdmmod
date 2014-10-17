@@ -10,10 +10,13 @@
 class TotalPopulation
 {
 private:
+    //attributes
     std::list<Population> m_listOfPopulations;
     float m_a; // sum of sigmas, full propensity of the system
 
     std::list<Population>::iterator findPopulation(std::string specie);
+    
+    //methods
     void removeSpecie(std::string specie); 
         /* takes specie and remomes the Population entity corresponding to this Specie 
         also checks all the Population's in TotalPopulation for the dependencies from this Specie and corrects them */

@@ -18,6 +18,8 @@ testSpecie: testSpecie.o specie.o reaction.o parameter.o
 
 testPopulation: testPopulation.o population.o specie.o parameter.o
 
+totalPopulation: totalPopulation.o 
+
 clean:
 	${RM} ${objects} specie
 

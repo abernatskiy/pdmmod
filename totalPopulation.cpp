@@ -18,3 +18,4 @@ std::list<Reaction>::iterator TotalPopulation::samplePopulation(){
 void TotalPopulation::stepSimulation(){
     
 }
+

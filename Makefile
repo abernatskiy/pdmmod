@@ -20,6 +20,8 @@ testParam: testParam.o parameter.o
 testPopulation: testPopulation.o ${objects}
 	${CC} ${LDFLAGS} -o $@ $^
 
+totalPopulation: totalPopulation.o 
+
 clean:
 	${RM} ${objects} specie
 

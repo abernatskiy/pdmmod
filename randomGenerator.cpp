@@ -9,7 +9,9 @@ void RandomGenerator::seedWithString(std::string str){
     // takes a string, treats it as an array of integers (one per symbol)
     // and creates a seed out of the result
     std::seed_seq seedGen(str.begin(),str.end());
-    seedGen.generate(&m_seed);
+    std::vector<unsigned int> seeds(1);
+    seedGen.generate(seeds.begin(), seeds.end());
+    m_seed = seeds[0];
     seedWithUInt(m_seed);
 }
 

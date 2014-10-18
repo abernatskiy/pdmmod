@@ -1,9 +1,9 @@
 .SUFFIXES = .cpp .o
 CC        = g++
-CFLAGS    = -g -ggdb -Wall -std=c++11
+CFLAGS    = -g -ggdb -Wall -std=c++11 -I"."
 LDFLAGS   = -g -ggdb -Wall
 CPPFLAGS  = ${CFLAGS}
-objects   =	specie.o reaction.o parameter.o population.o totalPopulation.o
+objects   =	specie.o reaction.o parameter.o population.o totalPopulation.o randomGenerator.o
 
 .cpp.o:
 	${CC} -o $@ -c ${CPPFLAGS} $<
@@ -11,21 +11,12 @@ objects   =	specie.o reaction.o parameter.o population.o totalPopulation.o
 specie: ${objects} main.o
 	${CC} ${LDFLAGS} -o $@ $^
 
-testParam: testParam.o parameter.o
-	${CC} ${LDFLAGS} -o $@ $^
-
-testSpecie: testSpecie.o ${objects}
-	${CC} ${LDFLAGS} -o $@ $^
-
-testPopulation: testPopulation.o ${objects}
-	${CC} ${LDFLAGS} -o $@ $^
-
-testTotalPopulation: testTotalPopulation.o ${objects}
+test%: tests/test%.o ${objects}
 	${CC} ${LDFLAGS} -o $@ $^
 
 lisaTestst: lisaTestst.o
 
 clean:
-	${RM} ${objects} test*.o specie main.o
+	${RM} ${objects} tests/*.o main.o specie
 
 all: specie

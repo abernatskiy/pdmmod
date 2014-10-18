@@ -10,11 +10,22 @@
 
 class TotalPopulation
 {
+public:
+    // Constructors/Destructors
+    TotalPopulation(std::string source);
+    /* constructs the object from the file listing all initial species and their populations
+     */
+    // TODO generation from distribution
+
+    // Methods
+    void stepSimulation(); // runs one step of a simulation
+
+    // Operator overloads
+    friend std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop);
 private:
     // Attributes
-
     float m_a; // sum of sigmas, full propensity of the system
-
+    std::list<Population> m_listOfPopulations;
 
     // Methods
     std::list<Population>::iterator findPopulation(std::string specie);
@@ -26,21 +37,12 @@ private:
     /* creates and appends Population corresponding to the Specie to TotalPopulation
      * and TODO
      */
+
     std::list<Reaction>::iterator samplePopulation();
     float sampleTime();
 
-public:
-    // Constructors/Destructors
-    TotalPopulation(std::string source);// or maybe not string, IDK how to implement generation from distribution TODO
-    /* Can construct the Object from various sources:
-     * 1) filename: каждую строчку файла он парсит на строчку (idшник) и int (количество молекул), после чего
-     *    добавляет к своему внутреннему листу Population'ов в конец новый Population, коструируемый из строчки и инта
-     * 2) Raise an Error so far.
+    void readPopulationsFromFile(std::string fileName);
+    /* reads the file with two columns, specie ids in column 0 and specie population in column 1,
+     * into the internal list of populaitons
      */
-
-    //Attributes
-    std::list<Population> m_listOfPopulations;//private
-
-    // Methods
-    void stepSimulation(); // runs one step of a simulation
 };

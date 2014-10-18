@@ -12,7 +12,14 @@ public:
 
     // Methods
 //    void removeReaction(std::list<Reaction>::iterator ptrReaction);
-//    void addAllReactions(Specie* ptrOtherReagent);
+    void buildRelationship(std::list<Population>::iterator itOther){};
+    /* Checks if this Population's Specie can react with *ptrOther's and appends
+     * Relationship object to its internal list of relationships. Returns
+     * iterator to the Relationship object if there were some possible
+     * reactions and NULL otherwise.
+     */
+    float computeKsi(){return 0.f;};
+    float updateKsi(){return 0.f;};
 
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const Population& pop);

@@ -4,6 +4,6 @@
 
 int main(int argc, char** argv){
     Population pop(std::string("10"), 50);
-    std::cout << pop << "\n";
+    std::cout << pop << std::endl;
     return 0;
 }

@@ -16,7 +16,7 @@ Specie::Specie(std::string id){
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
 {
-    os << sp.m_id << " : with length " << sp.m_length;
+    os << sp.m_id << " (of length " << sp.m_length << ")";
     return os;
 }
 //methods

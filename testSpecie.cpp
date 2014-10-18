@@ -7,5 +7,5 @@ int main(int argc, char** argv){
     Specie two("2");
     std::cout << a << "\n";
     std::list<Reaction> rs = a.reactions(two);
-    (*rs.begin()).getReactants();
+    
 }

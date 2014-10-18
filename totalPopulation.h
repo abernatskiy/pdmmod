@@ -2,7 +2,7 @@
 #include <list>
 #include "population.h"
 //#include "reaction.h"
-#include "realRandomGenerator.h"
+#include "randomGenerator.h"
 
 /* Root class:
  * Simulation works by creating a single object of this class, then updating them with stepSimulation().
@@ -12,12 +12,13 @@ class TotalPopulation
 {
 private:
     // Attributes
-    std::list<Population> m_listOfPopulations;
+    
     float m_a; // sum of sigmas, full propensity of the system
 
-    std::list<Population>::iterator findPopulation(std::string specie);
+    
 
     // Methods
+    std::list<Population>::iterator findPopulation(std::string specie);
     void removeSpecie(std::string specie);
     /* takes specie and removes the Population entity corresponding to this Specie, then checks
      * corrects all Population's in TotalPopulation for dependent on this Specie
@@ -37,7 +38,11 @@ public:
      *    добавляет к своему внутреннему листу Population'ов в конец новый Population, коструируемый из строчки и инта
      * 2) Raise an Error so far.
      */
-
+    ~TotalPopulation();
+    
+    //Attributes
+    std::list<Population> m_listOfPopulations;//private
+    
     // Methods
     void stepSimulation(); // runs one step of a simulation
 };

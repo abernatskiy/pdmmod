@@ -10,6 +10,7 @@ class Population
 public:
     MOLINT m_n;
     Specie m_specie;
+    
 //    std::list<std::list<Reaction>> reactions;
 
     // maybe we can get away with only one of these

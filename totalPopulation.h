@@ -12,10 +12,9 @@ class TotalPopulation
 {
 private:
     // Attributes
-    
+
     float m_a; // sum of sigmas, full propensity of the system
 
-    
 
     // Methods
     std::list<Population>::iterator findPopulation(std::string specie);
@@ -38,11 +37,10 @@ public:
      *    добавляет к своему внутреннему листу Population'ов в конец новый Population, коструируемый из строчки и инта
      * 2) Raise an Error so far.
      */
-    ~TotalPopulation();
-    
+
     //Attributes
     std::list<Population> m_listOfPopulations;//private
-    
+
     // Methods
     void stepSimulation(); // runs one step of a simulation
 };

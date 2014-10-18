@@ -26,6 +26,6 @@ testTotalPopulation: testTotalPopulation.o ${objects}
 lisaTestst: lisaTestst.o
 
 clean:
-	${RM} ${objects} specie
+	${RM} ${objects} test*.o specie main.o
 
 all: specie

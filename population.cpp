@@ -5,8 +5,7 @@ Population::Population(std::string id, MOLINT initPop){
     m_n = initPop;
 }
 
-std::ostream& operator<<(std::ostream& os, const Population& pop)
-{
+std::ostream& operator<<(std::ostream& os, const Population& pop){
     os << "Population of specie " << pop.m_specie << " with " << pop.m_n << " molecules in it";
     return os;
 }

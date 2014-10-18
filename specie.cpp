@@ -34,7 +34,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //all the reactions two species can have
     std::list<Reaction> allReactions;
     
-    
+    //nothing is produced
     if (m_id==std::string("")){}
     //if our specie is an activated monomer
     else if(m_id==std::string("a")){
@@ -50,11 +50,8 @@ std::list<Reaction> Specie::reactions(Specie specie){
     }
     //if our specie is a regular molecule (n-mer)
     else{
-        //it can reat with "vacuum" 
-        if (specie.m_id==std::string("")){
-            //and decay
-            Reaction decay(m_id,1,std::string(""),1,globParams[std::string("d")].getFloat());
-        }
+        //it cannot react with "vacuum" 
+        if (specie.m_id==std::string("")){}
         //it can react with an activated monomer
         else if(specie.m_id==std::string("a")){
             //and elongate itself by one.
@@ -62,10 +59,14 @@ std::list<Reaction> Specie::reactions(Specie specie){
             elongation.addProduct(std::to_string(m_length+1), 1);
             allReactions.push_back(elongation);
         }
-        //it can react with a regular molecule only if it is a catalyst
-        else{
-            
+        //it can have a monomolecular reaction
+        else if (specie.m_id==m_id){
+            //and decay
+            Reaction decay(m_id,1,m_id,0,globParams[std::string("d")].getFloat());
+              
         }
+        //it can react with a regular molecule only if it is a catalyst
+        else{}
     }
     
     return allReactions;

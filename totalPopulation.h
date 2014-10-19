@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 #include "population.h"
-//#include "reaction.h"
+#include "reaction.h"
 #include "randomGenerator.h"
 
 /* Root class:
@@ -31,6 +31,7 @@ private:
     float m_a; // sum of sigmas, full propensity of the system
     float m_deltaA; // the change in full propensity during the current step
     std::list<Population> m_listOfPopulations;
+    RandomGenerator m_randGen; // TODO organize civilized seeding
 
     // Methods
     std::list<Population>::iterator findPopulation(std::string specie);
@@ -43,8 +44,13 @@ private:
      * and TODO
      */
 
-    std::list<Reaction>::iterator samplePopulation();
+    Reaction sampleReaction();
+    /* finds out which reaction happens next, according to the Gillespie distribution
+     * computed using Partial-propensity Direct Method
+     */
     float sampleTime();
+    /* finds out when the next reaction happens
+     */
 
     void readPopulationsFromFile(std::string fileName);
     /* reads the file with two columns, specie ids in column 0 and specie population in column 1,

@@ -21,10 +21,14 @@
 class Population
 {
 public:
+    // Attributes
+    float m_ksi;
+
     // Constructors
     Population(std::string id, MOLINT initPop);
 
     // Methods
+    Reaction sampleReaction(float remainingJuice);
 //    void removeReaction(std::list<Reaction>::iterator ptrReaction);
     void buildRelation(std::list<Population>::iterator itOther);
     /* Checks if this Population's Specie can react with *ptrOther's and appends
@@ -46,7 +50,6 @@ private:
     std::list<Relation> m_relations;
     std::list<relationAddr_t> m_depenedents;
     float m_lambda;
-    float m_ksi;
 };
 
 #endif // __POPULATION_H

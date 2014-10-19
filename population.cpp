@@ -3,6 +3,12 @@
 Population::Population(std::string id, MOLINT initPop){
     m_specie = Specie(id);
     m_n = initPop;
+    m_ksi = 1.f;
+}
+
+Reaction Population::sampleReaction(float remainingJuice){
+    std::cout << "Sampling reaction from the following population:\n" << (*this) << std::endl;
+    return Reaction("", 0, "", 0, 0.f);
 }
 
 void Population::buildRelation(std::list<Population>::iterator itOther){

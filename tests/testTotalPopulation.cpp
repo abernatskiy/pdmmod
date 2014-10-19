@@ -2,6 +2,8 @@
 
 int main (int argc, char** argv){
     TotalPopulation tp("populations.txt");
-    std::cout << "names and populations:\n" << tp;
+    std::cout << "before stepping:\n"<< tp;
+    tp.stepSimulation();
+    std::cout << "after stepping:\n" << tp;
     return 0;
 }

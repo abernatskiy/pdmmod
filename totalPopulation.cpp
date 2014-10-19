@@ -6,14 +6,17 @@
 #include <sstream>
 
 TotalPopulation::TotalPopulation(std::string source){
+    m_t = 0.f;
+
     m_listOfPopulations.push_back(Population(std::string(""), 1)); // adding "vacuum"
     readPopulationsFromFile(source);
 
     m_a = 0.f;
+    m_deltaA = 0.f;
     for(auto popIt1 = m_listOfPopulations.begin(); popIt1 != m_listOfPopulations.end(); popIt1++){
         for(auto popIt2 = popIt1; popIt2 != m_listOfPopulations.end(); popIt2++)
-            popIt1->buildRelationship(popIt2);
-            // optimization is possible here: "vacuum" only reacts with itself
+            popIt1->buildRelation(popIt2);
+            // small optimization is possible here: "vacuum" only reacts with itself
         m_a += popIt1->computeKsi();
     }
 }

@@ -1,3 +1,6 @@
+#ifndef __TOTAL_POPULATION_H
+#define __TOTAL_POPULATION_H
+
 #include <string>
 #include <list>
 #include "population.h"
@@ -24,7 +27,9 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop);
 private:
     // Attributes
+    float m_t; // current simulation time
     float m_a; // sum of sigmas, full propensity of the system
+    float m_deltaA; // the change in full propensity during the current step
     std::list<Population> m_listOfPopulations;
 
     // Methods
@@ -46,3 +51,5 @@ private:
      * into the internal list of populaitons
      */
 };
+
+#endif // __TOTAL_POPULATION_H

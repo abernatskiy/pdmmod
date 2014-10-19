@@ -1,3 +1,6 @@
+#ifndef __SPECIE_H
+#define __SPECIE_H
+
 #include <vector>
 #include <string>
 #include <list>
@@ -19,3 +22,5 @@ public:
     std::list<Reaction> reactions(Specie specie);
     friend std::ostream& operator<<(std::ostream& os, const Specie& sp);
 };
+
+#endif // __SPECIE_H

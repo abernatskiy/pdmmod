@@ -1,3 +1,6 @@
+#ifndef __REACTION_H
+#define __REACTION_H
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -20,3 +23,5 @@ public:
     float getPartialPropensityWithRespectTo(std::string reagent);
     float getPartialPropensityWithRespectTo(int reagentId);
 };
+
+#endif

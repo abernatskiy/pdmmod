@@ -1,3 +1,6 @@
+#ifndef __RANDOM_GENERATOR_H
+#define __RANDOM_GENERATOR_H
+
 #include <random>
 #include <time.h>
 #include <string>
@@ -31,3 +34,5 @@ public:
      */
     unsigned int getSeed(){return m_seed;};
 };
+
+#endif // __RANDOM_GENERATOR_H

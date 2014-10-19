@@ -1,3 +1,6 @@
+#ifndef __PARAMETER_H
+#define __PARAMETER_H
+
 #include <string>
 
 //do not call with Constants
@@ -24,3 +27,5 @@ private:
     template<typename T>
     Parameter(T value);
 };
+
+#endif // __PARAMETER_H

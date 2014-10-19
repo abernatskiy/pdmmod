@@ -63,7 +63,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if (specie.m_id==m_id){
             //and decay
             Reaction decay(m_id,1,m_id,0,globParams[std::string("d")].getFloat());
-              
+            allReactions.push_back(decay);
         }
         //it can react with a regular molecule only if it is a catalyst
         else{}

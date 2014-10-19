@@ -29,30 +29,38 @@ private:
     // Attributes
     float m_t; // current simulation time
     float m_a; // sum of sigmas, full propensity of the system
-    float m_deltaA; // the change in full propensity during the current step
     std::list<Population> m_listOfPopulations;
     RandomGenerator m_randGen; // TODO organize civilized seeding
 
     // Methods
     std::list<Population>::iterator findPopulation(std::string specie);
-    void removeSpecie(std::string specie);
-    /* takes specie and removes the Population entity corresponding to this Specie, then checks
-     * corrects all Population's in TotalPopulation for dependent on this Specie
+    void removePopulation(std::list<Population>::iterator itToPopToRemove);
+    /* takes an iterator to a Population, requests the population to remove all its dependencies
+     * and removes the Population from the list
+     * Complexity O(n)
      */
-    void addSpecie(std::string specie, int initPop);
-    /* creates and appends Population corresponding to the Specie to TotalPopulation
-     * and TODO
+    void addPopulation(std::string specie, int initPop);
+    /* creates and appends to the list a Population of a specie
+     * and builds relations from all preceding populations to the new population
+     * Complexity O(n)
+     */
+
+    void computeTotalPropensity();
+    /* recomputes the total propensity of the population
+     * Complexity O(n)
      */
 
     Reaction sampleReaction();
     /* finds out which reaction happens next, according to the Gillespie distribution
      * computed using Partial-propensity Direct Method
+     * Complexity O(n)
      */
     float sampleTime();
     /* finds out when the next reaction happens
+     * Complexity O(1)
      */
 
-    void readPopulationsFromFile(std::string fileName);
+    void addPopulationsFromFile(std::string fileName);
     /* reads the file with two columns, specie ids in column 0 and specie population in column 1,
      * into the internal list of populaitons
      */

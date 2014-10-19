@@ -2,29 +2,54 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 #include <cstdlib>
 #include <cmath>
 
 TotalPopulation::TotalPopulation(std::string source){
     m_t = 0.f;
-
-    m_listOfPopulations.push_back(Population(std::string(""), 1)); // adding "vacuum"
-    readPopulationsFromFile(source);
-
-    m_a = 0.f;
-    m_deltaA = 0.f;
-    for(auto popIt1 = m_listOfPopulations.begin(); popIt1 != m_listOfPopulations.end(); popIt1++){
-        for(auto popIt2 = popIt1; popIt2 != m_listOfPopulations.end(); popIt2++)
-            popIt1->buildRelation(popIt2);
-            // small optimization is possible here: "vacuum" only reacts with itself
-        popIt1->computeKsi();
-        m_a += popIt1->m_ksi;
-    }
+    addPopulation("", 1); // adding "vacuum"
+    addPopulationsFromFile(source);
+    computeTotalPropensity();
 }
 
 void TotalPopulation::stepSimulation(){
     Reaction reac = sampleReaction();
     m_t += sampleTime();
+
+    // When the reaction is known, iterate through all species involved in the reaction
+    for( auto itSpRec = reac.m_records.begin(); itSpRec != reac.m_records.end(); itSpRec++ ){
+        // The data structure at the iterator is tuple. We must first unpack it.
+        std::string specieId;
+        int specieSto;
+        std::tie (specieId, specieSto) = *itSpRec;
+
+        // For every specie, we're interested in getting an iterator to its population
+        auto itPop = findPopulation(specieId);
+
+        // If such population alrady exists
+        if( itPop != m_listOfPopulations.end() ){
+            // Update the population
+            itPop->update(specieSto);
+        }
+        else{
+            // Otherwise, add the new specie
+            addPopulation(specieId, specieSto);
+        }
+    }
+
+    // After we're done updating, remove all Populations with molecular count of 0
+    for( auto itPop = m_listOfPopulations.begin(); itPop != m_listOfPopulations.end(); itPop++ ){
+        if( (itPop->m_n) == 0 )
+            removePopulation(itPop);
+        else if( (itPop->m_n) < 0 ){
+            std::cout << "TotalPopulation: Population with negative molecule count found, exiting.\n" << *itPop << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Recompute m_a
+    computeTotalPropensity();
 }
 
 std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){
@@ -38,13 +63,44 @@ std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){
 /***** Private methods *****/
 
 std::list<Population>::iterator TotalPopulation::findPopulation(std::string specie){
-    return m_listOfPopulations.begin();
+    int i = 0;
+    auto soughtIt = m_listOfPopulations.end();
+    for( auto itPop = m_listOfPopulations.begin(); itPop != m_listOfPopulations.end(); itPop++ ){
+        if( itPop->m_specie.m_id == specie ){
+            soughtIt = itPop;
+            i++;
+        }
+    }
+    if( i > 1 ){
+        std::cout << "TotalPopulation: More than one poulation of a specie " << specie << " found during search, exiting.";
+        exit(EXIT_FAILURE);
+    }
+    else
+        return soughtIt;
 }
 
-void TotalPopulation::removeSpecie(std::string specie){
+void TotalPopulation::removePopulation(std::list<Population>::iterator itToPopToRemove){
+    itToPopToRemove->removeDependentRelations();
+    m_listOfPopulations.erase(itToPopToRemove);
 }
 
-void TotalPopulation::addSpecie(std::string specie, int initPop){
+void TotalPopulation::addPopulation(std::string specie, int initPop){
+    if( initPop <= 0 ){
+        std::cout << "TotalPopulation: Addition of a population of 0 of less (" << initPop << ") molecules attempted, exiting." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    MOLINT initPopN = (MOLINT) initPop;
+    m_listOfPopulations.push_back(Population(specie, initPopN));
+    auto itNewPop = m_listOfPopulations.rbegin();
+    for( auto itOtherPop = m_listOfPopulations.begin(); itOtherPop != m_listOfPopulations.end(); itOtherPop++ ){
+        itOtherPop->buildRelation(itNewPop);
+    }
+}
+
+void TotalPopulation::computeTotalPropensity(){
+    m_a = 0.f;
+    for( auto itPop = m_listOfPopulations.begin(); itPop != m_listOfPopulations.end(); itPop++ )
+        m_a += itPop->m_ksi;
 }
 
 Reaction TotalPopulation::sampleReaction(){
@@ -80,7 +136,7 @@ float TotalPopulation::sampleTime(){
     return -1.f*log(r2)/m_a;
 }
 
-void TotalPopulation::readPopulationsFromFile(std::string source){
+void TotalPopulation::addPopulationsFromFile(std::string source){
     std::string line;
     std::cin.sync_with_stdio(false);
     std::string filename(source);
@@ -96,7 +152,7 @@ void TotalPopulation::readPopulationsFromFile(std::string source){
             MOLINT              population;
 
             linestream >> name >> population;
-            m_listOfPopulations.push_back(Population(name, population));
+            addPopulation(name, population);
         }
     }
 

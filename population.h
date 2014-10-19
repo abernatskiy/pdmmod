@@ -10,7 +10,7 @@
 #include "specie.h"
 #include "relation.h"
 
-/* Class representing a population of a specie.
+/* Class representing a population of molecules of a specie.
  */
 
 #define relationAddr_t std::tuple<std::list<Population>::iterator, std::list<Relation>::iterator>
@@ -23,21 +23,29 @@ class Population
 public:
     // Attributes
     float m_ksi;
+    MOLINT m_n;
+    Specie m_specie;
 
     // Constructors
     Population(std::string id, MOLINT initPop);
 
     // Methods
+    void update(int molNoDifference){};
     Reaction sampleReaction(float remainingJuice);
-//    void removeReaction(std::list<Reaction>::iterator ptrReaction);
-    void buildRelation(std::list<Population>::iterator itOther);
-    /* Checks if this Population's Specie can react with *ptrOther's and appends
-     * Relationship object to its internal list of relationships. Returns
-     * iterator to the Relationship object if there were some possible
-     * reactions and NULL otherwise.
+    /* Take the remaining juice from the higher level sampler and subsamples
+     * within the Population. See comment to TotalPopulation::sampleReaction()'s
+     * implementation in totalPopulation.cpp for details
      */
-    float computeKsi(){return 0.f;};
-    float updateKsi(){return 0.f;};
+    void removeDependentRelations(){};
+    void removeRelation(std::list<Relation>::iterator itReaction);
+    void buildRelation(std::list<Population>::reverse_iterator itOther);
+    /* Checks if this Population's Specie can react with itOther's and appends
+     * Relation object to its internal list of relationships (if the Relation
+     * object is not empty). Updates the intermediate sums of propensities
+     * accordingly.
+     */
+    void computeKsi();
+    void updateKsi();
 
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const Population& pop);
@@ -45,10 +53,8 @@ public:
 private:
 //public:
     // Attributes
-    MOLINT m_n;
-    Specie m_specie;
     std::list<Relation> m_relations;
-    std::list<relationAddr_t> m_depenedents;
+    std::list<relationAddr_t> m_depenedentRelations;
     float m_lambda;
 };
 

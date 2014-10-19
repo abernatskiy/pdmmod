@@ -8,7 +8,7 @@ objects   =	specie.o reaction.o parameter.o relation.o population.o totalPopulat
 .cpp.o:
 	${CC} -o $@ -c ${CPPFLAGS} $<
 
-specie: ${objects} main.o
+pdmmod: ${objects} main.o
 	${CC} ${LDFLAGS} -o $@ $^
 
 test%: tests/test%.o ${objects}
@@ -19,4 +19,4 @@ lisaTestst: lisaTestst.o
 clean:
 	${RM} ${objects} tests/*.o main.o specie
 
-all: specie
+all: pdmmod

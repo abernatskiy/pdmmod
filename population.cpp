@@ -11,7 +11,7 @@ Reaction Population::sampleReaction(float remainingJuice){
     return Reaction("", 0, "", 0, 0.f);
 }
 
-void Population::buildRelation(std::list<Population>::iterator itOther){
+void Population::buildRelation(std::list<Population>::reverse_iterator itOther){
     std::cout << "Building relation between\n" << (*this) << std::endl << (*itOther) << std::endl;
 }
 

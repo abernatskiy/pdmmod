@@ -43,6 +43,7 @@ private:
     // Attributes
     MOLINT m_n;
     Specie m_specie;
+    std::list<Relation> m_relations;
     std::list<relationAddr_t> m_depenedents;
     float m_lambda;
     float m_ksi;

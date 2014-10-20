@@ -18,8 +18,12 @@ class Relation
 public:
     // Constructors
     Relation(Specie specI, Specie specJ);
+
+    // Methods
     bool isEmpty(){return m_listOfReactions.empty();};
 
+    // Operator overloads
+    friend std::ostream& operator<<(std::ostream& os, const Relation& rel);
 private:
     // Attributes
     std::list<Reaction> m_listOfReactions;

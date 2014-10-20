@@ -15,6 +15,7 @@ TotalPopulation::TotalPopulation(std::string source){
 
 void TotalPopulation::stepSimulation(){
     Reaction reac = sampleReaction();
+    std::cout << "Got reaction " << reac << std::endl;
     m_t += sampleTime();
 
     // When the reaction is known, iterate through all species involved in the reaction
@@ -39,14 +40,17 @@ void TotalPopulation::stepSimulation(){
     }
 
     // After we're done updating, remove all Populations with molecular count of 0
+    std::list<std::list<Population>::iterator> blackList;
     for( auto itPop = m_listOfPopulations.begin(); itPop != m_listOfPopulations.end(); itPop++ ){
         if( (itPop->m_n) == 0 )
-            removePopulation(itPop);
+            blackList.push_back(itPop);
         else if( (itPop->m_n) < 0 ){
             std::cout << "TotalPopulation: Population with negative molecule count found, exiting.\n" << *itPop << std::endl;
             exit(EXIT_FAILURE);
         }
     }
+    for( auto itPopToKill = blackList.begin(); itPopToKill != blackList.end(); itPopToKill++ )
+        removePopulation(*itPopToKill);
 
     // Recompute m_a
     computeTotalPropensity();

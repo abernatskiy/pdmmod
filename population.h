@@ -27,25 +27,33 @@ public:
     Specie m_specie;
 
     // Constructors
-    Population(std::string id, MOLINT initPop);
+    Population(std::string id, int initPop);
 
     // Methods
-    void update(int molNoDifference){};
     Reaction sampleReaction(float remainingJuice);
     /* Take the remaining juice from the higher level sampler and subsamples
      * within the Population. See comment to TotalPopulation::sampleReaction()'s
-     * implementation in totalPopulation.cpp for details
+     * implementation in totalPopulation.cpp for details.
      */
-    void removeDependentRelations(){};
-    void removeRelation(std::list<Relation>::iterator itReaction);
+    void update(int moleculesAdded);
+    /* Updates the population given the change in the number of molecules that
+     * occured. Also updates all dependent relations and partial propensity
+     * sums (m_ksi and m_lambda). Note that the argument may be negative.
+     */
     void buildRelation(std::list<Population>::reverse_iterator itOther);
     /* Checks if this Population's Specie can react with itOther's and appends
      * Relation object to its internal list of relationships (if the Relation
      * object is not empty). Updates the intermediate sums of propensities
      * accordingly.
      */
-    void computeKsi();
-    void updateKsi();
+    void removeDependentRelations();
+    /* Iterates through all dependent relations of other populations and
+     * removes them.
+     */
+    void removeRelation(std::list<Relation>::iterator itReaction);
+    /* Removes a relation of this population and updates the partial propensity
+     * sums (m_ksi and m_lambda) accordingly.
+     */
 
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const Population& pop);
@@ -56,6 +64,10 @@ private:
     std::list<Relation> m_relations;
     std::list<relationAddr_t> m_depenedentRelations;
     float m_lambda;
+
+    // Methods
+    void computeKsi(){};
+    void updateKsi(){};
 };
 
 #endif // __POPULATION_H

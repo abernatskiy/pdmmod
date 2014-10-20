@@ -36,15 +36,15 @@ void Population::update(int moleculesAdded){
 }
 
 void Population::buildRelation(std::list<Population>::iterator itSelf, std::list<Population>::reverse_iterator itOther){
-    std::cout << "Building relation\nof " << (*this) << "to " << (*itOther) << std::endl;
+//    std::cout << "Building relation\nof " << (*this) << "to " << (*itOther) << std::endl;
 
     Relation newRel(m_specie, m_n, itOther->m_specie);
     if( newRel.isEmpty() ){
-        std::cout << "Done building empty relation\n\n";
+        std::cout << "Done building empty relation from " << m_specie.m_id << " to " << itOther->m_specie.m_id << std::endl;
         return;
     }
 
-    std::cout << "Nonempty relation found: " << newRel << std::endl;
+    std::cout << "Nonempty relation found from " << m_specie.m_id << " to " << itOther->m_specie.m_id << ": " << newRel << std::endl;
 
     m_lambda += newRel.m_psi;
     m_ksi = m_lambda*((float) m_n);

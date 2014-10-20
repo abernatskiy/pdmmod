@@ -31,7 +31,7 @@ public:
 
     // Methods
     void addProduct(std::string product, int stoichiometry){addSpecie(product, stoichiometry);};
-    void computePartialPropensity(std::string wRespectToSp, int populationOfSp);
+    void computePartialPropensity(std::string wRespectToSp, MOLINT populationOfSp);
 private:
     void addSpecie(std::string specie, int stoichiometry);
 };

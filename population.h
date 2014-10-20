@@ -40,11 +40,22 @@ public:
      * occured. Also updates all dependent relations and partial propensity
      * sums (m_ksi and m_lambda). Note that the argument may be negative.
      */
-    void buildRelation(std::list<Population>::reverse_iterator itOther);
+    void buildRelation(std::list<Population>::iterator itSelf, std::list<Population>::reverse_iterator itOther);
     /* Checks if this Population's Specie can react with itOther's and appends
      * Relation object to its internal list of relationships (if the Relation
      * object is not empty). Updates the intermediate sums of propensities
      * accordingly.
+     *
+     * Takes an iterator to this Population within Total Population's list.
+     * This is required to make lookup lists (U3). Not pretty, but can't think
+     * of a better way.
+     *
+     * This function is tricky to think about. A useful fact to keep in mind
+     * is that for all calls of the function, the second argument is an iterator
+     * to the highest Population in TotalPopulation's list.
+     */
+    void addDependentRelation(std::list<Population>::iterator itPop, std::list<Relation>::iterator itRel);
+    /* Adds a dependent relation record
      */
     void removeDependentRelations();
     /* Iterates through all dependent relations of other populations and
@@ -62,10 +73,11 @@ private:
 //public:
     // Attributes
     std::list<Relation> m_listOfRelations;
-    std::list<relationAddr_t> m_depenedentRelations;
+    std::list<relationAddr_t> m_dependentRelations;
     float m_lambda;
 
     // Methods
+//    void add
     void computeKsi(){};
     void updateKsi(){};
 };

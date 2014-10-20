@@ -97,7 +97,7 @@ void TotalPopulation::addPopulation(std::string specie, int initPop){
     m_listOfPopulations.push_back(Population(specie, initPopN));
     auto itNewPop = m_listOfPopulations.rbegin();
     for( auto itOtherPop = m_listOfPopulations.begin(); itOtherPop != m_listOfPopulations.end(); itOtherPop++ ){
-        itOtherPop->buildRelation(itNewPop);
+        itOtherPop->buildRelation(itOtherPop, itNewPop);
     }
 }
 
@@ -127,7 +127,7 @@ Reaction TotalPopulation::sampleReaction(){
             return pop->sampleReaction( remainingJuice );
         }
     }
-    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken.\n";
+    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken, or all molecules have decayed.\n";
     exit(EXIT_FAILURE);
 }
 

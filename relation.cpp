@@ -1,7 +1,16 @@
+#include <iostream>
 #include "relation.h"
 
-Relation::Relation(Specie specI, Specie specJ){
-    m_psi = 1.f;
+Relation::Relation(Specie specI, MOLINT popSpecI, Specie specJ){
+    std::cout << "Relation: constructing, from " << specI << " (population " << popSpecI << ") to " << specJ << std::endl;
+    m_listOfReactions = specI.reactions(specJ);
+    std::cout << "Relation: list of reactions obtained\n";
+    m_psi = 0.f;
+    for( auto itRea = m_listOfReactions.begin(); itRea != m_listOfReactions.end(); itRea++){
+        std::cout << "Computing propensity for reaction " << (*itRea) << std::endl;
+        itRea->computePartialPropensity(specI.m_id, popSpecI);
+        m_psi += itRea->m_partialPropensity;
+    }
 }
 
 Reaction Relation::sampleReaction(float remainingJuice){

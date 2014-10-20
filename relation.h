@@ -4,6 +4,7 @@
 #include <list>
 #include "reaction.h"
 #include "specie.h"
+#include "types.h"
 
 /* This class represents the relation from
  * a population of some species SI to a population
@@ -20,7 +21,7 @@ public:
     float m_psi;
 
     // Constructors
-    Relation(Specie specI, Specie specJ);
+    Relation(Specie specI, MOLINT popSpecI, Specie specJ);
 
     // Methods
     Reaction sampleReaction(float remainingJuice);

@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
-#include "specie.h"
 #include <iostream>
+#include "specie.h"
 
 std::map<std::string,Parameter> globParams;
 
@@ -33,7 +33,7 @@ bool Specie::ifCatalyst(){
 std::list<Reaction> Specie::reactions(Specie specie){
     //all the reactions two species can have
     std::list<Reaction> allReactions;
-    
+
     //nothing is produced
     if (m_id==std::string("")){}
     //if our specie is an activated monomer
@@ -43,38 +43,37 @@ std::list<Reaction> Specie::reactions(Specie specie){
         //in the reaction with a regular molecule
         else{
             //it elongates the molecule by one.
-            Reaction elongation(m_id, 1, specie.m_id, 1, globParams[std::string("a")].getFloat());
+//            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
+            Reaction elongation(m_id, 1, specie.m_id, 1, 1.f); // TODO fix the dictionary
             elongation.addProduct(std::to_string(specie.m_length+1), 1);
             allReactions.push_back(elongation);
         }
     }
     //if our specie is a regular molecule (n-mer)
     else{
-        //it cannot react with "vacuum" 
+        //it cannot react with "vacuum"
         if (specie.m_id==std::string("")){}
         //it can react with an activated monomer
         else if(specie.m_id==std::string("a")){
             //and elongate itself by one.
-            Reaction elongation(m_id, 1, specie.m_id, 1, globParams[std::string("a")].getFloat());
+//            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
+            Reaction elongation(m_id, 1, specie.m_id, 1, 1.f); // TODO fix the dictionary
             elongation.addProduct(std::to_string(m_length+1), 1);
             allReactions.push_back(elongation);
         }
         //it can have a monomolecular reaction
         else if (specie.m_id==m_id){
             //and decay
-            Reaction decay(m_id,1,m_id,0,globParams[std::string("d")].getFloat());
+//            Reaction decay(m_id,1,m_id,0,globParams["d"].getFloat());
+            Reaction decay(m_id,1,m_id,0,0.1); // TODO fix the dictionary
             allReactions.push_back(decay);
         }
         //it can react with a regular molecule only if it is a catalyst
         else{}
     }
-    
     return allReactions;
 }
 
-
-
-
 Specie::~Specie(){
-    
+
 }

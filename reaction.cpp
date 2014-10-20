@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream& os, const Reaction& rc){
     return os;
 }
 
-void Reaction::computePartialPropensity(std::string wRespectToSp, int populationOfSp)
+void Reaction::computePartialPropensity(std::string wRespectToSp, MOLINT populationOfSp)
 {
     std::string s0, s1;
     int st0, st1;

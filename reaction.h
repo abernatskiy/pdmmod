@@ -21,7 +21,7 @@ public:
     std::vector<specieRecord_t> m_records;
     float m_rate;
     float m_partialPropensity; // a.k.a. Pi
-    std::string m_pPWRespectTo; // id of the reagent, with respect to which the partial propensity was last computed
+    std::string m_pPWRespectTo; // id of the reagent, with respect to which the partial propensity was last computed (holder of the Relation)
 
     // Constructor
     Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, float rate);
@@ -31,7 +31,7 @@ public:
 
     // Methods
     void addProduct(std::string product, int stoichiometry){addSpecie(product, stoichiometry);};
-    void computePartialPropensity(std::string wRespectToSp, MOLINT populationOfSp);
+    void computePartialPropensity(std::string wRespectToSp, MOLINT populationOfOtherSp); // warning - the second argument is the population of the OTHER specie, not wRespectToSp
 private:
     void addSpecie(std::string specie, int stoichiometry);
 };

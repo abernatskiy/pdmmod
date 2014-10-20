@@ -21,16 +21,22 @@ public:
     float m_psi;
 
     // Constructors
-    Relation(Specie specI, MOLINT popSpecI, Specie specJ);
+    Relation(Specie fromSp, Specie toSp, MOLINT popToSp);
+    /* fromSp is the owner, Specie object of the Populaiton which keeps this Relation
+     * toSp is the Specie, on the population of which partial propensities may depend
+     * popToSp is the population of the latter
+     */
 
     // Methods
     Reaction sampleReaction(float remainingJuice);
+    void update(MOLINT newNToSp);
     bool isEmpty(){return m_listOfReactions.empty();};
 
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const Relation& rel);
 private:
     // Attributes
+    std::string m_fromSpId;
     std::list<Reaction> m_listOfReactions;
 };
 

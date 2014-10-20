@@ -4,7 +4,6 @@
 #include <string>
 #include <list>
 #include <tuple>
-#include <iostream>
 #include "types.h"
 #include "reaction.h"
 #include "specie.h"
@@ -54,16 +53,20 @@ public:
      * is that for all calls of the function, the second argument is an iterator
      * to the highest Population in TotalPopulation's list.
      */
+    void updateRelation(std::list<Relation>::iterator itRelation, MOLINT newN);
+    /* For some Relation object from local list, update all Pi values, recompute
+     * their sum Psi and update the local sums (m_ksi abd m_lambda) accordingly
+     */
+    void removeRelation(std::list<Relation>::iterator itRelation);
+    /* Removes a relation of this population and updates the partial propensity
+     * sums (m_ksi and m_lambda) accordingly.
+     */
     void addDependentRelation(std::list<Population>::iterator itPop, std::list<Relation>::iterator itRel);
     /* Adds a dependent relation record
      */
     void removeDependentRelations();
     /* Iterates through all dependent relations of other populations and
      * removes them.
-     */
-    void removeRelation(std::list<Relation>::iterator itReaction);
-    /* Removes a relation of this population and updates the partial propensity
-     * sums (m_ksi and m_lambda) accordingly.
      */
 
     // Operator overloads
@@ -73,7 +76,7 @@ private:
 //public:
     // Attributes
     std::list<Relation> m_listOfRelations;
-    std::list<relationAddr_t> m_dependentRelations;
+    std::list<relationAddr_t> m_dependentRelations; // a.k.a. U3
     float m_lambda;
 
     // Methods

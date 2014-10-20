@@ -127,7 +127,7 @@ Reaction TotalPopulation::sampleReaction(){
             return pop->sampleReaction( remainingJuice );
         }
     }
-    std::cout << "ERROR: Sampling failed. Full propensity m_a is likely broken.\n";
+    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken.\n";
     exit(EXIT_FAILURE);
 }
 

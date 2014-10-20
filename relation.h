@@ -2,7 +2,7 @@
 #define __RELATION_H
 
 #include <list>
-//#include "reaction.h"
+#include "reaction.h"
 #include "specie.h"
 
 /* This class represents the relation from
@@ -16,10 +16,14 @@
 class Relation
 {
 public:
+    // Attributes
+    float m_psi;
+
     // Constructors
     Relation(Specie specI, Specie specJ);
 
     // Methods
+    Reaction sampleReaction(float remainingJuice);
     bool isEmpty(){return m_listOfReactions.empty();};
 
     // Operator overloads
@@ -27,7 +31,6 @@ public:
 private:
     // Attributes
     std::list<Reaction> m_listOfReactions;
-    float m_psi;
 };
 
 #endif // __RELATION_H

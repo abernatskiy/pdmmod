@@ -61,7 +61,7 @@ public:
 private:
 //public:
     // Attributes
-    std::list<Relation> m_relations;
+    std::list<Relation> m_listOfRelations;
     std::list<relationAddr_t> m_depenedentRelations;
     float m_lambda;
 

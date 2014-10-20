@@ -1,16 +1,25 @@
+#include <iostream>
+#include <cstdlib>
 #include "population.h"
 
 Population::Population(std::string id, int initPop){
     m_specie = Specie(id);
     m_n = (MOLINT) initPop;
-    m_ksi = 1.f;
+    m_ksi = 0.f;
 }
 
 Reaction Population::sampleReaction(float remainingJuice){
     std::cout << "Sampling reaction from the following population:\n" << (*this) << std::endl;
-    Reaction reac("a", 1, "3", 1, 5.f);
-    reac.addProduct("4", 2);
-    return reac;
+    float localJuice = remainingJuice;
+    for( auto itRel = m_listOfRelations.begin(); itRel != m_listOfRelations.end(); itRel++ ){
+        localJuice -= itRel->m_psi;
+        if( localJuice < 0.f ){
+            float juiceRemainingAfterLocalSampling = localJuice + itRel->m_psi;
+            return itRel->sampleReaction(juiceRemainingAfterLocalSampling);
+        }
+    }
+    std::cout << "ERROR: Population-level sampling failed. Full propensity m_a is likely broken.\n";
+    exit(EXIT_FAILURE);
 }
 
 void Population::update(int moleculesAdded){

@@ -60,7 +60,8 @@ std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){
     os << "Current simulation time: " << pop.m_t << std::endl;
     os << "Total propensity: " << pop.m_a << std::endl;
     for (auto pops_it = pop.m_listOfPopulations.begin(); pops_it != pop.m_listOfPopulations.end(); pops_it++)
-        os << " " << *pops_it << std::endl;
+//        os << " " << *pops_it << std::endl;
+        os << "  " << pops_it->m_specie.m_id << "  " << pops_it->m_n << std::endl;
     return os;
 }
 

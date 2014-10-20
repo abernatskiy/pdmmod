@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include "relation.h"
 
 Relation::Relation(Specie specI, Specie specJ, MOLINT popSpecJ){
@@ -9,14 +10,24 @@ Relation::Relation(Specie specI, Specie specJ, MOLINT popSpecJ){
 }
 
 Reaction Relation::sampleReaction(float remainingJuice){
-    Reaction reac("a", 1, "3", 1, 5.f);
-    reac.addProduct("4", 2);
-    return reac;
+    float localJuice = remainingJuice;
+    for( auto itRea = m_listOfReactions.begin(); itRea != m_listOfReactions.end(); itRea++ ){
+        if( m_fromSpId != itRea->m_pPWRespectTo ){
+            std::cout << "Reaction: Found a reaction with partial propensity calculated with respect to a wrong specie. Something is wrong here. Exiting.\n";
+            exit(EXIT_FAILURE);
+        }
+
+        localJuice -= itRea->m_partialPropensity;
+        if( localJuice < 0.f )
+            return *itRea;
+    }
+    std::cout << "ERROR: Relation-level sampling failed. Total partial propensity of the group m_psi is likely broken\n";
+    exit(EXIT_FAILURE);
 }
 
 void Relation::update(MOLINT newNToSp){
     m_psi = 0.f;
-    for( auto itRea = m_listOfReactions.begin(); itRea != m_listOfReactions.end(); itRea++){
+    for( auto itRea = m_listOfReactions.begin(); itRea != m_listOfReactions.end(); itRea++ ){
         itRea->computePartialPropensity(m_fromSpId, newNToSp);
         m_psi += itRea->m_partialPropensity;
     }
@@ -25,6 +36,6 @@ void Relation::update(MOLINT newNToSp){
 std::ostream& operator<<(std::ostream& os, const Relation& rel){
     os << "Relation object from " << rel.m_fromSpId << std::endl;
     for( auto itReac = rel.m_listOfReactions.begin(); itReac != rel.m_listOfReactions.end(); itReac++ )
-        os << " " << (*itReac) << std::endl;
+        os << "  " << (*itReac);
     return os;
 }

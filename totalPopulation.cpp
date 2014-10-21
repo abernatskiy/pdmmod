@@ -134,10 +134,6 @@ Reaction TotalPopulation::sampleReaction(){
 
 float TotalPopulation::sampleTime(){
     float r2 = m_randGen.getFloat01();
-    if( r2 == 0.f ){
-        std::cout << "ERROR: Random number of 0.f got whan computing time step, corresponding to a timestep of infinity.\n";
-        exit(EXIT_FAILURE);
-    } // TODO do something about it
     return -1.f*log(r2)/m_a;
 }
 

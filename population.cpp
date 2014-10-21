@@ -10,7 +10,7 @@ Population::Population(std::string id, int initPop){
 }
 
 Reaction Population::sampleReaction(float remainingJuice){
-    std::cout << "Sampling reaction from the following population:\n" << (*this) << std::endl;
+//    std::cout << "Sampling reaction from the following population:\n" << (*this) << std::endl;
     if( m_n <= 0 ){
         std::cout << "ERROR: Sampling from a population of " << m_n << " molecules. This shouldn't happen. Exiting.\n";
         exit(EXIT_FAILURE);
@@ -30,7 +30,7 @@ Reaction Population::sampleReaction(float remainingJuice){
 
 void Population::update(int moleculesAdded){
     // Note that the argument may negative, while m_n may be of potentially unsigned type MOLINT. This works, I checked.
-    std::cout << "Population::update called on " << (*this) << " with molecular change of " << moleculesAdded << std::endl;
+//    std::cout << "Population::update called on " << (*this) << " with molecular change of " << moleculesAdded << std::endl;
     m_n += moleculesAdded;
 
     // Go through all records of dependent relations (all reacords in U3) and ask the other Populations to update their relations
@@ -49,11 +49,11 @@ void Population::buildRelation(std::list<Population>::iterator itSelf, std::list
 
     Relation newRel(m_specie, itOther->m_specie, itOther->m_n);
     if( newRel.isEmpty() ){
-        std::cout << "Done building empty relation from " << m_specie.m_id << " to " << itOther->m_specie.m_id << std::endl;
+//        std::cout << "Done building empty relation from " << m_specie.m_id << " to " << itOther->m_specie.m_id << std::endl;
         return;
     }
 
-    std::cout << "Nonempty relation found from " << m_specie.m_id << " to " << itOther->m_specie.m_id << ": " << newRel;
+//    std::cout << "Nonempty relation found from " << m_specie.m_id << " to " << itOther->m_specie.m_id << ": " << newRel;
 
     m_lambda += newRel.m_psi;
     m_ksi = m_lambda*((float) m_n);
@@ -62,11 +62,11 @@ void Population::buildRelation(std::list<Population>::iterator itSelf, std::list
     itToNewRelation--;
     itOther->addDependentRelation(itSelf, itToNewRelation);
 
-    std::cout << "Done building relation\n\n";
+//    std::cout << "Done building relation\n\n";
 }
 
 void Population::updateRelation(std::list<Relation>::iterator itRelation, MOLINT newN){
-    std::cout << "Population::updateRelation called on " << (*this) << " to update " << *itRelation;
+//    std::cout << "Population::updateRelation called on " << (*this) << " to update " << *itRelation;
 
     m_lambda -= itRelation->m_psi;
     itRelation->update(newN);
@@ -76,7 +76,7 @@ void Population::updateRelation(std::list<Relation>::iterator itRelation, MOLINT
 }
 
 void Population::removeRelation(std::list<Relation>::iterator itRelation){
-    std::cout << "Population::removeRelation called on " << (*this) << " to remove " << *itRelation;
+//    std::cout << "Population::removeRelation called on " << (*this) << " to remove " << *itRelation;
 
     m_lambda -= itRelation->m_psi;
     m_listOfRelations.erase(itRelation);
@@ -90,7 +90,7 @@ void Population::addDependentRelation(std::list<Population>::iterator itPop, std
 }
 
 void Population::removeDependentRelations(){
-    std::cout << "Population::removeDependentRelations called on " << (*this);
+//    std::cout << "Population::removeDependentRelations called on " << (*this);
     for(auto itRec = m_dependentRelations.begin(); itRec != m_dependentRelations.end(); itRec++ ){
         std::list<Population>::iterator itOtherPop;
         std::list<Relation>::iterator itOtherRel;
@@ -102,10 +102,10 @@ void Population::removeDependentRelations(){
 
 std::ostream& operator<<(std::ostream& os, const Population& pop){
     os << "Population of specie " << pop.m_specie << " with " << pop.m_n << " molecules in it\n";
+    os << "Full propensity of the population: " << pop.m_ksi << std::endl;
     os << "Relations: ";
     for( auto itRel = pop.m_listOfRelations.begin(); itRel != pop.m_listOfRelations.end(); itRel++ )
-        os << (*itRel);
-//    os << "Dependent relations: " << pop.m_dependentRelations.size() << " pc\n";
+        os << (*itRel) << std::endl;
     os << "Dependent relations:";
     for(auto itRec = pop.m_dependentRelations.begin(); itRec != pop.m_dependentRelations.end(); itRec++ ){
         std::list<Population>::iterator itOtherPop;
@@ -114,6 +114,5 @@ std::ostream& operator<<(std::ostream& os, const Population& pop){
 
         std::cout << " in population of " << itOtherPop->m_specie.m_id << ",";
     }
-    std::cout << std::endl;
     return os;
 }

@@ -6,8 +6,8 @@ int main (int argc, char** argv){
     tp.stepSimulation();
     std::cout << "after stepping:\n" << tp;
     while(true){
-    tp.stepSimulation();
-    std::cout << "after stepping:\n" << tp;
+        tp.stepSimulation();
+        std::cout << "after stepping:\n" << tp;
     }
     return 0;
 }

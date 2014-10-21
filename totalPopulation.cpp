@@ -54,6 +54,11 @@ void TotalPopulation::stepSimulation(){
 
     // Recompute m_a
     computeTotalPropensity();
+
+    if( m_listOfPopulations.size() == 1 && m_a == 0.f ){
+        std::cout << "All molecules died off and there are no source reactions, exiting\n";
+        exit(EXIT_SUCCESS);
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){
@@ -61,7 +66,8 @@ std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){
     os << "Total propensity: " << pop.m_a << std::endl;
     for (auto pops_it = pop.m_listOfPopulations.begin(); pops_it != pop.m_listOfPopulations.end(); pops_it++)
 //        os << " " << *pops_it << std::endl;
-        os << "  " << pops_it->m_specie.m_id << "  " << pops_it->m_n << std::endl;
+        if( pops_it->m_specie.m_id != "" )
+            os << "  " << pops_it->m_specie.m_id << "  " << pops_it->m_n << std::endl;
     return os;
 }
 
@@ -128,7 +134,7 @@ Reaction TotalPopulation::sampleReaction(){
             return pop->sampleReaction( remainingJuice );
         }
     }
-    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken, or all molecules have decayed.\n";
+    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken.\n";
     exit(EXIT_FAILURE);
 }
 

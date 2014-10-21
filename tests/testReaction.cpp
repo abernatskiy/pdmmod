@@ -9,9 +9,9 @@ int main(){
     reac.addProduct("13", 1);
     std::cout << "After product addition: " << reac << std::endl;
     reac.computePartialPropensity("a", 100);
-    std::cout << "After Pi computation w/r to a (100 mols): " << reac << std::endl;
+    std::cout << "After Pi computation w/r to a (given 100 mols of 12): " << reac << std::endl;
     reac.computePartialPropensity("12", 50);
-    std::cout << "After Pi computation w/r to 12 (50 mols): " << reac << std::endl;
+    std::cout << "After Pi computation w/r to 12 (given 50 mols of a): " << reac << std::endl;
     std::cout << std::endl;
 
     // Test for the "reagent not found" error message

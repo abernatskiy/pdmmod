@@ -30,7 +30,7 @@ public:
 
     // Methods
     Reaction sampleReaction(float remainingJuice);
-    /* Take the remaining juice from the higher level sampler and subsamples
+    /* Take the remaining juice from the TotalPopulation-level sampler and subsamples
      * within the Population. See comment to TotalPopulation::sampleReaction()'s
      * implementation in totalPopulation.cpp for details.
      */

@@ -14,7 +14,7 @@ int main(int argc, char** argv){
     std::cout << a << "\n";
     std::cout << two << "\n";
     std::cout << "Reactions:\n";
-    std::list<Reaction> rs = a.reactions(two);
+    std::list<Reaction> rs = two.reactions(a);
     for( auto itRea = rs.begin(); itRea != rs.end(); itRea++ )
         std::cout << "    " << (*itRea) << std::endl;
 }

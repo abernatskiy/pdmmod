@@ -34,7 +34,8 @@ void Relation::update(MOLINT newNToSp){
 }
 
 std::ostream& operator<<(std::ostream& os, const Relation& rel){
-    os << "Relation object from " << rel.m_fromSpId << std::endl;
+    os << "Relation from " << rel.m_fromSpId << std::endl;
+    os << "Sum of partial propensities (Psi) is " << rel.m_psi << std::endl;
     for( auto itReac = rel.m_listOfReactions.begin(); itReac != rel.m_listOfReactions.end(); itReac++ )
         os << "  " << (*itReac);
     return os;

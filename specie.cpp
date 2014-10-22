@@ -11,9 +11,9 @@ Specie::Specie(std::string id){
         m_length=1;
         m_type=std::string("act");
     }
-    else
+    else{
         m_length = std::atoi(m_id.c_str());
-        m_type=std::string("reg");
+        m_type=std::string("reg");}
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
@@ -36,12 +36,10 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //if our specie is an activated monomer
     else if(m_type==std::string("act")){
         //it cannot react with itself of decay
-        if ( (specie.m_id==std::string("")) || (specie.m_type==std::string("act")) ){}
-        //in the reaction with a regular molecule
-        else if (specie.m_type==std::string("reg")){
+        if (specie.m_type==std::string("reg")){
             //it elongates the molecule by one.
 //            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
-            Reaction elongation(m_id, 1, specie.m_id, 1, 1.f); // TODO fix the dictionary
+            Reaction elongation(m_id, 1, specie.m_id, 1, 1.01); // TODO fix the dictionary
             elongation.addProduct(std::to_string(specie.m_length+1), 1);
             allReactions.push_back(elongation);
         }
@@ -56,7 +54,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if(specie.m_type==std::string("act")){
             //and elongate itself by one.
 //            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
-            Reaction elongation(m_id, 1, specie.m_id, 1, 1.f); // TODO fix the dictionary
+            Reaction elongation(m_id, 1, specie.m_id, 1, 1.01); // TODO fix the dictionary
             elongation.addProduct(std::to_string(m_length+1), 1);
             allReactions.push_back(elongation);
         }
@@ -64,7 +62,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if (specie.m_id==m_id){
             //and decay
 //            Reaction decay(m_id,1,m_id,0,globParams["d"].getFloat());
-            Reaction decay(m_id,1,m_id,0,0.01); // TODO fix the dictionary
+            Reaction decay(m_id,1,m_id,0,0.5); // TODO fix the dictionary
             allReactions.push_back(decay);
         }
         //it can react with a regular molecule only if it is a catalyst

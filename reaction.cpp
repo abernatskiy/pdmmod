@@ -10,21 +10,21 @@ Reaction::Reaction(std::string reactant0, int stoichiometry0, std::string reacta
 std::ostream& operator<<(std::ostream& os, const Reaction& rc){
     int i = 0;
     for(auto itRec=rc.m_records.begin(); itRec != rc.m_records.end(); itRec++){
-        std::string s;
-        int st;
+        std::string s; //specie id
+        int st; //specie's stoichiometry
         std::tie (s, st) = *itRec;
-        switch(i){
+        switch(i){//case is the position of the ?? in the reactions vector?? TODO
         case 0:
-            os << (-1)*st << " " << s;
+            os << (-1)*st << " of " << s;
             break;
         case 1:
-            os << " + " << (-1)*st << " " << s << " -> " ;
+            os << " + " << (-1)*st << " of " << s << " -> " ;
             break;
         case 2:
-            os << st << " " << s;
+            os << st << " of " << s;
             break;
         default:
-            os << " + " << st << " " << s;
+            os << " + " << st << " of " << s;
             break;
         }
         i++;

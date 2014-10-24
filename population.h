@@ -26,7 +26,8 @@ public:
     Specie m_specie;
 
     // Constructors
-    Population(std::string id, int initPop);
+    Population(std::string id, int initPop, std::list<Population>* ptrPopulationList);
+    std::list<Population>* m_ptrPopulationList;
 
     // Methods
     Reaction sampleReaction(float remainingJuice);

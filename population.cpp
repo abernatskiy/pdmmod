@@ -2,11 +2,12 @@
 #include <cstdlib>
 #include "population.h"
 
-Population::Population(std::string id, int initPop){
+Population::Population(std::string id, int initPop, std::list<Population>* ptrPopulationList){
     m_specie = Specie(id);
     m_n = (MOLINT) initPop;
     m_ksi = 0.f;
     m_lambda = 0.f;
+    m_ptrPopulationList = ptrPopulationList;
 }
 
 Reaction Population::sampleReaction(float remainingJuice){
@@ -40,7 +41,17 @@ void Population::update(int moleculesAdded){
         std::list<Relation>::iterator itOtherRel;
         std::tie (itOtherPop, itOtherRel) = *itRec;
         // Asking for the update
-        itOtherPop->updateRelation(itOtherRel, m_n);
+
+        bool isPresent = false;
+
+        for(auto itPop = m_ptrPopulationList->begin(); itPop != m_ptrPopulationList->end() ; itPop++)
+            if( itPop == itOtherPop )
+                isPresent = true;
+        if(isPresent)
+            itOtherPop->updateRelation(itOtherRel, m_n);
+        else
+            std::cout << "Deletion of the deleted has been prevented\n";
+
     }
 }
 
@@ -96,7 +107,15 @@ void Population::removeDependentRelations(){
         std::list<Relation>::iterator itOtherRel;
         std::tie (itOtherPop, itOtherRel) = *itRec;
 
-        itOtherPop->removeRelation(itOtherRel);
+        bool isPresent = false;
+
+        for(auto itPop = m_ptrPopulationList->begin(); itPop != m_ptrPopulationList->end() ; itPop++)
+            if( itPop == itOtherPop )
+                isPresent = true;
+        if(isPresent)
+            itOtherPop->removeRelation(itOtherRel);
+        else
+            std::cout << "Deletion of the deleted has been prevented\n";
     }
 }
 
@@ -106,13 +125,13 @@ std::ostream& operator<<(std::ostream& os, const Population& pop){
     os << "Relations: ";
     for( auto itRel = pop.m_listOfRelations.begin(); itRel != pop.m_listOfRelations.end(); itRel++ )
         os << (*itRel) << std::endl;
-    os << "Dependent relations:";
-    for(auto itRec = pop.m_dependentRelations.begin(); itRec != pop.m_dependentRelations.end(); itRec++ ){
-        std::list<Population>::iterator itOtherPop;
-        std::list<Relation>::iterator itOtherRel;
-        std::tie (itOtherPop, itOtherRel) = *itRec;
-
-        std::cout << " in population of " << itOtherPop->m_specie.m_id << ",";
-    }
+    os << "Dependent relations: up to " << pop.m_dependentRelations.size() << std::endl;
+//    for(auto itRec = pop.m_dependentRelations.begin(); itRec != pop.m_dependentRelations.end(); itRec++ ){
+//        std::list<Population>::iterator itOtherPop;
+//        std::list<Relation>::iterator itOtherRel;
+ //       std::tie (itOtherPop, itOtherRel) = *itRec;
+//
+//        std::cout << " in population of " << itOtherPop->m_specie.m_id << ",";
+ //   }
     return os;
 }

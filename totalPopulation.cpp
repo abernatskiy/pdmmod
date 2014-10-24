@@ -101,7 +101,7 @@ void TotalPopulation::addPopulation(std::string specie, int initPop){
         exit(EXIT_FAILURE);
     }
     MOLINT initPopN = (MOLINT) initPop;
-    m_listOfPopulations.push_back(Population(specie, initPopN));
+    m_listOfPopulations.push_back(Population(specie, initPopN, &m_listOfPopulations));
     auto itNewPop = m_listOfPopulations.rbegin();
     for( auto itOtherPop = m_listOfPopulations.begin(); itOtherPop != m_listOfPopulations.end(); itOtherPop++ ){
         itOtherPop->buildRelation(itOtherPop, itNewPop);

@@ -91,7 +91,7 @@ std::list<Population>::iterator TotalPopulation::findPopulation(std::string spec
 }
 
 void TotalPopulation::removePopulation(std::list<Population>::iterator itToPopToRemove){
-    itToPopToRemove->removeDependentRelations();
+    itToPopToRemove->eraseTracesOfExistence();
     m_listOfPopulations.erase(itToPopToRemove);
 }
 
@@ -101,7 +101,7 @@ void TotalPopulation::addPopulation(std::string specie, int initPop){
         exit(EXIT_FAILURE);
     }
     MOLINT initPopN = (MOLINT) initPop;
-    m_listOfPopulations.push_back(Population(specie, initPopN, &m_listOfPopulations));
+    m_listOfPopulations.push_back(Population(specie, initPopN));
     auto itNewPop = m_listOfPopulations.rbegin();
     for( auto itOtherPop = m_listOfPopulations.begin(); itOtherPop != m_listOfPopulations.end(); itOtherPop++ ){
         itOtherPop->buildRelation(itOtherPop, itNewPop);

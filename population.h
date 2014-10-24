@@ -3,7 +3,6 @@
 
 #include <string>
 #include <list>
-#include <tuple>
 #include "types.h"
 #include "reaction.h"
 #include "specie.h"
@@ -12,7 +11,15 @@
 /* Class representing a population of molecules of a specie.
  */
 
-#define relationAddr_t std::tuple<std::list<Population>::iterator, std::list<Relation>::iterator>
+struct relationAddr_t {
+    void* ptrPopAddr;
+    std::list<Relation>::iterator itRelAddr;
+    std::list<struct relationAddr_t>* ptrListSelf;
+    std::list<struct relationAddr_t>::iterator itSelf;
+};
+
+typedef struct relationAddr_t relationAddr_t;
+
 /* Defines a type for records of the lookup table listing dependents (a.k.a. U3). Each record contains an
  * iterator to the population and an iterator to the relationship of that population.
  */
@@ -26,7 +33,7 @@ public:
     Specie m_specie;
 
     // Constructors
-    Population(std::string id, int initPop, std::list<Population>* ptrPopulationList);
+    Population(std::string id, int initPop);
     std::list<Population>* m_ptrPopulationList;
 
     // Methods
@@ -63,11 +70,20 @@ public:
      * sums (m_ksi and m_lambda) accordingly.
      */
     void addDependentRelation(std::list<Population>::iterator itPop, std::list<Relation>::iterator itRel);
-    /* Adds a dependent relation record
+    /* Adds a dependent relation record. Updates a pointer inside the Relation
+     * reflect the address of the record.
      */
     void removeDependentRelations();
     /* Iterates through all dependent relations of other populations and
      * removes them.
+     */
+    void removeDependencyRecordsOnOwnRelations();
+    /* Removes all dependency records pointing to Relations of this Population.
+     */
+    void eraseTracesOfExistence();
+    /* Removes all Relations of this Population together with dependence
+     * records mentioning them, then removes all Relations of other Populations
+     * which depend on this Population (according to our records)
      */
 
     // Operator overloads

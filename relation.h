@@ -22,6 +22,7 @@ class Relation
 public:
     // Attributes
     float m_psi; // the sum of partial propensities
+    void* m_ptrRecordOfSelf; // pointer to the dependence record about this Relation which is kept in Population in the other Specie
 
     // Constructors
     Relation(Specie ofSp, Specie toSp, MOLINT popToSp);

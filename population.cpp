@@ -2,12 +2,11 @@
 #include <cstdlib>
 #include "population.h"
 
-Population::Population(std::string id, int initPop, std::list<Population>* ptrPopulationList){
+Population::Population(std::string id, int initPop){
     m_specie = Specie(id);
     m_n = (MOLINT) initPop;
     m_ksi = 0.f;
     m_lambda = 0.f;
-    m_ptrPopulationList = ptrPopulationList;
 }
 
 Reaction Population::sampleReaction(float remainingJuice){
@@ -37,21 +36,11 @@ void Population::update(int moleculesAdded){
     // Go through all records of dependent relations (all reacords in U3) and ask the other Populations to update their relations
     for(auto itRec = m_dependentRelations.begin(); itRec != m_dependentRelations.end(); itRec++ ){
         // Unpacking the record
-        std::list<Population>::iterator itOtherPop;
-        std::list<Relation>::iterator itOtherRel;
-        std::tie (itOtherPop, itOtherRel) = *itRec;
+        Population* ptrOtherPop = (Population*) (itRec->ptrPopAddr);
+        std::list<Relation>::iterator itOtherRel = itRec->itRelAddr;
+
         // Asking for the update
-
-        bool isPresent = false;
-
-        for(auto itPop = m_ptrPopulationList->begin(); itPop != m_ptrPopulationList->end() ; itPop++)
-            if( itPop == itOtherPop )
-                isPresent = true;
-        if(isPresent)
-            itOtherPop->updateRelation(itOtherRel, m_n);
-        else
-            std::cout << "Deletion of the deleted has been prevented\n";
-
+        ptrOtherPop->updateRelation(itOtherRel, m_n);
     }
 }
 
@@ -63,7 +52,6 @@ void Population::buildRelation(std::list<Population>::iterator itSelf, std::list
 //        std::cout << "Done building empty relation from " << m_specie.m_id << " to " << itOther->m_specie.m_id << std::endl;
         return;
     }
-
 //    std::cout << "Nonempty relation found from " << m_specie.m_id << " to " << itOther->m_specie.m_id << ": " << newRel;
 
     m_lambda += newRel.m_psi;
@@ -71,6 +59,7 @@ void Population::buildRelation(std::list<Population>::iterator itSelf, std::list
     m_listOfRelations.push_back(newRel);
     auto itToNewRelation = m_listOfRelations.end();
     itToNewRelation--;
+
     itOther->addDependentRelation(itSelf, itToNewRelation);
 
 //    std::cout << "Done building relation\n\n";
@@ -96,27 +85,40 @@ void Population::removeRelation(std::list<Relation>::iterator itRelation){
 }
 
 void Population::addDependentRelation(std::list<Population>::iterator itPop, std::list<Relation>::iterator itRel){
-    relationAddr_t relRecord(itPop, itRel);
+    relationAddr_t relRecord;
+    relRecord.ptrPopAddr = (void*) &(*itPop);
+    relRecord.itRelAddr = itRel;
+    relRecord.ptrListSelf = &m_dependentRelations;
+
     m_dependentRelations.push_back(relRecord);
+    auto itLastRec = m_dependentRelations.end();
+    itLastRec--;
+    itLastRec->itSelf = itLastRec;
+    itRel->m_ptrRecordOfSelf = ((void*) &(*itLastRec));
 }
 
 void Population::removeDependentRelations(){
 //    std::cout << "Population::removeDependentRelations called on " << (*this);
     for(auto itRec = m_dependentRelations.begin(); itRec != m_dependentRelations.end(); itRec++ ){
-        std::list<Population>::iterator itOtherPop;
-        std::list<Relation>::iterator itOtherRel;
-        std::tie (itOtherPop, itOtherRel) = *itRec;
+        Population* ptrOtherPop = (Population*) (itRec->ptrPopAddr);
+        std::list<Relation>::iterator itOtherRel = itRec->itRelAddr;
 
-        bool isPresent = false;
-
-        for(auto itPop = m_ptrPopulationList->begin(); itPop != m_ptrPopulationList->end() ; itPop++)
-            if( itPop == itOtherPop )
-                isPresent = true;
-        if(isPresent)
-            itOtherPop->removeRelation(itOtherRel);
-        else
-            std::cout << "Deletion of the deleted has been prevented\n";
+        ptrOtherPop->removeRelation(itOtherRel);
     }
+}
+
+void Population::removeDependencyRecordsOnOwnRelations(){
+    // do not forget to erase the records of Relations' existence together with the relations
+    for( auto itRel = m_listOfRelations.begin(); itRel != m_listOfRelations.end(); itRel++ ){
+        relationAddr_t* ptrRel = (relationAddr_t*) (itRel->m_ptrRecordOfSelf);
+        std::list<struct relationAddr_t>::iterator itRec = ptrRel->itSelf;
+        (ptrRel->ptrListSelf)->erase(itRec);
+    }
+}
+
+void Population::eraseTracesOfExistence(){
+    removeDependencyRecordsOnOwnRelations();
+    removeDependentRelations();
 }
 
 std::ostream& operator<<(std::ostream& os, const Population& pop){

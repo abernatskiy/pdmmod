@@ -22,14 +22,15 @@ public:
 
     // Methods
     void stepSimulation(); // runs one step of a simulation
-
+    std::list<Population> m_listOfPopulations;
+    
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop);
 private:
     // Attributes
     float m_t; // current simulation time
     float m_a; // sum of sigmas, full propensity of the system
-    std::list<Population> m_listOfPopulations;
+    // made public std::list<Population> m_listOfPopulations;
     RandomGenerator m_randGen; // TODO organize civilized seeding
 
     // Methods

@@ -3,7 +3,7 @@ CC        = g++
 CFLAGS    = -g -ggdb -Wall -std=c++11 -I"."
 LDFLAGS   = -g -ggdb -Wall
 CPPFLAGS  = ${CFLAGS}
-objects   =	specie.o reaction.o parameter.o relation.o population.o totalPopulation.o randomGenerator.o
+objects   =	specie.o reaction.o parameter.o relation.o population.o totalPopulation.o randomGenerator.o output.o
 
 .cpp.o:
 	${CC} -o $@ -c ${CPPFLAGS} $<

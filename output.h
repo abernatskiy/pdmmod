@@ -26,7 +26,8 @@ std::list<Population> storePopulations(TotalPopulation tp);
 void writeToFile(std::list<Population> currPops, filename);
 
 void writeOrNotTo(float stepLen, float currTime, float prevStep);
-
+int closeFile(std::string filename);
+int openFile(std::string filename);
 
 
 

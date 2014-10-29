@@ -21,12 +21,17 @@ public:
     // TODO generation from distribution
     //Attributes
     float m_t; // current simulation time
-    
-    
+
     // Methods
-    void stepSimulation(); // runs one step of a simulation
+    int stepSimulation();
+    /* Runs one step of a simulation.
+     * Returns 0 if there are some reactions left after the step,
+     * and 1 if no more reactions are possible.
+     * If called again after it returning 1 once,
+     * will end the execution with return status EXIT_SUCCESS.
+     */
     std::list<Population> m_listOfPopulations;
-    
+
     // Operator overloads
     friend std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop);
 private:

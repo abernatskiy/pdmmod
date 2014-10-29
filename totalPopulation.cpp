@@ -13,7 +13,13 @@ TotalPopulation::TotalPopulation(std::string source){
     computeTotalPropensity();
 }
 
-void TotalPopulation::stepSimulation(){
+int TotalPopulation::stepSimulation(){
+
+    if( m_listOfPopulations.size() == 1 && m_a == 0.f ){
+        std::cout << "All molecules died off and there are no source reactions, exiting\n";
+        exit(EXIT_SUCCESS);
+    }
+
     Reaction reac = sampleReaction();
     std::cout << "Got reaction " << reac << std::endl;
     m_t += sampleTime();
@@ -55,10 +61,10 @@ void TotalPopulation::stepSimulation(){
     // Recompute m_a
     computeTotalPropensity();
 
-    if( m_listOfPopulations.size() == 1 && m_a == 0.f ){
-        std::cout << "All molecules died off and there are no source reactions, exiting\n";
-        exit(EXIT_SUCCESS);
-    }
+    if(m_a == 0.f)
+        return 1;
+    else
+        return 0;
 }
 
 std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop){

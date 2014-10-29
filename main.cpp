@@ -20,20 +20,21 @@ int main (int argc, char** argv){
         TotalPopulation tp("populations.txt");
         
         std::cout << "before stepping:\n"<< tp;
-        std::list<Population> currentPops = storePopulations(tp);
+        std::string currPops = storePopulations(tp);
         float prevStep = 0.f;
         openFile(filename);
-        writeToFile(currentPops, filename);
+        writeToFile(currPops, filename);
         
         while(true){
-            if (totalTime != 0.f)
+            if (totalTime == 0.f)
             {
                 //TODO
             }
             else{
                 stp = tp.stepSimulation();
-                writeOrNotTo(stepLen, tp.m_t, prevStep, filename);
                 std::cout << "after stepping:\n" << tp;
+                prevPops = writeOrNotTo(stepLen, tp.m_t, prevStep, prevPops, filename);
+                prevStep = getPrevStep(prevStep, tp.m_t);
                 if (tp.m_t >= totalTime){
                     closeFile(filename);
                     break;
@@ -42,7 +43,8 @@ int main (int argc, char** argv){
             
         }
         if (tp.m_t < totalTime && stp == 1){
-            writeOrNotTo(stepLen, totalTime, prevStep, filename);
+            currPops = storePopulations(tp);
+            writeOrNotTo(stepLen, totalTime, prevStep, currPops, filename);
             closeFile(filename);
         }
         

@@ -21,14 +21,15 @@
  *
 */
 
-std::list<Population> storePopulations(TotalPopulation tp);
+std::string storePopulations(TotalPopulation tp);
     //stores a list of entities of class Population
-void writeToFile(std::list<Population> currPops, filename);
 
-void writeOrNotTo(float stepLen, float currTime, float prevStep);
+std::string writeToFile(float currTime, std::list<Population> currPops, std::string filename);
+
+std::string writeOrNotTo(float stepLen, TotalPopulation tp, float prevStep, std::string prevPops, std::string filename);
 int closeFile(std::string filename);
 int openFile(std::string filename);
-
+float getPrevStep(float stepLen, float prevStep, float currTime);
 
 
 

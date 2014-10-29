@@ -6,3 +6,8 @@ std::list<Population> storePopulations(TotalPopulation tp){
     
     return currentPops;
 }
+
+void writeOrNotTo(float stepLen, float currTime, float prevStep){
+    //if stepLen = 0, no questions: write every stepLen
+    writeToFile(std::list<Population> currPops, filename)
+}

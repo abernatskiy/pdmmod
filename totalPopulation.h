@@ -19,7 +19,10 @@ public:
     /* constructs the object from the file listing all initial species and their populations
      */
     // TODO generation from distribution
-
+    //Attributes
+    float m_t; // current simulation time
+    
+    
     // Methods
     void stepSimulation(); // runs one step of a simulation
     std::list<Population> m_listOfPopulations;
@@ -28,7 +31,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const TotalPopulation& pop);
 private:
     // Attributes
-    float m_t; // current simulation time
+    // moved to public float m_t; // current simulation time
     float m_a; // sum of sigmas, full propensity of the system
     // made public std::list<Population> m_listOfPopulations;
     RandomGenerator m_randGen; // TODO organize civilized seeding

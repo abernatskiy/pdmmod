@@ -23,4 +23,13 @@
 
 std::list<Population> storePopulations(TotalPopulation tp);
     //stores a list of entities of class Population
+void writeToFile(std::list<Population> currPops, filename);
+
+void writeOrNotTo(float stepLen, float currTime, float prevStep);
+
+
+
+
+
+
 

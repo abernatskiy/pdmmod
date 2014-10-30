@@ -1,3 +1,4 @@
+#include <fstream>
 #include "totalPopulation.h"
 #include "output.h"
 
@@ -22,8 +23,9 @@ int main (int argc, char** argv){
         std::cout << "before stepping:\n"<< tp;
         std::string currPops = storePopulations(tp);
         float prevStep = 0.f;
-        openFile(filename);
-        writeToFile(currPops, filename);
+        std::ofstream myfile;
+        myfile.open (filename);
+        std::string prevPops = writeToFile(currPops, 0.0, myfile);
         
         while(true){
             if (totalTime == 0.f)
@@ -33,21 +35,29 @@ int main (int argc, char** argv){
             else{
                 stp = tp.stepSimulation();
                 std::cout << "after stepping:\n" << tp;
-                prevPops = writeOrNotTo(stepLen, tp.m_t, prevStep, prevPops, filename);
-                prevStep = getPrevStep(prevStep, tp.m_t);
+                prevPops = writeOrNotTo(stepLen, tp, prevStep, prevPops, myfile);
+                prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
                 if (tp.m_t >= totalTime){
-                    closeFile(filename);
+                    myfile.close();
+                    break;
+                }
+                if (stp==1){
                     break;
                 }
             }
             
         }
+        std::cout << "status is " << stp << std::endl;
         if (tp.m_t < totalTime && stp == 1){
-            currPops = storePopulations(tp);
-            writeOrNotTo(stepLen, totalTime, prevStep, currPops, filename);
-            closeFile(filename);
+            std::cout <<"simulations is over. prevStep is " << prevStep << std::endl;
+            for (float time=(prevStep+stepLen);time<=totalTime;time=time+stepLen){
+                writeToFile(prevPops,time,myfile);
+            }
+            
+            myfile.close();  
         }
-        
+          
     }
+    
     return 0;
 }

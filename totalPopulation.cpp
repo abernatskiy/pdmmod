@@ -17,7 +17,9 @@ int TotalPopulation::stepSimulation(){
 
     if( m_listOfPopulations.size() == 1 && m_a == 0.f ){
         std::cout << "All molecules died off and there are no source reactions, exiting\n";
-        exit(EXIT_SUCCESS);
+        //exit(EXIT_SUCCESS);
+        //break;
+        return 1;
     }
 
     Reaction reac = sampleReaction();
@@ -62,6 +64,7 @@ int TotalPopulation::stepSimulation(){
     computeTotalPropensity();
 
     if(m_a == 0.f)
+        //break;
         return 1;
     else
         return 0;

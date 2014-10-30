@@ -21,11 +21,11 @@ int main (int argc, char** argv){
         TotalPopulation tp("populations.txt");
         
         std::cout << "before stepping:\n"<< tp;
-        std::string currPops = storePopulations(tp);
+        std::string prevPops = storePopulations(tp);
         float prevStep = 0.f;
         std::ofstream myfile;
         myfile.open (filename);
-        std::string prevPops = writeToFile(currPops, 0.0, myfile);
+        writeToFile(prevPops, 0.0, &myfile);
         
         while(true){
             if (totalTime == 0.f)
@@ -35,7 +35,7 @@ int main (int argc, char** argv){
             else{
                 stp = tp.stepSimulation();
                 std::cout << "after stepping:\n" << tp;
-                prevPops = writeOrNotTo(stepLen, tp, prevStep, prevPops, myfile);
+                prevPops = writeOrNotTo(stepLen, tp, prevStep, prevPops, &myfile);
                 prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
                 if (tp.m_t >= totalTime){
                     myfile.close();
@@ -51,7 +51,7 @@ int main (int argc, char** argv){
         if (tp.m_t < totalTime && stp == 1){
             std::cout <<"simulations is over. prevStep is " << prevStep << std::endl;
             for (float time=(prevStep+stepLen);time<=totalTime;time=time+stepLen){
-                writeToFile(prevPops,time,myfile);
+                writeToFile(prevPops,time,&myfile);
             }
             
             myfile.close();  

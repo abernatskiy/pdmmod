@@ -1,4 +1,4 @@
-/*#include <map>
+#include <map>
 #include <string>
 #include <iostream>
 #include "specie.h"
@@ -31,7 +31,12 @@ std::list<Reaction> Specie::reactions(Specie specie){
     std::list<Reaction> allReactions;
 
     //nothing is being produced from vacuum in this model
-    if (m_id==std::string("")){}
+    if (m_id==std::string("")){
+        //activated monomers are being imported
+        Reaction actImport("", 0, "",0,IMP_RATE);
+        actImport.addProduct(std::string("a"),1);
+        allReactions.push_back(actImport);
+    }
     
     //if our specie is an activated monomer
     else if(m_type==std::string("act")){
@@ -39,7 +44,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         if (specie.m_type==std::string("reg")){
             //it elongates the molecule by one.
 //            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
-            Reaction elongation(m_id, 1, specie.m_id, 1, 2.01); // TODO fix the dictionary
+            Reaction elongation(m_id, 1, specie.m_id, 1, GROWTH_RATE); // TODO fix the dictionary
             elongation.addProduct(std::to_string(specie.m_length+1), 1);
             allReactions.push_back(elongation);
         }
@@ -54,7 +59,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if(specie.m_type==std::string("act")){
             //and elongate itself by one.
 //            Reaction elongation(m_id, 1, specie.m_id, 1, globParams["a"].getFloat());
-            Reaction elongation(m_id, 1, specie.m_id, 1, 2.01); // TODO fix the dictionary
+            Reaction elongation(m_id, 1, specie.m_id, 1, GROWTH_RATE); // TODO fix the dictionary
             elongation.addProduct(std::to_string(m_length+1), 1);
             allReactions.push_back(elongation);
         }
@@ -62,7 +67,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if (specie.m_id==m_id){
             //and decay
 //            Reaction decay(m_id,1,m_id,0,globParams["d"].getFloat());
-            Reaction decay(m_id,1,m_id,0,0.5); // TODO fix the dictionary
+            Reaction decay(m_id,1,m_id,0,DEGR_RATE); // TODO fix the dictionary
             allReactions.push_back(decay);
         }
         //it can react with a regular molecule only if it is a catalyst
@@ -75,4 +80,3 @@ std::list<Reaction> Specie::reactions(Specie specie){
 Specie::~Specie(){
 
 }
-*/

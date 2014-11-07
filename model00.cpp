@@ -1,4 +1,4 @@
-/*#include <map>
+#include <map>
 #include <string>
 #include <iostream>
 #include "specie.h"
@@ -75,4 +75,3 @@ std::list<Reaction> Specie::reactions(Specie specie){
 Specie::~Specie(){
 
 }
-*/

@@ -7,6 +7,7 @@
 #include <cmath>
 
 TotalPopulation::TotalPopulation(std::string source){
+    m_randGen.seedWithString("shg;l ivnmsvceg dgfh d0sfdfsd ");
     m_t = 0.f;
     addPopulation("", 1); // adding "vacuum"
     addPopulationsFromFile(source);
@@ -21,6 +22,8 @@ int TotalPopulation::stepSimulation(){
         //break;
         return 1;
     }
+
+    computeTotalPropensity();
 
     Reaction reac = sampleReaction();
     std::cout << "Got reaction " << reac << std::endl;
@@ -136,6 +139,12 @@ Reaction TotalPopulation::sampleReaction(){
      * the method of class Population handles the rest of the sampling.
      */
     float juice = m_randGen.getFloat01() * m_a;
+    std::cout << "Sampling a reaction with " << juice << " of juice, total propensity is " << m_a;
+    float sumKsi = 0.f;
+    for(auto pop = m_listOfPopulations.begin(); pop != m_listOfPopulations.end(); pop++){
+        sumKsi = sumKsi + pop->m_ksi;
+    }
+    std::cout << ", sum of ksis is " << sumKsi << std::endl;
     for(auto pop = m_listOfPopulations.begin(); pop != m_listOfPopulations.end(); pop++){
         juice -= pop->m_ksi;
         if( juice < 0.f ){
@@ -144,6 +153,7 @@ Reaction TotalPopulation::sampleReaction(){
         }
     }
     std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken.\n";
+    std::cout << "Juice in the end: " << juice << std::endl;
     exit(EXIT_FAILURE);
 }
 

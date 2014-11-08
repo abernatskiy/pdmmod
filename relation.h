@@ -21,7 +21,7 @@ class Relation
 {
 public:
     // Attributes
-    float m_psi; // the sum of partial propensities
+    PROPFLOAT m_psi; // the sum of partial propensities
     void* m_ptrRecordOfSelf; // pointer to the dependence record about this Relation which is kept in Population in the other Specie
 
     // Constructors
@@ -32,7 +32,7 @@ public:
      */
 
     // Methods
-    Reaction sampleReaction(float remainingJuice);
+    Reaction sampleReaction(PROPFLOAT remainingJuice);
     /* Takes the remaining juice from the Population-level sampler and subsamples
      * within the Relation. See comment to TotalPopulation::sampleReaction()'s
      * implementation in totalPopulation.cpp for details.

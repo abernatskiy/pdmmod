@@ -28,7 +28,7 @@ class Population
 {
 public:
     // Attributes
-    float m_ksi;
+    PROPFLOAT m_ksi;
     MOLINT m_n;
     Specie m_specie;
 
@@ -37,7 +37,7 @@ public:
     std::list<Population>* m_ptrPopulationList;
 
     // Methods
-    Reaction sampleReaction(float remainingJuice);
+    Reaction sampleReaction(PROPFLOAT remainingJuice);
     /* Take the remaining juice from the TotalPopulation-level sampler and subsamples
      * within the Population. See comment to TotalPopulation::sampleReaction()'s
      * implementation in totalPopulation.cpp for details.
@@ -94,7 +94,7 @@ private:
     // Attributes
     std::list<Relation> m_listOfRelations;
     std::list<relationAddr_t> m_dependentRelations; // a.k.a. U3
-    float m_lambda;
+    PROPFLOAT m_lambda;
 
     // Methods
 //    void add

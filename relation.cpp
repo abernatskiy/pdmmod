@@ -9,8 +9,8 @@ Relation::Relation(Specie specI, Specie specJ, MOLINT popSpecJ){
     update(popSpecJ);
 }
 
-Reaction Relation::sampleReaction(float remainingJuice){
-    float localJuice = remainingJuice;
+Reaction Relation::sampleReaction(PROPFLOAT remainingJuice){
+    PROPFLOAT localJuice = remainingJuice;
     for( auto itRea = m_listOfReactions.begin(); itRea != m_listOfReactions.end(); itRea++ ){
         if( m_fromSpId != itRea->m_pPWRespectTo ){
             std::cout << "Reaction: Found a reaction with partial propensity calculated with respect to a wrong specie. Something is wrong here. Exiting.\n";

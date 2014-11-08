@@ -7,7 +7,10 @@
 #include <cmath>
 
 TotalPopulation::TotalPopulation(std::string source){
-    m_randGen.seedWithString("shg;l ivnmsvceg dgfh d0sfdfsd ");
+//    m_randGen.seedWithString("shg;l ivnmsvceg dgfh d0sfdfsd ");
+//    // This random seed is known to trigger a numerical error in top-level sampling
+//    // with older sampler code (dded6fac3a92ff3aec1d92216a66971dbc9b9605 and older).
+//    // I'll just leave it here for a while.
     m_t = 0.f;
     addPopulation("", 1); // adding "vacuum"
     addPopulationsFromFile(source);
@@ -22,8 +25,6 @@ int TotalPopulation::stepSimulation(){
         //break;
         return 1;
     }
-
-    computeTotalPropensity();
 
     Reaction reac = sampleReaction();
     std::cout << "Got reaction " << reac << std::endl;
@@ -138,21 +139,17 @@ Reaction TotalPopulation::sampleReaction(){
      * m_ksi. First we determine which population keeps the record of the reaction, then
      * the method of class Population handles the rest of the sampling.
      */
-    float juice = m_randGen.getFloat01() * m_a;
-    std::cout << "Sampling a reaction with " << juice << " of juice, total propensity is " << m_a;
-    float sumKsi = 0.f;
+    PROPFLOAT juice = (1.f - m_randGen.getFloat01()) * m_a; // the "one minus" part is here because we need the juice to be in [0, m_a)
+    PROPFLOAT sumKsi = 0.f;
+    PROPFLOAT prevSumKsi;
+//    std::cout << "Sampling a reaction with " << juice << " of juice, total propensity is " << m_a << std::endl;
     for(auto pop = m_listOfPopulations.begin(); pop != m_listOfPopulations.end(); pop++){
-        sumKsi = sumKsi + pop->m_ksi;
+        prevSumKsi = sumKsi;
+        sumKsi += pop->m_ksi;
+        if( juice < sumKsi )
+            return pop->sampleReaction( juice - prevSumKsi );
     }
-    std::cout << ", sum of ksis is " << sumKsi << std::endl;
-    for(auto pop = m_listOfPopulations.begin(); pop != m_listOfPopulations.end(); pop++){
-        juice -= pop->m_ksi;
-        if( juice < 0.f ){
-            float remainingJuice = juice + pop->m_ksi;
-            return pop->sampleReaction( remainingJuice );
-        }
-    }
-    std::cout << "ERROR: TotalPopulation-level sampling failed. Full propensity m_a is likely broken.\n";
+    std::cout << "ERROR: TotalPopulation-level sampling failed. This is likely to be a rare consequence of the numerical error of the juice quantity, which is not handled in the current version\n"; // TODO
     std::cout << "Juice in the end: " << juice << std::endl;
     exit(EXIT_FAILURE);
 }

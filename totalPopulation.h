@@ -37,7 +37,7 @@ public:
 private:
     // Attributes
     // moved to public float m_t; // current simulation time
-    float m_a; // sum of sigmas, full propensity of the system
+    PROPFLOAT m_a; // sum of sigmas, full propensity of the system
     // made public std::list<Population> m_listOfPopulations;
     RandomGenerator m_randGen; // TODO organize civilized seeding
 

@@ -57,12 +57,12 @@ class Reaction
 public:
     // Attributes
     std::vector<specieRecord_t> m_records; // vector of tuples holding ids of all species involved in the reaction and their stoichiometric coefficients
-    float m_rate;
-    float m_partialPropensity; // a.k.a. Pi
+    PROPFLOAT m_rate;
+    PROPFLOAT m_partialPropensity; // a.k.a. Pi
     std::string m_pPWRespectTo; // id of the reagent, with respect to which the partial propensity was last computed (holder of the Relation)
 
     // Constructor
-    Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, float rate);
+    Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiomentry1, PROPFLOAT rate);
 
     // Operator reaload
     friend std::ostream& operator<<(std::ostream& os, const Reaction& rc);

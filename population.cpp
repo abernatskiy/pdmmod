@@ -9,18 +9,18 @@ Population::Population(std::string id, int initPop){
     m_lambda = 0.f;
 }
 
-Reaction Population::sampleReaction(float remainingJuice){
+Reaction Population::sampleReaction(PROPFLOAT remainingJuice){
 //    std::cout << "Sampling reaction from the following population:\n" << (*this) << std::endl;
     if( m_n <= 0 ){
         std::cout << "ERROR: Sampling from a population of " << m_n << " molecules. This shouldn't happen. Exiting.\n";
         exit(EXIT_FAILURE);
     }
 
-    float localJuice = remainingJuice/((float) m_n);
+    PROPFLOAT localJuice = remainingJuice/((PROPFLOAT) m_n);
     for( auto itRel = m_listOfRelations.begin(); itRel != m_listOfRelations.end(); itRel++ ){
         localJuice -= itRel->m_psi;
         if( localJuice < 0.f ){
-            float juiceRemainingAfterLocalSampling = localJuice + itRel->m_psi;
+            PROPFLOAT juiceRemainingAfterLocalSampling = localJuice + itRel->m_psi;
             return itRel->sampleReaction(juiceRemainingAfterLocalSampling);
         }
     }
@@ -55,7 +55,7 @@ void Population::buildRelation(std::list<Population>::iterator itSelf, std::list
 //    std::cout << "Nonempty relation found from " << m_specie.m_id << " to " << itOther->m_specie.m_id << ": " << newRel;
 
     m_lambda += newRel.m_psi;
-    m_ksi = m_lambda*((float) m_n);
+    m_ksi = m_lambda*((PROPFLOAT) m_n);
     m_listOfRelations.push_back(newRel);
     auto itToNewRelation = m_listOfRelations.end();
     itToNewRelation--;
@@ -72,7 +72,7 @@ void Population::updateRelation(std::list<Relation>::iterator itRelation, MOLINT
     itRelation->update(newN);
     m_lambda += itRelation->m_psi;
 
-    m_ksi = m_lambda*((float) m_n);
+    m_ksi = m_lambda*((PROPFLOAT) m_n);
 }
 
 void Population::removeRelation(std::list<Relation>::iterator itRelation){
@@ -81,7 +81,7 @@ void Population::removeRelation(std::list<Relation>::iterator itRelation){
     m_lambda -= itRelation->m_psi;
     m_listOfRelations.erase(itRelation);
 
-    m_ksi = m_lambda*((float) m_n);
+    m_ksi = m_lambda*((PROPFLOAT) m_n);
 }
 
 void Population::addDependentRelation(std::list<Population>::iterator itPop, std::list<Relation>::iterator itRel){

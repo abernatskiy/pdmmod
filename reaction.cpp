@@ -1,6 +1,6 @@
 #include "reaction.h"
 
-Reaction::Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiometry1, float rate){
+Reaction::Reaction(std::string reactant0, int stoichiometry0, std::string reactant1, int stoichiometry1, PROPFLOAT rate){
 	addSpecie(reactant0, -1*stoichiometry0);
 	addSpecie(reactant1, -1*stoichiometry1);
 	m_rate = rate;
@@ -67,14 +67,14 @@ void Reaction::computePartialPropensity(std::string wRespectToSp, MOLINT populat
         }
         // for reactions involving two molecules of the same specie, Pi is computed using formula from RG-SS
         if( st0 == -1 && st1 == -1 ){
-            m_partialPropensity = 0.5f*((float) (populationOfSp - 1))*m_rate;
+            m_partialPropensity = 0.5f*((PROPFLOAT) (populationOfSp - 1))*m_rate;
             return;
         }
     }
 
     // if the reagents are different, both stoichiometries must be -1: we do NOT handle trinary reactions
     if( s0 != s1 && st0 == -1 && st1 == -1 ){
-        m_partialPropensity = ((float) populationOfSp)*m_rate;
+        m_partialPropensity = ((PROPFLOAT) populationOfSp)*m_rate;
         return;
     }
 

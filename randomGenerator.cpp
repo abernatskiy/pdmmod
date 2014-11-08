@@ -2,7 +2,7 @@
 
 RandomGenerator::RandomGenerator(){
     seedWithClock();
-    m_distribution = std::uniform_real_distribution<float>(0.f, 1.f);
+    m_distribution = std::uniform_real_distribution<PROPFLOAT>(0.f, 1.f);
 }
 
 void RandomGenerator::seedWithString(std::string str){

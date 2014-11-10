@@ -48,14 +48,25 @@ def readData(filename):
     
     return times,specPop
 
-def printStats(times,specPop):
+def printStats(times,specPop,plot=True):
     print("total number of species is "+str(len(specPop.keys())))
     lengths=[]
     for key in specPop.keys():
         lengths.append(len(key))
-    print("maximum length of a polymer is "+str(max(lengths)))
+    mL=max(lengths)
+    print("maximum length of a polymer is "+str())
+    hist=[]
+    for i in range(1,mL+1):
+        hist.append(lengths.count(i))
+    if plot:
+        fig=plt.figure(figsize=(8,6))
+        plt.plot(range(1,mL+1),hist)
+        plt.title("distribution of n-mers")
+        plt.show()
     
-    return None
+    return hist
+
+    
 
 def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))

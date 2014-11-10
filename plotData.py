@@ -45,19 +45,29 @@ def readData(filename):
                     print('length',len(specPop[spec]))
                     print('count',count)
                     raise ValueError("!")
-            
     
     return times,specPop
+
+def printStats(times,specPop):
+    print("total number of species is "+str(len(specPop.keys())))
+    lengths=[]
+    for key in specPop.keys():
+        lengths.append(len(key))
+    print("maximum length of a polymer is "+str(max(lengths)))
+    
+    return None
 
 def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
         plt.plot(times,specPop[key],label=key)
-    plt.legend(fontsize='small') 
+    #plt.legend(fontsize='small') 
+    
     plt.title("Populations of species")
     plt.xlim(0,times[-1])
-    plt.savefig('x.pdf')
+    plt.savefig('y.pdf')
 
 
 times, specPop = readData("x")
-plotData(times, specPop)
+printStats(times,specPop)
+#plotData(times, specPop)

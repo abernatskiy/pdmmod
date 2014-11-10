@@ -7,11 +7,12 @@
 #include "parameter.h"
 #include "reaction.h"
 
-const float IMP_RATE = 20.f;
-const float DECAY_RATE = 10.f;
-const float DEGR_RATE = 0.1;
-const float GROWTH_RATE = 10.f;
-const float FAST_RATE = 10.f;
+const float IMP0 = 2.f;
+const float IMP1 = 2.f;
+const float DECAY_RATE = 1.f;
+const float DEGR_RATE = 0.f;
+const float GROWTH_RATE = 0.1;
+const float FAST_RATE = 0.1;
 
 
 class Specie

@@ -1,6 +1,7 @@
 #include <fstream>
 #include "totalPopulation.h"
 #include "output.h"
+#include <time.h>
 
 int main (int argc, char** argv){
     if (argc != 4 ){
@@ -11,6 +12,9 @@ int main (int argc, char** argv){
         std::cout << "Step = 0: record every step" << std::endl;
     }
     else{
+        clock_t t1,t2;
+        t1=clock();
+        
         int stp;
         //total time of simulation
         float totalTime = std::atoi((std::string(argv[1])).c_str());
@@ -56,8 +60,11 @@ int main (int argc, char** argv){
             
             myfile.close();  
         }
-          
+        t2=clock();
+        float diff ((float)t2-(float)t1);
+        std::cout << "running time is " << diff/CLOCKS_PER_SEC << std::endl;
     }
+    
     
     return 0;
 }

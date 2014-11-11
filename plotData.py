@@ -52,25 +52,27 @@ def printStats(times,specPop,plot=True):
     print("total number of species is "+str(len(specPop.keys())))
     lengths=[]
     popStats={}
+    total=range(len(times))
     for key in specPop.keys():
         lengths.append(len(key))
+        total=[total[i]+specPop[key][i] for i in range(len(total))]
         if not len(key) in popStats.keys():
             popStats[len(key)]=specPop[key][-1]
-            print(specPop[key][-1])
         else:
             popStats[len(key)]+=specPop[key][-1]
     mL=max(lengths)
     print("maximum length of a polymer is "+str(mL))
+    
     hist=[]
     
     for i in range(1,mL+1):
         hist.append(lengths.count(i))
     if plot:
         fig, (ax0, ax1) = plt.subplots(nrows=2)
-        ax0.plot(range(1,mL+1),hist)
-        for key in popStats.keys():
-            ax1.plot(key,popStats[key],'r--')
-        plt.title("Types of n-mers and populations in the last moment")
+        ax0.plot(range(1,mL+1),hist,'o')
+        ax1.plot(times,total)
+        ax0.set_title("Types of n-mers and populations in the last moment")
+        ax1.set_title("Total count of molecules at each moment")
         plt.show()
     
     return hist
@@ -81,13 +83,13 @@ def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
         plt.plot(times,specPop[key],label=key)
-    #plt.legend(fontsize='small') 
+    plt.legend(fontsize='small') 
     
     plt.title("Populations of species")
     plt.xlim(0,times[-1])
-    plt.savefig('y.pdf')
+    plt.show()
 
 
 times, specPop = readData("x")
 printStats(times,specPop)
-#plotData(times, specPop)
+plotData(times, specPop)

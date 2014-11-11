@@ -32,7 +32,15 @@ std::list<Reaction> Specie::reactions(Specie specie){
     std::list<Reaction> allReactions;
 
     //nothing is being produced from vacuum in this model
-    if (m_id==std::string("")){}
+    if (m_id==std::string("")){
+        //activated monomers are being imported
+        Reaction ai0("", 0, "",0,IMP0);
+        ai0.addProduct(std::string("a0"),1);
+        allReactions.push_back(ai0);
+        Reaction ai1("", 0, "",0,IMP1);
+        ai1.addProduct(std::string("a1"),1);
+        allReactions.push_back(ai1);
+    }
     
     //if our specie is an activated monomer
     else if(m_type==std::string("act")){
@@ -73,6 +81,13 @@ std::list<Reaction> Specie::reactions(Specie specie){
             elongation.addProduct(m_id+(specie.m_id).substr(1,1), 1);
             allReactions.push_back(elongation);
         }
+        //it can have a monomolecular reaction
+        else if (specie.m_id==m_id){
+            //and decay
+            Reaction decay(m_id,1,m_id,0,DEGR_RATE); // TODO fix the dictionary
+            allReactions.push_back(decay);
+        }
+        //it can react with a regular molecule only if it is a catalyst
         else{}
     }
     else{} 

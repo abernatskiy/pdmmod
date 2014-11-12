@@ -65,15 +65,22 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else if(specie.m_type==std::string("act")){
             //and elongate itself by one.
             if (m_id.find(std::string("1"))==std::string::npos && specie.m_id==std::string("a0")){
-                Reaction elongation(m_id, 1, specie.m_id, 1, FAST_RATE); // TODO fix the dictionary
+                Reaction elongation(m_id, 1, specie.m_id, 1, FAST_RATE); 
                 elongation.addProduct(m_id+(specie.m_id).substr(1,1), 1);
                 allReactions.push_back(elongation);
             }
-            Reaction elongation(m_id, 1, specie.m_id, 1, GROWTH_RATE); // TODO fix the dictionary
+            Reaction elongation(m_id, 1, specie.m_id, 1, GROWTH_RATE); 
             elongation.addProduct(m_id+(specie.m_id).substr(1,1), 1);
             allReactions.push_back(elongation);
         }
-        else{}
+        else if (m_id==specie.m_id){
+            for (int i=1; i<m_id.length();i++){
+                Reaction hidr(m_id, 1, specie.m_id, 0, HIDR_RATE);
+                hidr.addProduct(m_id.substr(0,i),1);
+                hidr.addProduct(m_id.substr(i,m_id.length()-i),1);
+                allReactions.push_back(hidr);
+            }
+        }
     }
     else{} 
     return allReactions;

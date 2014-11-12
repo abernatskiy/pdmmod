@@ -51,31 +51,38 @@ def readData(filename):
 def printStats(times,specPop,plot=True):
     print("total number of species is "+str(len(specPop.keys())))
     lengths=[]
+    #dictionary where populations of all n-mers in the last moment is counted
     popStats={}
-    total=range(len(times))
+    lengthDistr={}
+    total=[0]*(len(times))
     for key in specPop.keys():
         if not (key=="a1" or key=="a0" ):
+            polLen=len(key)
             lengths.append(len(key))
         else:
             lengths.append(1)
+            polLen=1
         total=[total[i]+specPop[key][i] for i in range(len(total))]
-        if not len(key) in popStats.keys():
-            popStats[len(key)]=specPop[key][-1]
+        if not polLen in popStats.keys():
+            #add dict entry and population of the first n-mer of the given length
+            popStats[polLen]=specPop[key][-1]
         else:
-            popStats[len(key)]+=specPop[key][-1]
+            #add to the population of n-mers a population of another n-mer
+            popStats[polLen]+=specPop[key][-1]
     mL=max(lengths)
     print("maximum length of a polymer is "+str(mL))
-    
     hist=[]
     
     for i in range(1,mL+1):
         hist.append(lengths.count(i))
     if plot:
-        fig, (ax0, ax1) = plt.subplots(nrows=2)
+        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
         ax0.plot(range(1,mL+1),hist,'o')
         ax1.plot(times,total)
+        ax2.plot(list(popStats.copy().keys()),list(popStats.copy().values()))
         ax0.set_title("Types of n-mers and populations in the last moment")
         ax1.set_title("Total count of molecules at each moment")
+        ax2.set_title("Length distribution")
         plt.show()
     
     return hist

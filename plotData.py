@@ -54,7 +54,10 @@ def printStats(times,specPop,plot=True):
     popStats={}
     total=range(len(times))
     for key in specPop.keys():
-        lengths.append(len(key))
+        if not (key=="a1" or key=="a0" ):
+            lengths.append(len(key))
+        else:
+            lengths.append(1)
         total=[total[i]+specPop[key][i] for i in range(len(total))]
         if not len(key) in popStats.keys():
             popStats[len(key)]=specPop[key][-1]
@@ -92,4 +95,4 @@ def plotData(times,specPop):
 
 times, specPop = readData("x")
 printStats(times,specPop)
-plotData(times, specPop)
+#plotData(times, specPop)

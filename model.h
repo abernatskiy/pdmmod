@@ -7,9 +7,9 @@
 #include "parameter.h"
 #include "reaction.h"
 
-const float DECAY_RATE = 5.f;
-const float GROWTH_RATE = 1.1;
-const float FAST_RATE = 1.1;
+const float DECAY_RATE = 0.5;
+const float GROWTH_RATE = 0.1;
+const float FAST_RATE = 0.1;
 
 
 class Specie

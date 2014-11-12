@@ -36,7 +36,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     
     //if our specie is an activated monomer
     else if(m_type==std::string("act")){
-        if (specie.m_type==std::string("reg")){//TODO
+        if (specie.m_type==std::string("reg")){
             //it elongates all 0 polymers with 0 very fast
             if (specie.m_id.find(std::string("1"))==std::string::npos && m_id==std::string("a0")){
                 Reaction elongation(m_id, 1, specie.m_id, 1, FAST_RATE); 

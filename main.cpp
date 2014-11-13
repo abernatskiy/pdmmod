@@ -61,8 +61,13 @@ int main (int argc, char** argv){
             myfile.close();  
         }
         t2=clock();
-        float diff ((float)t2-(float)t1);
-        std::cout << "running time is " << diff/CLOCKS_PER_SEC << std::endl;
+        float diff = ((float)t2-(float)t1);
+        float floatTime = diff/CLOCKS_PER_SEC;
+        //std::cout << "Simulation run time is " << floatTime << std::endl;
+        std::ofstream timeFile;
+        timeFile.open ("runtime.txt");
+        timeFile << floatTime << std:: endl;
+        timeFile.close();
     }
     
     

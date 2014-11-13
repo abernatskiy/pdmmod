@@ -93,7 +93,7 @@ def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
         plt.plot(times,specPop[key],label=key)
-    plt.legend(fontsize='small') 
+    #plt.legend(fontsize='small') 
     
     plt.title("Populations of species")
     plt.xlim(0,times[-1])
@@ -102,4 +102,4 @@ def plotData(times,specPop):
 
 times, specPop = readData("x")
 printStats(times,specPop)
-#plotData(times, specPop)
+plotData(times, specPop)

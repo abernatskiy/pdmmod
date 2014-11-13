@@ -83,6 +83,7 @@ def printStats(times,specPop,plot=True):
         ax0.set_title("Types of n-mers and populations in the last moment")
         ax1.set_title("Total count of molecules at each moment")
         ax2.set_title("Length distribution")
+        plt.savefig("stats.pdf")
         plt.show()
     
     return hist
@@ -93,7 +94,7 @@ def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
         plt.plot(times,specPop[key],label=key)
-    plt.legend(fontsize='small') 
+    #plt.legend(fontsize='small') 
     
     plt.title("Populations of species")
     plt.xlim(0,times[-1])

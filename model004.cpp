@@ -3,8 +3,7 @@
 #include <iostream>
 #include "specie.h"
 
-/* rigid growing balls
- * binary polymers
+/*binary polymers
  * sequences grow on its own and never decay
  */
 
@@ -33,27 +32,23 @@ std::list<Reaction> Specie::reactions(Specie specie){
     if (m_id==std::string("")){}
     else if(m_id==specie.m_id){
             if (m_id.find(std::string("1"))==std::string::npos){
-                Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-                growth1.addProduct(m_id+std::string("1"),2);
+                Reaction growth1(m_id, 1, specie.m_id, 0, GROWTH_RATE);
+                growth1.addProduct(m_id+std::string("1"),1);
                 allReactions.push_back(growth1);
-                Reaction growth0(m_id, 1, specie.m_id, 1, FAST_RATE);
-                growth0.addProduct(m_id+std::string("0"),2);
+                Reaction growth0(m_id, 1, specie.m_id, 0, FAST_RATE);
+                growth0.addProduct(m_id+std::string("0"),1);
                 allReactions.push_back(growth0);
             }
             else{
-                
+                Reaction growth1(m_id, 1, specie.m_id, 0, GROWTH_RATE);
+                growth1.addProduct(m_id+std::string("1"),1);
+                allReactions.push_back(growth1);
+                Reaction growth0(m_id, 1, specie.m_id, 0, GROWTH_RATE);
+                growth0.addProduct(m_id+std::string("0"),1);
+                allReactions.push_back(growth0);
             }
         }
-    else{
-        Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-        growth1.addProduct(m_id+std::string("1"),1);
-        growth1.addProduct(specie.m_id+std::string("1"),1);
-        allReactions.push_back(growth1);
-        Reaction growth0(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-        growth0.addProduct(m_id+std::string("0"),1);
-        growth0.addProduct(specie.m_id+std::string("0"),1);
-        allReactions.push_back(growth0);
-    }
+    else{}
     
     return allReactions;
 }

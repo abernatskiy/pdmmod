@@ -79,11 +79,11 @@ def analyzeRuntime(command,runs,minpop,multiplier,numPoints,plot=True):
     return runtimes
 
 number=50
-command = './pdmmod', '50', '1', 'x'
-runs = 5
+command = './pdmmod', '20', '1', 'x'
+runs = 3
 minpop=number
 multiplier=2
-numPoints=7
+numPoints=5
 
 rD=analyzeRuntime(command,runs,minpop,multiplier,numPoints)
 

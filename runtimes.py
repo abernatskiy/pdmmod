@@ -39,7 +39,7 @@ def getTimeStat(command,number,runs):
     print(ave, stdDev)
     return ave, stdDev
 
-def analyzeRuntime(command,runs,minpop,multiplier,numPoints,plot=True):
+def analyzeRuntime(command,runs,minpop,multiplier,numPoints):
     def func(x, a, b):
         return a + b*x
     
@@ -58,8 +58,9 @@ def analyzeRuntime(command,runs,minpop,multiplier,numPoints,plot=True):
         e=m*sqrt((runtimes[i][2]/runtimes[i][1])**2+(runtimes[i-1][2]/runtimes[i-1][1])**2)
         ratios.append((runtimes[i][0],m,e))
     
+    return runtimes, ratios
     
-    
+def plotRuntimes(runtimes,ratios):
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=True)
     for i in range(len(runtimes)):
         element=runtimes[i]
@@ -76,14 +77,15 @@ def analyzeRuntime(command,runs,minpop,multiplier,numPoints,plot=True):
     ax0.set_title('Simulation run time vs number of species in the simulation')
     ax1.set_title('Ratio of runtimes as number of species doubles')
     plt.show()
-    return runtimes
+    return None
 
-number=50
-command = './pdmmod', '20', '1', 'x'
+number=10
+command = './pdmmod', '3', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-numPoints=5
+numPoints=6
 
-rD=analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
 
+plotRuntimes(runtimes,ratios)

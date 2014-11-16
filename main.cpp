@@ -12,6 +12,7 @@ int main (int argc, char** argv){
         std::cout << "Step = 0: record every step" << std::endl;
     }
     else{
+        int reacNum= 0;
         clock_t t1,t2;
         t1=clock();
         
@@ -38,6 +39,7 @@ int main (int argc, char** argv){
             }
             else{
                 stp = tp.stepSimulation();
+                reacNum=reacNum+1;
                 //std::cout << "after stepping:\n" << tp;
                 prevPops = writeOrNotTo(stepLen, tp, prevStep, prevPops, &myfile);
                 prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
@@ -62,11 +64,11 @@ int main (int argc, char** argv){
         }
         t2=clock();
         float diff = ((float)t2-(float)t1);
-        float floatTime = diff/CLOCKS_PER_SEC;
-        //std::cout << "Simulation run time is " << floatTime << std::endl;
+        float timePerReac = diff/CLOCKS_PER_SEC/reacNum;
+        std::cout << "Number of reactions is " << reacNum << std::endl;
         std::ofstream timeFile;
         timeFile.open ("runtime.txt");
-        timeFile << floatTime << std:: endl;
+        timeFile << timePerReac << std:: endl;
         timeFile.close();
     }
     

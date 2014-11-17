@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 #include <iostream>
-#include "specie.h"
+#include "model003.h"
 
 /*binary polymers
  * hydrolysis, decay, activated monomers convert to monomres

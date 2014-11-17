@@ -15,7 +15,7 @@ int main (int argc, char** argv){
         int reacNum= 0;
         clock_t t1,t2;
         t1=clock();
-        
+
         int stp;
         //total time of simulation
         float totalTime = std::atoi((std::string(argv[1])).c_str());
@@ -24,14 +24,14 @@ int main (int argc, char** argv){
         std::string filename = std::string(argv[3]);
         //reading initial conditions frmo file
         TotalPopulation tp("populations.txt");
-        
+
         //std::cout << "before stepping:\n"<< tp;
-        std::string prevPops = storePopulations(tp);
+        std::string prevPops = storePopulations(&tp);
         float prevStep = 0.f;
         std::ofstream myfile;
         myfile.open (filename);
         writeToFile(prevPops, 0.0, &myfile);
-        
+
         while(true){
             if (totalTime == 0.f)
             {
@@ -41,7 +41,7 @@ int main (int argc, char** argv){
                 stp = tp.stepSimulation();
                 reacNum=reacNum+1;
                 //std::cout << "after stepping:\n" << tp;
-                prevPops = writeOrNotTo(stepLen, tp, prevStep, prevPops, &myfile);
+                prevPops = writeOrNotTo(stepLen, &tp, prevStep, prevPops, &myfile);
                 prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
                 if (tp.m_t >= totalTime){
                     myfile.close();
@@ -51,7 +51,6 @@ int main (int argc, char** argv){
                     break;
                 }
             }
-            
         }
         std::cout << "status is " << stp << std::endl;
         if (tp.m_t < totalTime && stp == 1){
@@ -59,8 +58,8 @@ int main (int argc, char** argv){
             for (float time=(prevStep+stepLen);time<=totalTime;time=time+stepLen){
                 writeToFile(prevPops,time,&myfile);
             }
-            
-            myfile.close();  
+
+            myfile.close();
         }
         t2=clock();
         float diff = ((float)t2-(float)t1);
@@ -71,7 +70,7 @@ int main (int argc, char** argv){
         timeFile << timePerReac << std:: endl;
         timeFile.close();
     }
-    
-    
+
+
     return 0;
 }

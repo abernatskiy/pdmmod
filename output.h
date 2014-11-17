@@ -23,12 +23,12 @@
  *
 */
 
-std::string storePopulations(TotalPopulation tp);
+std::string storePopulations(TotalPopulation* tp);
     //stores a list of entities of class Population
 
 void writeToFile(std::string populations, float time, std::ofstream* myfile);
-std::string convToString(TotalPopulation tp);
-std::string writeOrNotTo(float stepLen, TotalPopulation tp, float prevStep, std::string prevPops, std::ofstream* myfile);
+std::string convToString(TotalPopulation* tp);
+std::string writeOrNotTo(float stepLen, TotalPopulation* tp, float prevStep, std::string prevPops, std::ofstream* myfile);
 int closeFile(std::string filename);
 int openFile(std::string filename);
 float getPrevStep(float stepLen, float prevStep, float currTime);

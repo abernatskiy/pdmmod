@@ -43,7 +43,7 @@ def getTimeStat(command,number,runs):
     return ave, stdDev
 
 def runSeveral(command,runs,minpop,multiplier,numPoints):
-    system('rm runTemp.txt && touch runTemp.txt' )
+    #system('rm runTemp.txt && touch runTemp.txt' )
     number=minpop
     for i in range(numPoints):
         pair=getTimeStat(command,number,runs)
@@ -82,8 +82,10 @@ def plotRuntimes(runtimes,ratios):
     
     x=[r[0] for r in runtimes]
     y=[r[1] for r in runtimes]
+    y_err=[r[2] for r in runtimes]
     
-    z = polyfit(x, y, 1)
+    z = polyfit(x, y, 2)
+    
     f = poly1d(z)
     
     x_new = linspace(x[0], x[-1], 50)
@@ -92,7 +94,8 @@ def plotRuntimes(runtimes,ratios):
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
     
     
-    ax0.plot(x,y,'o', x_new, y_new)
+    ax0.errorbar(x,y,yerr=y_err,fmt='o')
+    ax0.plot(x_new,y_new,label='y = '+'%.2e' %z[0]+' x^2 +'+'%.2e' %z[1]+' x '+'%.2e' %z[2])
     
     for i in range(len(runtimes)):
         element=runtimes[i]
@@ -104,19 +107,20 @@ def plotRuntimes(runtimes,ratios):
     #ax0.set_yscale('log')
     #ax0.set_xscale('log')
     #ax1.set_xscale('log')
+    ax0.legend()
     ax0.set_title('Simulation run time vs number of species in the simulation')
     ax1.set_title('Ratio of runtimes as number of species doubles')
     #plt.savefig('timeStats.pdf')
     plt.show()
     return None
 
-number=20
-command = './pdmmod', '3', '1', 'x'
+number=4000
+command = './pdmmod', '1', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-numPoints=10
+numPoints=1
 
 runSeveral(command,runs,minpop,multiplier,numPoints)
-runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
-plotRuntimes(runtimes,ratios)
+#runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+#plotRuntimes(runtimes,ratios)

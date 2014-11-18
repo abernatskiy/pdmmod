@@ -86,18 +86,21 @@ def plotRuntimes(runtimes,ratios):
     y=[r[1] for r in runtimes]
     y_err=[r[2] for r in runtimes]
     
-    z = polyfit(x, y, 2)
-    
+    z = polyfit(x, y, 1)
     f = poly1d(z)
+    
+    z2 = polyfit(x, y, 2)
+    f2 = poly1d(z2)
     
     x_new = linspace(x[0], x[-1], 50)
     y_new = f(x_new)
-    
+    y_new2= f2(x_new)
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
     
     
     ax0.errorbar(x,y,yerr=y_err,fmt='o')
-    ax0.plot(x_new,y_new,label='y = '+'%.2e' %z[0]+' x^2 +'+'%.2e' %z[1]+' x '+'%.2e' %z[2])
+    ax0.plot(x_new,y_new,label='y = '+'%.2e' %z[0]+' x +'+'%.2e' %z[1])
+    ax0.plot(x_new,y_new2,label='y = '+'%.2e' %z2[0]+' x^2 +'+'%.2e' %z2[1]+' x '+'%.2e' %z2[2])
     
     for i in range(len(runtimes)):
         element=runtimes[i]
@@ -121,10 +124,10 @@ command = './pdmmod', '2', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-steps=[30,50, 100,200,200,400, 500, 500, 500]
-#   20,50,100,200,400,600,1000,1500,2000,2500
-numPoints=len(steps)
+steps=[200,200, 500, 500, 500]
+#  600,800,1000,1500,2000,2500
+numPoints=6#len(steps)
 
-runSeveral(command,runs,minpop,multiplier,numPoints)
-#runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
-#plotRuntimes(runtimes,ratios)
+#runSeveral(command,runs,minpop,multiplier,numPoints)
+runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+plotRuntimes(runtimes,ratios)

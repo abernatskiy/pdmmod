@@ -42,14 +42,16 @@ def getTimeStat(command,number,runs):
     print(ave, stdDev)
     return ave, stdDev
 
-def runSeveral(command,runs,minpop,multiplier,numPoints):
-    #system('rm runTemp.txt && touch runTemp.txt' )
+def runSeveral(command,runs,minpop,multiplier,steps):
+    system('rm runTemp.txt && touch runTemp.txt' )
+    
+    numPoints=len(steps)
     number=minpop
     for i in range(numPoints):
         pair=getTimeStat(command,number,runs)
         with open("runTemp.txt", "a") as myfile:
             myfile.write(str(number*2)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        number=number+500
+        number=number+steps[i]
 
     
     return None
@@ -114,12 +116,14 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=2000
-command = './pdmmod', '1', '1', 'x'
+number=20
+command = './pdmmod', '2', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-numPoints=1
+steps=[30,50, 100,200,200,400, 500, 500, 500]
+#   20,50,100,200,400,600,1000,1500,2000,2500
+numPoints=len(steps)
 
 runSeveral(command,runs,minpop,multiplier,numPoints)
 #runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)

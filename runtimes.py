@@ -15,8 +15,8 @@ def changeInitPop(number):
     '''number -- int. the number of molecules of each monomer
     '''
     popFile = open("populations.txt", mode='w', encoding='utf-8')
-    popFile.write("a0 "+str(number)+"\n")
-    popFile.write("a1 "+str(number)+"\n")
+    popFile.write("0 "+str(number)+"\n")
+    popFile.write("1 "+str(number)+"\n")
     popFile.close()
     
     return None
@@ -49,7 +49,7 @@ def runSeveral(command,runs,minpop,multiplier,numPoints):
         pair=getTimeStat(command,number,runs)
         with open("runTemp.txt", "a") as myfile:
             myfile.write(str(number*2)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        number=number*multiplier
+        number=number+500
 
     
     return None
@@ -114,7 +114,7 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=4000
+number=2000
 command = './pdmmod', '1', '1', 'x'
 runs = 3
 minpop=number

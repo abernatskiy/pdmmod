@@ -7,10 +7,13 @@
 #include "parameter.h"
 #include "reaction.h"
 
-const float DECAY_RATE = 0.02;
+/*binary polymers
+ * sequences grow on its own and never decay
+ */
+
+
 const float GROWTH_RATE = 0.01;
 const float FAST_RATE = 0.01;
-const float HIDR_RATE = 0.001;
 
 
 class Specie
@@ -23,7 +26,6 @@ public:
     //attributes
     std::string m_id;
     int m_length;
-    std::string m_type;
     
     //constants
     

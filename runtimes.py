@@ -127,6 +127,6 @@ multiplier=2
 steps=[200,200, 200, 200]
 numPoints=len(steps)
 
-#runSeveral(command,runs,minpop,multiplier,numPoints)
-runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
-plotRuntimes(runtimes,ratios)
+runSeveral(command,runs,minpop,multiplier,steps)
+#runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+#plotRuntimes(runtimes,ratios)

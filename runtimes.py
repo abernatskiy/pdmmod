@@ -119,14 +119,13 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=20
+number=800
 command = './pdmmod', '2', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-steps=[200,200, 500, 500, 500]
-#  600,800,1000,1500,2000,2500
-numPoints=6#len(steps)
+steps=[200,200, 200, 200]
+numPoints=len(steps)
 
 #runSeveral(command,runs,minpop,multiplier,numPoints)
 runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)

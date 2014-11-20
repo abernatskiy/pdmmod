@@ -79,11 +79,12 @@ def printStats(times,specPop,plot=True):
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
         ax0.plot(range(1,mL+1),hist,'o')
         ax1.plot(times,total)
-        ax2.plot(list(popStats.copy().keys()),list(popStats.copy().values()))
+        ax2.plot(list(popStats.copy().keys()),list(popStats.copy().values()),label=str(mL)+'/'+str(len(specPop.keys())))
+        ax2.legend()
         ax0.set_title("Types of n-mers and populations in the last moment")
         ax1.set_title("Total count of molecules at each moment")
         ax2.set_title("Length distribution")
-        plt.savefig("stats.pdf")
+        #plt.savefig("stats.pdf")
         plt.show()
     
     return hist
@@ -94,7 +95,7 @@ def plotData(times,specPop):
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
         plt.plot(times,specPop[key],label=key)
-    #plt.legend(fontsize='small') 
+    plt.legend(fontsize='small') 
     
     plt.title("Populations of species")
     plt.xlim(0,times[-1])
@@ -103,4 +104,4 @@ def plotData(times,specPop):
 
 times, specPop = readData("x")
 printStats(times,specPop)
-plotData(times, specPop)
+#plotData(times, specPop)

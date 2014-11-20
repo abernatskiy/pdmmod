@@ -14,7 +14,7 @@ int main (int argc, char** argv){
     else{
         int reacNum= 0;
         clock_t t1,t2;
-        t1=clock();
+        
 
         int stp;
         //total time of simulation
@@ -31,7 +31,7 @@ int main (int argc, char** argv){
         std::ofstream myfile;
         myfile.open (filename);
         writeToFile(prevPops, 0.0, &myfile);
-
+        t1=clock();
         while(true){
             if (totalTime == 0.f)
             {

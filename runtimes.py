@@ -133,7 +133,7 @@ command = './pdmmod', '2', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-steps=[50]*17
+steps=[25]*38
 numPoints=12#len(steps)
 
 #runSeveral(command,runs,minpop,multiplier,steps)

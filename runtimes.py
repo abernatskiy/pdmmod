@@ -134,8 +134,8 @@ runs = 3
 minpop=number
 multiplier=2
 steps=[25]*38
-numPoints=12#len(steps)
+numPoints=len(steps)
 
-#runSeveral(command,runs,minpop,multiplier,steps)
-runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
-plotRuntimes(runtimes,ratios)
+runSeveral(command,runs,minpop,multiplier,steps)
+#runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+#plotRuntimes(runtimes,ratios)

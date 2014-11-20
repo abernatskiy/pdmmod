@@ -70,6 +70,7 @@ int main (int argc, char** argv){
         timeFile.open ("runtime.txt");
         timeFile << timePerReac << std:: endl;
         timeFile.close();
+        std::cout << "total time is " << tp.m_t << std::endl;
     }
 
 

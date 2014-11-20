@@ -71,9 +71,11 @@ def analyzeRuntime(command,runs,minpop,multiplier,numPoints):
     
     ratios=[]
     for i in range(1,len(runtimes)):
-        m=runtimes[i][1]/runtimes[i-1][1]
-        e=m*sqrt((runtimes[i][2]/runtimes[i][1])**2+(runtimes[i-1][2]/runtimes[i-1][1])**2)
+        m=(runtimes[i][1]-runtimes[i-1][1])/(runtimes[i][0]-runtimes[i-1][0])
+        e=sqrt((runtimes[i][2])**2+(runtimes[i-1][2])**2)/(runtimes[i][0]-runtimes[i-1][0])
         ratios.append((runtimes[i][0],m,e))
+    
+    print(ratios)
     
     return runtimes, ratios
     
@@ -119,12 +121,12 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=800
+number=20
 command = './pdmmod', '2', '1', 'x'
 runs = 3
 minpop=number
 multiplier=2
-steps=[200,200, 200, 200]
+steps=[30,50,100, 100, 100,100,100,100,100,100,100]
 numPoints=len(steps)
 
 runSeveral(command,runs,minpop,multiplier,steps)

@@ -52,6 +52,7 @@ int main (int argc, char** argv){
                 }
             }
         }
+        t2=clock();
         std::cout << "status is " << stp << std::endl;
         if (tp.m_t < totalTime && stp == 1){
             std::cout <<"simulations is over. prevStep is " << prevStep << std::endl;
@@ -61,7 +62,7 @@ int main (int argc, char** argv){
 
             myfile.close();
         }
-        t2=clock();
+        
         float diff = ((float)t2-(float)t1);
         float timePerReac = diff/CLOCKS_PER_SEC/reacNum;
         std::cout << "Number of reactions is " << reacNum << std::endl;

@@ -80,10 +80,7 @@ def analyzeRuntime(command,runs,minpop,multiplier,numPoints):
     return runtimes, ratios
     
 def plotRuntimes(runtimes,ratios):
-    #def func(x, a, b):
-    #    return a*x + b
-    #a, b = optimization.curve_fit(func, [r[0] for r in runtimes], [r[1] for r in runtimes],[0.0,0.0],[r[2] for r in runtimes])[0]
-    
+    '''runtimes fitting'''
     x=[r[0] for r in runtimes]
     y=[r[1] for r in runtimes]
     y_err=[r[2] for r in runtimes]
@@ -97,13 +94,22 @@ def plotRuntimes(runtimes,ratios):
     x_new = linspace(x[0], x[-1], 50)
     y_new = f(x_new)
     y_new2= f2(x_new)
+    
+    '''ratios fitting'''
+    xr=[r[0] for r in ratios[2:]]
+    yr=[r[1] for r in ratios[2:]]
+    zr=polyfit(xr, yr, 1)
+    fr = poly1d(zr)
+    xr_new = linspace(xr[0], xr[-1], 50)
+    yr_new = fr(xr_new)
+    
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
     
     
     ax0.errorbar(x,y,yerr=y_err,fmt='o')
     ax0.plot(x_new,y_new,label='y = '+'%.2e' %z[0]+' x +'+'%.2e' %z[1])
     ax0.plot(x_new,y_new2,label='y = '+'%.2e' %z2[0]+' x^2 +'+'%.2e' %z2[1]+' x '+'%.2e' %z2[2])
-    
+    ax1.plot(xr_new,yr_new,label='y = '+'%.2e' %zr[0]+' x +'+'%.2e' %zr[1])
     for i in range(len(runtimes)):
         element=runtimes[i]
         
@@ -114,9 +120,10 @@ def plotRuntimes(runtimes,ratios):
     #ax0.set_yscale('log')
     #ax0.set_xscale('log')
     #ax1.set_xscale('log')
-    ax0.legend()
+    ax0.legend(loc=4)
+    ax1.legend(loc=4)
     ax0.set_title('Simulation run time vs number of species in the simulation')
-    ax1.set_title('Ratio of runtimes as number of species doubles')
+    ax1.set_title('Current slope of the graph above')
     #plt.savefig('timeStats.pdf')
     plt.show()
     return None
@@ -127,8 +134,8 @@ runs = 3
 minpop=number
 multiplier=2
 steps=[50]*17
-numPoints=len(steps)
+numPoints=12#len(steps)
 
-runSeveral(command,runs,minpop,multiplier,steps)
-#runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
-#plotRuntimes(runtimes,ratios)
+#runSeveral(command,runs,minpop,multiplier,steps)
+runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+plotRuntimes(runtimes,ratios)

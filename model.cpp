@@ -31,28 +31,34 @@ std::list<Reaction> Specie::reactions(Specie specie){
 
     //nothing is being produced from vacuum in this model
     if (m_id==std::string("")){}
+    //same name
     else if(m_id==specie.m_id){
-            if (m_id.find(std::string("1"))==std::string::npos){
-                Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-                growth1.addProduct(m_id+std::string("1"),2);
-                allReactions.push_back(growth1);
-                Reaction growth0(m_id, 1, specie.m_id, 1, FAST_RATE);
-                growth0.addProduct(m_id+std::string("0"),2);
-                allReactions.push_back(growth0);
-            }
-            else{
-                
-            }
+        //hydrolysis
+        /*for (int i=1; i<m_id.length();i++){
+            Reaction hidr(m_id, 1, specie.m_id, 0, HIDR_RATE);
+            hidr.addProduct(m_id.substr(0,i),1);
+            hidr.addProduct(m_id.substr(i,m_id.length()-i),1);
+            allReactions.push_back(hidr);
+        }*/
+        //if (m_id.find(std::string("1"))!=std::string::npos){
+            Reaction growth0(m_id, 1, specie.m_id, 0, GROWTH_RATE);
+            growth0.addProduct(m_id+std::string("0"),1);
+            allReactions.push_back(growth0);
+            Reaction growth1(m_id, 1, specie.m_id, 0, GROWTH_RATE);
+            growth0.addProduct(m_id+std::string("1"),1);
+            allReactions.push_back(growth0);
+        //}
         }
-    else{
-        Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-        growth1.addProduct(m_id+std::string("1"),1);
-        growth1.addProduct(specie.m_id+std::string("1"),1);
-        allReactions.push_back(growth1);
-        Reaction growth0(m_id, 1, specie.m_id, 1, GROWTH_RATE);
-        growth0.addProduct(m_id+std::string("0"),1);
-        growth0.addProduct(specie.m_id+std::string("0"),1);
-        allReactions.push_back(growth0);
+    //if both are all ones, one is being catalyzed    
+    else if(m_id.find(std::string("1"))==std::string::npos && specie.m_id.find(std::string("1"))==std::string::npos) {
+        Reaction fast(m_id, 1, specie.m_id, 1, FAST_RATE);
+        fast.addProduct(m_id+std::string("0"),1);
+        fast.addProduct(specie.m_id,1);
+        allReactions.push_back(fast);
+        Reaction fast2(m_id, 1, specie.m_id, 1, FAST_RATE);
+        fast2.addProduct(specie.m_id+std::string("0"),1);
+        fast2.addProduct(m_id,1);
+        allReactions.push_back(fast2);
     }
     
     return allReactions;

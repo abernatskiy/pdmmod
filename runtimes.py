@@ -85,19 +85,19 @@ def plotRuntimes(runtimes,ratios):
     y=[r[1] for r in runtimes]
     y_err=[r[2] for r in runtimes]
     
-    z = polyfit(x[4:], y[4:], 1)
+    z = polyfit(x, y, 1)
     f = poly1d(z)
     
-    z2 = polyfit(x[4:], y[4:], 2)
+    z2 = polyfit(x, y, 2)
     f2 = poly1d(z2)
     
-    x_new = linspace(x[4], x[-1], 50)
+    x_new = linspace(x[0], x[-1], 50)
     y_new = f(x_new)
     y_new2= f2(x_new)
     
     '''ratios fitting'''
-    xr=[r[0] for r in ratios[4:]]
-    yr=[r[1] for r in ratios[4:]]
+    xr=[r[0] for r in ratios[2:]]
+    yr=[r[1] for r in ratios[2:]]
     zr=polyfit(xr, yr, 1)
     fr = poly1d(zr)
     xr_new = linspace(xr[0], xr[-1], 50)
@@ -128,14 +128,15 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=50
-command = './pdmmod', '2', '1', 'x'
-runs = 3
+number=2000
+command = './pdmmod', '10', '1', 'x'
+runs = 5
 minpop=number
 multiplier=2
 steps=[25]*38
 numPoints=18#len(steps)
 
-#runSeveral(command,runs,minpop,multiplier,steps)
+
+runSeveral(command,runs,minpop,multiplier,steps)
 runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
 plotRuntimes(runtimes,ratios)

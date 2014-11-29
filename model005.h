@@ -13,7 +13,7 @@
 
 
 const float GROWTH_RATE = 0.01;
-const float FAST_RATE = 0.02;
+const float FAST_RATE = 0.01;
 
 
 class Specie

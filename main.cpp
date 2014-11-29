@@ -25,7 +25,7 @@ int main (int argc, char** argv){
         //reading initial conditions frmo file
         TotalPopulation tp("populations.txt");
 
-        std::cout << "before stepping:\n"<< tp;
+        //std::cout << "before stepping:\n"<< tp;
         std::string prevPops = storePopulations(&tp);
         float prevStep = 0.f;
         std::ofstream myfile;
@@ -40,7 +40,7 @@ int main (int argc, char** argv){
             else{
                 stp = tp.stepSimulation();
                 reacNum=reacNum+1;
-                std::cout << "after stepping:\n" << tp;
+                //std::cout << "after stepping:\n" << tp;
                 prevPops = writeOrNotTo(stepLen, &tp, prevStep, prevPops, &myfile);
                 prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
                 if (tp.m_t >= totalTime){

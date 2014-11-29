@@ -11,52 +11,58 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
-def changeInitPop(number):
-    '''number -- int. the number of molecules of each monomer
+def changeInitPop(numSpec,number):
+    '''numSpec -- number of species types
+    number -- int. the number of molecules of each monomer
     '''
     popFile = open("populations.txt", mode='w', encoding='utf-8')
-    popFile.write("0 "+str(number)+"\n")
-    popFile.write("1 "+str(number)+"\n")
+    for i in range(numSpec):
+        popFile.write(str(i)+" "+str(number)+"\n")
     popFile.close()
     
     return None
+    
 
 def getSimTime(command):
     '''command -- string. simulation run command with parameters
     '''
-    subprocess.call(command)
+    retValue=subprocess.call(command)
     
     timeFile = open("runtime.txt")
     time = float(timeFile.readline().rstrip('\n'))
     
-    return time
+    return time, retValue
 
-def getTimeStat(command,number,runs):
-    changeInitPop(number)
+def getTimeStat(command,numSpec,number,runs):
+    changeInitPop(numSpec,number)
     times=[]
     for i in range(runs):
-        times.append(getSimTime(command))
+        time, retValue = getSimTime(command)
+        while retValue == 2:
+            print('rerun')
+            time, retValue = getSimTime(command)
+            
+        times.append(time)
     
     ave = mean(times)
     stdDev = stdev(times)
     print(ave, stdDev)
     return ave, stdDev
 
-def runSeveral(command,runs,minpop,multiplier,steps):
+def runSeveral(command,runs,minNum,number,steps):
     system('rm runTemp.txt && touch runTemp.txt' )
-    
     numPoints=len(steps)
-    number=minpop
+    numSpec=minNum
     for i in range(numPoints):
-        pair=getTimeStat(command,number,runs)
+        pair=getTimeStat(command,numSpec,number,runs)
         with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(number*2)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        number=number+steps[i]
+            myfile.write(str(number*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+        numSpec=numSpec+steps[i]
 
     
     return None
 
-def analyzeRuntime(command,runs,minpop,multiplier,numPoints):
+def analyzeRuntime(command,runs,minpop,numPoints):
     
     runtimes=[]
     myfile = open('runTemp.txt','rt')
@@ -128,15 +134,15 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
-number=2000
-command = './pdmmod', '10', '1', 'x'
-runs = 5
+minNum=5
+number=10
+command = './pdmmod', '1', '1', 'x'
+runs = 3
 minpop=number
-multiplier=2
-steps=[25]*38
-numPoints=18#len(steps)
+steps=[5]*20
+numPoints=len(steps)
 
 
-runSeveral(command,runs,minpop,multiplier,steps)
-runtimes, ratios = analyzeRuntime(command,runs,minpop,multiplier,numPoints)
+runSeveral(command,runs,minNum,number,steps)
+runtimes, ratios = analyzeRuntime(command,runs,minpop,numPoints)
 plotRuntimes(runtimes,ratios)

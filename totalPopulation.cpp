@@ -27,7 +27,7 @@ int TotalPopulation::stepSimulation(){
     }
 
     Reaction reac = sampleReaction();
-    std::cout << "Got reaction " << reac << std::endl;
+    //std::cout << "Got reaction " << reac << std::endl;
     m_t += sampleTime();
 
     // When the reaction is known, iterate through all species involved in the reaction
@@ -151,7 +151,7 @@ Reaction TotalPopulation::sampleReaction(){
     }
     std::cout << "ERROR: TotalPopulation-level sampling failed. This is likely to be a rare consequence of the numerical error of the juice quantity, which is not handled in the current version\n"; // TODO
     std::cout << "Juice in the end: " << juice << std::endl;
-    exit(EXIT_FAILURE);
+    exit(2);
 }
 
 float TotalPopulation::sampleTime(){

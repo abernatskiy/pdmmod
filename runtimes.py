@@ -137,9 +137,9 @@ def plotRuntimes(runtimes,ratios):
 minNum=5
 number=10
 command = './pdmmod', '1', '1', 'x'
-runs = 3
+runs = 5
 minpop=number
-steps=[5]*20
+steps=[5]*25
 numPoints=len(steps)
 
 

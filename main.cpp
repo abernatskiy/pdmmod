@@ -1,7 +1,13 @@
 #include <fstream>
 #include "totalPopulation.h"
 #include "output.h"
+#include "nativeListLoader.h"
 #include <time.h>
+#include <map>
+
+/* HP-model-specific global variables */
+std::map<std::string,std::string> catPatterns;
+std::map<std::string,int> wellDepths;
 
 int main (int argc, char** argv){
     if (argc != 4 ){
@@ -11,10 +17,14 @@ int main (int argc, char** argv){
         std::cout << "Total Time = 0: if you want to run simulation until it breaks down/you get tired" << std::endl;
         std::cout << "Step = 0: record every step" << std::endl;
     }
-    else{
+     else{
+
+        /* Loading HP-model-specific data */
+        catPatterns = readCatPatterns("nativeList.txt");
+        wellDepths = readWellDepths("nativeList.txt");
+
         int reacNum= 0;
         clock_t t1,t2;
-        
 
         int stp;
         //total time of simulation
@@ -62,7 +72,7 @@ int main (int argc, char** argv){
 
             myfile.close();
         }
-        
+
         float diff = ((float)t2-(float)t1);
         float timePerReac = diff/CLOCKS_PER_SEC/reacNum;
         std::cout << "Number of reactions is " << reacNum << std::endl;
@@ -72,7 +82,6 @@ int main (int argc, char** argv){
         timeFile.close();
         std::cout << "total time is " << tp.m_t << std::endl;
     }
-
 
     return 0;
 }

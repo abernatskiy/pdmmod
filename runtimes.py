@@ -143,6 +143,6 @@ steps=[5]*25
 numPoints=len(steps)
 
 
-runSeveral(command,runs,minNum,number,steps)
+#runSeveral(command,runs,minNum,number,steps)
 runtimes, ratios = analyzeRuntime(command,runs,minpop,numPoints)
 plotRuntimes(runtimes,ratios)

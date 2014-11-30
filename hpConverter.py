@@ -3,7 +3,7 @@
 import sys
 import pickle
 sys.path.append('../codes/hp-model')
-pickleFolder = ('../codes/stochKit/')
+pickleFolder = ('../codes/hp-model/')
 filename = ('nativeList.txt')
 
 def convertHP(maxLength):
@@ -19,7 +19,7 @@ def convertHP(maxLength):
     
     hpFile.close()
     
-    return nativeList[8]
+    return nativeList
 
 
 a=convertHP(18)

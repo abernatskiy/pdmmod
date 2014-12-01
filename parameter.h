@@ -23,6 +23,7 @@ public:
     short m_type;
     void* m_valuePtr;
     //TODO from .cpp
+    std::string getString();
 private:
     template<typename T>
     Parameter(T value);

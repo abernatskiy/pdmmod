@@ -8,7 +8,7 @@
  * rates are bigger if all 1's are elongated by 1
  */
 
-std::map<std::string,Parameter> globParams;
+//std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
     m_id = id;

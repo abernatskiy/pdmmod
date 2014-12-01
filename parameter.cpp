@@ -4,17 +4,18 @@
 
 
 Parameter::Parameter(){
-    printf("strings goes here\n");
     m_valuePtr=NULL;
 }
+
 //BOOL
 Parameter::Parameter(bool value){
     bool* ptr = new bool;
     *ptr = value;
     m_valuePtr = (void *) ptr;
     m_type = 0;
-    printf("boolean created %s\n", value ? "true" : "false");
+//    printf("boolean created %s\n", value ? "true" : "false");
 }
+
 bool Parameter::getBool(){
     bool* ptr = (bool*) m_valuePtr;
     if (m_type != 0){
@@ -29,8 +30,9 @@ Parameter::Parameter(int value){
     *ptr = value;
     m_valuePtr = (void *) ptr;
     m_type = 1;
-    printf("int created: %d\n", value);
+//    printf("int created: %d\n", value);
 }
+
 int Parameter::getInt(){
     int* ptr = (int*) m_valuePtr;
     if (m_type != 1){
@@ -45,8 +47,8 @@ Parameter::Parameter(float value){
     *ptr = value;
     m_valuePtr = (void *) ptr;
     m_type = 2;
-    
 }
+
 float Parameter::getFloat(){
     float* ptr = (float*) m_valuePtr;
     if (m_type != 2){
@@ -60,19 +62,19 @@ Parameter::~Parameter(){
     switch(m_type){
         case 0:{
             bool* ptr = (bool*) m_valuePtr;
-            printf("bool deleted\n");
+//            printf("bool deleted\n");
             delete ptr;
             break;
         }
         case 1:{
             int* ptr = (int *) m_valuePtr;
-            printf("int deleted\n");
+//            printf("int deleted\n");
             delete ptr;
             break;
         }
         case 2:{
             float* ptr = (float *) m_valuePtr;
-            printf("float deleted\n");
+//            printf("float deleted\n");
             delete ptr;
             break;
         }
@@ -103,9 +105,31 @@ std::string Parameter::getType(){
             break;
         }
     }
-    
     return typeValue;
 }
 
-
+std::string Parameter::getString()
+{
+    switch(m_type){
+        case 0:{
+            if(getBool())
+                return std::string("true");
+            else
+                return std::string("false");
+            break;
+        }
+        case 1:{
+            return std::to_string(getInt());
+            break;
+        }
+        case 2:{
+            return std::to_string(getFloat());
+            break;
+        }
+        default:{
+            return std::string("UNDEFINED");
+            break;
+        }
+    }
+}
 

@@ -4,6 +4,7 @@
 #include "parameter.h"
 #include "specie.h"
 
+
 /* hp-model 
  * monomers import (monImp)
  * reactions are binary collisions, particles don't change when interact.
@@ -16,10 +17,6 @@ extern std::map<std::string,Parameter> configDict;
 extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
 
-<<<<<<< HEAD
-=======
-//std::map<std::string,Parameter> globParams;
->>>>>>> 48da286e6d1290847a7271dd651bfe235ffc0a3a
 
 Specie::Specie(std::string id){
     m_id = id;

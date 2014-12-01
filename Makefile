@@ -1,9 +1,12 @@
-.SUFFIXES = .cpp .o
-CC        = g++
-CFLAGS    = -g -ggdb -Wall -std=c++11 -I"." -O2
-LDFLAGS   = -g -ggdb -Wall
-CPPFLAGS  = ${CFLAGS}
-objects   =	specie.o reaction.o parameter.o relation.o population.o totalPopulation.o randomGenerator.o output.o model.o nativeListLoader.o
+.SUFFIXES       = .cpp .o
+CC              = g++
+CFLAGS          = -g -ggdb -Wall -std=c++11 -I"." -O2
+LDFLAGS         = -g -ggdb -Wall
+CPPFLAGS        = ${CFLAGS}
+engineObjects   = reaction.o relation.o population.o randomGenerator.o totalPopulation.o
+modelObjects    = specie.o model.o
+ioObjects       = output.o nativeListLoader.o inih/cpp/INIReader.o inih/ini.o parametersLoader.o parameter.o
+objects         = ${engineObjects} ${modelObjects} ${ioObjects}
 
 .cpp.o:
 	${CC} -o $@ -c ${CPPFLAGS} $<

@@ -18,8 +18,7 @@ std::map<std::string,std::string> readCatPatterns(std::string filename)
             std::istringstream iss(line);
             std::vector<std::string> tokens{std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
 
-            if(tokens[2] != "N")
-                catPatterns[tokens[0]] = tokens[2];
+            catPatterns[tokens[0]] = tokens[2];
         }
         nativeList.close();
     }

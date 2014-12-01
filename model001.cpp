@@ -3,7 +3,7 @@
 #include <iostream>
 #include "specie.h"
 
-std::map<std::string,Parameter> globParams;
+//std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
     m_id = id;

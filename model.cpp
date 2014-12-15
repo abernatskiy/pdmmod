@@ -3,6 +3,7 @@
 #include <iostream>
 #include "parameter.h"
 #include "specie.h"
+#include <math.h>
 
 
 /* hp-model 
@@ -85,13 +86,14 @@ std::ostream& operator<<(std::ostream& os, const Specie& sp)
 
 std::list<Reaction> Specie::reactions(Specie specie){
     //parameters
-    //float eH = configDict["hydrophobicEnergy"].getFloat();
     float aH = configDict["monomerBirthH"].getFloat();
     float aP = configDict["monomerBirthP"].getFloat();
     int maxLength = configDict["configDict"].getInt();
     float alpha = configDict["growth"].getFloat();
     float d = configDict["unfoldedDegradation"].getFloat();
     float dF = configDict["foldedDegradation"].getFloat();
+    float eH = configDict["hydrophobicEnergy"].getFloat();
+    float k_unf = configDict["unfolding"].getFloat();
     
     //all the reactions two species can have
     std::list<Reaction> allReactions;
@@ -114,25 +116,25 @@ std::list<Reaction> Specie::reactions(Specie specie){
         if (m_folded == false){
             //it degrades
             Reaction degradation(m_id,1,specie.m_id,0,d);
-            allReactions(push_back(degradation));
+            allReactions.push_back(degradation);
             //and might fold
             if (m_native!=0){
-                
+                Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));
             }
         }
         else{
             Reaction degradationF(m_id,1,specie.m_id,0,dF);
-            allReactions(push_back(degradationF));
+            allReactions.push_back(degradationF);
         }
         
         //it grows
         if (m_length != maxLength && m_folded == false) {
             Reaction growH(m_id,1,specie.m_id,0,alpha);
-            growH.addProduct(m_id+std::string("H"));
+            growH.addProduct(m_id+std::string("H"),1);
             allReactions.push_back(growH);
             
-            Reaction growP(m_id,1,specie.m_id,0);
-            growP.addProduct(m_id+std::string("P"),alpha);
+            Reaction growP(m_id,1,specie.m_id,0,alpha);
+            growP.addProduct(m_id+std::string("P"),1);
             allReactions.push_back(growP);
         }
         //false degradation (we are blind if sequence is too long)

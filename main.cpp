@@ -27,6 +27,7 @@ int main (int argc, char** argv){
 
     /* Loading HP-model-specific data */
     catPatterns = readCatPatterns("nativeList.txt");
+    // 
     wellDepths = readWellDepths("nativeList.txt");
     
     /* Loading parameters */

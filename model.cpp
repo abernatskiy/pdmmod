@@ -14,6 +14,21 @@
  * false degradation
  * 
  */
+
+/*DATA
+ * catPattern -- string. (cases)
+ * interp.:
+ *  - if consists of 'H' and 'P' then represents a catalytic site of a given catalyst.
+ *  - if it's 'N' then it means the sequence is NOT a catalyst
+ * 
+ * catPatterns -- dict. {string: string}
+ * interp. a dictionary from monomer sequence string to catalytic pattern string
+ * 
+ * wellDepth -- dict. {string: int}
+ * interp. a dictionary form monomer sequence string to potential well depth (energy of folded state)
+ */
+
+
 #include <map>
 
 extern std::map<std::string,Parameter> configDict;
@@ -33,9 +48,10 @@ Specie::Specie(std::string id){
     }
     //otherwise we need to check how long the substrate site is
     else{
-        std::string maxPat = std::string("HHHHHHH");
-        for (int i=0;i<6;i++){
-            int subLen=7-i;
+        std::string maxPat = std::string("HHHHHHHH");
+        int patLength=8;
+        for (int i=0;i<patLength-1;i++){
+            int subLen=patLength-i;
             std::string pat= maxPat.substr(i,subLen);
             if (m_id.find(pat)!=std::string::npos){
                 m_substrate = pat;
@@ -102,7 +118,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //all the reactions two species can have
     std::list<Reaction> allReactions;
 
-    //nothing is being produced from vacuum in this model
+    // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.
     if (m_id==std::string("")){
         if (specie.m_id==std::string("")){
             Reaction importH(m_id, 0, specie.m_id, 0, aH);
@@ -138,7 +154,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
             allReactions.push_back(unfold);
         }
         
-        //it grows
+        //it grows if it's not of a max length and not folded
         if (m_length != maxLength && m_folded == false) {
             Reaction growH(m_id,1,specie.m_id,0,alpha);
             growH.addProduct(m_id+std::string("H"),1);
@@ -157,9 +173,14 @@ std::list<Reaction> Specie::reactions(Specie specie){
             allReactions.push_back(falseGrowP);
         }
        
-        
     }
-        
+    //binary reactions TODO
+    /*else if (specie.m_catalyst && m_folded == false){
+        if (m_length < maxLength){
+            Reaction catGrowth(m_id,1.specie.m_id,1,)
+        }
+    }*/
+    
     return allReactions;
 }
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <math.h>
+#include <algorithm>    // std::min
 #include "parameter.h"
 #include "specie.h"
 
@@ -175,11 +176,12 @@ std::list<Reaction> Specie::reactions(Specie specie){
        
     }
     //binary reactions TODO
-    /*else if (specie.m_catalyst && m_folded == false){
+    else if (specie.m_catalyst != std::string("N") && m_folded == false){
         if (m_length < maxLength){
-            Reaction catGrowth(m_id,1.specie.m_id,1,)
+            common std::min(specie.m_catalyst.length(), m_substrate.length()+1)
+            Reaction catGrowth(m_id,1.specie.m_id,1,alpha*exp(eH*common))
         }
-    }*/
+    }
     
     return allReactions;
 }

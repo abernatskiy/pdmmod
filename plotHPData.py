@@ -89,6 +89,7 @@ def printStats(times,specPop,natData,plot=True):
         for i in range(len(times)):
             countAll[i]+=specPop[key][i]
             if not key.find('f')==-1:
+                print(key)
                 countFold[i]+=specPop[key][i]
                 if not natData[key[1:]][1]=='N':
                     countCat[i]+=specPop[key][i]
@@ -122,7 +123,7 @@ def printStats(times,specPop,natData,plot=True):
         ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(specPop.keys())))
         ax2.legend()
         ax1.legend()
-        ax1.grid(True)
+        ax2.grid(True)
         ax2.set_yscale('log')
         ax0.set_title("Total count of molecules at each moment")
         ax1.set_title("count of molecules of various types at each moment")
@@ -133,11 +134,6 @@ def printStats(times,specPop,natData,plot=True):
     
     return hist
 
-def printHPStats(times,specPop,plot=True):
-    
-    
-    
-    return None
 
 
 natData=readNativeList()

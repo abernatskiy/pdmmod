@@ -14,7 +14,7 @@ void readConfig(std::map<std::string,Parameter>* dict, std::string filename){
     dict->emplace("monomerBirthP",          (float) reader.GetReal("kinetic model", "monomerBirthP", 0.0));
     dict->emplace("growth",                 (float) reader.GetReal("kinetic model", "growth", 0.0));
     dict->emplace("unfoldedDegradation",    (float) reader.GetReal("kinetic model", "unfoldedDegradation", 0.0));
-    dict->emplace("unfoldingCoefficient",   (float) reader.GetReal("kinetic model", "unfoldingCoefficient", 0.0));
+    dict->emplace("unfolding",              (float) reader.GetReal("kinetic model", "unfolding", 0.0));
     dict->emplace("foldedDegradation",      (float) reader.GetReal("kinetic model", "foldedDegradation", 0.0));
     dict->emplace("hydrophobicEnergy",      (float) reader.GetReal("kinetic model", "hydrophobicEnergy", -1.0));
     dict->emplace("maxLength",              (int) reader.GetInteger("kinetic model", "maxLength", -1));

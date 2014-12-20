@@ -89,7 +89,7 @@ def printStats(times,specPop,natData,plot=True):
         for i in range(len(times)):
             countAll[i]+=specPop[key][i]
             if not key.find('f')==-1:
-                print(key)
+                #print(key)
                 countFold[i]+=specPop[key][i]
                 if not natData[key[1:]][1]=='N':
                     countCat[i]+=specPop[key][i]
@@ -107,13 +107,13 @@ def printStats(times,specPop,natData,plot=True):
     print("maximum length of a polymer is "+str(mL))
     hist=[]
     histNorm=[]
-    lengthsD=[ps/hi for (ps,hi) in zip(popStats.copy().values(),hist)]
+    #lengthsD=[ps/hi for (ps,hi) in zip(popStats.copy().values(),hist)]
     
     for i in range(1,mL+1):
         hist.append(lengths.count(i))
         histNorm.append(hist[i-1]/2**i)
     if plot:
-        lengthsD=[ps/hi for (ps,hi) in zip(list(popStats.copy().values()),hist)]
+        lengthsD=[ps/2**li for (ps,li) in zip(list(popStats.copy().values()),list(popStats.copy().keys()))]
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
         #ax1.plot(range(1,mL+1),histNorm,'o')
         ax0.plot(times,countAll)

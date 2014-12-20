@@ -113,7 +113,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float alpha = configDict["growth"].getFloat();
     float d = configDict["unfoldedDegradation"].getFloat();
     float dF = configDict["foldedDegradation"].getFloat();
-    float k_unf = 0.1;//configDict["unfolding"].getFloat();
+    float k_unf = configDict["unfolding"].getFloat();
     float eH = configDict["hydrophobicEnergy"].getFloat();
     
     //all the reactions two species can have
@@ -175,14 +175,26 @@ std::list<Reaction> Specie::reactions(Specie specie){
         }
        
     }
-    //binary reactions TODO
-    else if (specie.m_catalyst != std::string("N") && m_folded == false){
-        if (m_length < maxLength){
-            common std::min(specie.m_catalyst.length(), m_substrate.length()+1)
-            Reaction catGrowth(m_id,1.specie.m_id,1,alpha*exp(eH*common))
+    //binary reactions
+    else if (specie.m_catalyst != std::string("N") && m_folded == false && m_substrate != std::string("N")){
+            int common = std::min(specie.m_catalyst.length(), m_substrate.length()+1);
+            Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
+            catGrowth.addProduct(specie.m_id,1);
+            if (m_length<maxLength){
+                catGrowth.addProduct(m_id+std::string("H"),1);
+                }
+            allReactions.push_back(catGrowth);
         }
-    }
-    
+    else if (m_catalyst != std::string("N") && specie.m_folded == false && specie.m_substrate != std::string("N")){
+        int common = std::min(m_catalyst.length(), specie.m_substrate.length()+1);
+        Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
+        catGrowth.addProduct(m_id,1);
+        if (specie.m_length<maxLength){
+            catGrowth.addProduct(specie.m_id+std::string("H"),1);
+            }
+        allReactions.push_back(catGrowth);    
+        }
+        
     return allReactions;
 }
 

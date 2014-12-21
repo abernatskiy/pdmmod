@@ -40,6 +40,7 @@ extern std::map<std::string,int> wellDepths;
 
 
 Specie::Specie(std::string id){
+    modelName = std::string("");
     m_id = id;
     
     //if sequence doesn't have HH in its sequence it cannot be substrate for catalyzed growth

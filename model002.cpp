@@ -6,6 +6,7 @@
 //std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
+    modelName = std::string("");
     m_id = id;
     if (m_id==std::string("a0") || m_id==std::string("a1")){
         m_length=1;

@@ -24,8 +24,21 @@ Reaction Population::sampleReaction(PROPFLOAT remainingJuice){
             return itRel->sampleReaction(juiceRemainingAfterLocalSampling);
         }
     }
-    std::cout << "ERROR: Population-level sampling failed. Full propensity of population m_ksi is likely broken.\n";
-    exit(EXIT_FAILURE);
+
+/*  Sampling sometimes gets broken due to floating point rounding errors. To fix it, I would need a library providing
+ *  truly associative addition with reversible subtraction. Such library does not seem to exist yet, although
+ *  there is an algorithm for associative addition described here:
+ *
+ *  http://www.eecs.berkeley.edu/~hdnguyen/public/papers/ARITH21_Fast_Sum.pdf
+ *
+ *  Won't fix for the time being. */
+
+//    std::cout << "ERROR: Population-level sampling failed. Full propensity of population m_ksi is likely broken.\n";
+//    exit(EXIT_FAILURE);
+
+    auto itRel = m_listOfRelations.end();
+    itRel--;
+    return itRel->sampleReaction(itRel->m_psi);
 }
 
 void Population::update(int moleculesAdded){

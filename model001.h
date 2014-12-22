@@ -16,6 +16,7 @@ const float GROWTH_RATE = 1.f;
 class Specie
 {
 public:
+    std::string modelName;
     Specie(){};
     Specie(std::string id);
     ~Specie();

@@ -19,6 +19,7 @@ const float COLL_RATE = 0.0001;
 class Specie
 {
 public:
+    std::string modelName;
     Specie(){};
     Specie(std::string id);
     ~Specie();

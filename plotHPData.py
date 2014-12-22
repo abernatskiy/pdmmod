@@ -128,7 +128,7 @@ def printStats(times,specPop,natData,plot=True):
         ax0.set_title("Total count of molecules at each moment")
         ax1.set_title("count of molecules of various types at each moment")
         ax2.set_title("Length distribution in the last moment")
-        fig.suptitle("hp-simple with folding, no unfolding")
+        fig.suptitle("hp-simple with catalysis")
         #plt.savefig("stats.pdf")
         plt.show()
     

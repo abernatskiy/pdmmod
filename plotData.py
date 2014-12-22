@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 def readData(filename):
-    #times at which we are recording
+    '''times at which we are recording'''
     times = []
     specPop = {}
     dataFile = open(filename, "rt")

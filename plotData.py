@@ -56,12 +56,12 @@ def printStats(times,specPop,plot=True):
     lengthDistr={}
     total=[0]*(len(times))
     for key in specPop.keys():
-        if not (key=="a1" or key=="a0" ):
+        if key.find('f')==-1:
             polLen=len(key)
             lengths.append(len(key))
         else:
-            lengths.append(1)
-            polLen=1
+            lengths.append(len(key)-1)
+            polLen=len(key)-1
         total=[total[i]+specPop[key][i] for i in range(len(total))]
         if not polLen in popStats.keys():
             #add dict entry and population of the first n-mer of the given length
@@ -72,18 +72,24 @@ def printStats(times,specPop,plot=True):
     mL=max(lengths)
     print("maximum length of a polymer is "+str(mL))
     hist=[]
+    histNorm=[]
+    lengthsD=[ps/hi for (ps,hi) in zip(popStats.copy().values(),hist)]
     
     for i in range(1,mL+1):
         hist.append(lengths.count(i))
+        histNorm.append(hist[i-1]/2**i)
     if plot:
+        lengthsD=[ps/hi for (ps,hi) in zip(list(popStats.copy().values()),hist)]
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
-        ax0.plot(range(1,mL+1),hist,'o')
-        ax1.plot(times,total)
-        ax2.plot(list(popStats.copy().keys()),list(popStats.copy().values()),label=str(mL)+'/'+str(len(specPop.keys())))
+        ax1.plot(range(1,mL+1),histNorm,'o')
+        ax0.plot(times,total)
+        ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(specPop.keys())))
         ax2.legend()
+        ax1.grid(True)
         ax0.set_title("Types of n-mers and populations in the last moment")
         ax1.set_title("Total count of molecules at each moment")
-        ax2.set_title("Length distribution")
+        ax2.set_title("Length distribution in the last moment")
+        fig.suptitle("hp-simple with folding, no unfolding")
         #plt.savefig("stats.pdf")
         plt.show()
     
@@ -92,10 +98,15 @@ def printStats(times,specPop,plot=True):
     
 
 def plotData(times,specPop):
+    def f(key):
+        if key.find('f')==-1:
+            return None
+        else:
+            return str(key)
     fig=plt.figure(figsize=(8,6))
     for key in specPop.keys():
-        plt.plot(times,specPop[key],label=key)
-    plt.legend(fontsize='small') 
+        plt.plot(times,specPop[key],label=f(key))
+    #plt.legend(fontsize='small') 
     
     plt.title("Populations of species")
     plt.xlim(0,times[-1])
@@ -104,4 +115,4 @@ def plotData(times,specPop):
 
 times, specPop = readData("x")
 printStats(times,specPop)
-plotData(times, specPop)
+#plotData(times, specPop)

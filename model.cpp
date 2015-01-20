@@ -1,14 +1,19 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <math.h>
 #include "parameter.h"
 #include "specie.h"
 #include <math.h>
 
 
 /* hp-model 
- * monomers import (monImp)
- * reactions are binary collisions, particles don't change when interact.
+ * monomers import 
+ * degradation
+ * folded degradation
+ * growth
+ * false degradation
+ * 
  */
 #include <map>
 
@@ -88,12 +93,17 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //parameters
     float aH = configDict["monomerBirthH"].getFloat();
     float aP = configDict["monomerBirthP"].getFloat();
-    int maxLength = configDict["configDict"].getInt();
+    int maxLength = configDict["maxLength"].getInt();
     float alpha = configDict["growth"].getFloat();
     float d = configDict["unfoldedDegradation"].getFloat();
     float dF = configDict["foldedDegradation"].getFloat();
+<<<<<<< HEAD
     float eH = configDict["hydrophobicEnergy"].getFloat();
     float k_unf = configDict["unfolding"].getFloat();
+=======
+    float k_unf = 0.1;//configDict["unfolding"].getFloat();
+    float eH = configDict["hydrophobicEnergy"].getFloat();
+>>>>>>> 0ba8161e0f3e8034fc4ca4c7b38c38142db83e78
     
     //all the reactions two species can have
     std::list<Reaction> allReactions;
@@ -112,7 +122,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     }
     //monomolecular reactions
     else if (m_id == specie.m_id){
-        //if it's folded
+        //if it's not folded
         if (m_folded == false){
             //it degrades
             Reaction degradation(m_id,1,specie.m_id,0,d);
@@ -120,11 +130,24 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //and might fold
             if (m_native!=0){
                 Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));
+<<<<<<< HEAD
+=======
+                fold.addProduct(std::string("f")+m_id,1);
+                allReactions.push_back(fold);
+>>>>>>> 0ba8161e0f3e8034fc4ca4c7b38c38142db83e78
             }
         }
         else{
+            //folded degrade too
             Reaction degradationF(m_id,1,specie.m_id,0,dF);
             allReactions.push_back(degradationF);
+<<<<<<< HEAD
+=======
+            //and unfold
+            Reaction unfold(m_id,1,specie.m_id,0,k_unf);
+            unfold.addProduct(m_id.substr(1,m_length),1);
+            allReactions.push_back(unfold);
+>>>>>>> 0ba8161e0f3e8034fc4ca4c7b38c38142db83e78
         }
         
         //it grows
@@ -137,7 +160,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
             growP.addProduct(m_id+std::string("P"),1);
             allReactions.push_back(growP);
         }
-        //false degradation (we are blind if sequence is too long)
+        //false degradation (we are blind if sequence grows too long)
         else if (m_length == maxLength && m_folded == false){
             Reaction falseGrowH(m_id,1,specie.m_id,0,alpha);
             allReactions.push_back(falseGrowH);

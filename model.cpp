@@ -130,25 +130,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //and might fold
             if (m_native!=0){
                 Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));
-<<<<<<< HEAD
-=======
-                fold.addProduct(std::string("f")+m_id,1);
-                allReactions.push_back(fold);
->>>>>>> 0ba8161e0f3e8034fc4ca4c7b38c38142db83e78
-            }
-        }
-        else{
-            //folded degrade too
-            Reaction degradationF(m_id,1,specie.m_id,0,dF);
-            allReactions.push_back(degradationF);
-<<<<<<< HEAD
-=======
-            //and unfold
-            Reaction unfold(m_id,1,specie.m_id,0,k_unf);
-            unfold.addProduct(m_id.substr(1,m_length),1);
-            allReactions.push_back(unfold);
->>>>>>> 0ba8161e0f3e8034fc4ca4c7b38c38142db83e78
-        }
+
         
         //it grows
         if (m_length != maxLength && m_folded == false) {

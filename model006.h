@@ -20,6 +20,7 @@ const float HIDR_RATE = 0.001;
 class Specie
 {
 public:
+    std::string modelName;
     Specie(){};
     Specie(std::string id);
     ~Specie();

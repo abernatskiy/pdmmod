@@ -10,6 +10,7 @@
 //std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
+    modelName = std::string("");
     m_id = id;
     m_length = m_id.length();
 }

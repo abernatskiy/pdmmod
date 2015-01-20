@@ -1,5 +1,7 @@
 #include "output.h"
 
+extern std::map<std::string,Parameter> configDict;
+
 //TODO
 std::string storePopulations(TotalPopulation* tp){
     std::stringstream ss;
@@ -24,7 +26,17 @@ int closeFile(std::string filename){
 
 //TODO
 
+void writeHeaderToFile(TotalPopulation* tp, float totalTime, float period, std::string filename, std::ofstream* myfile){
 
+    std::string modelName = (((tp->m_listOfPopulations).begin())->m_specie).modelName;
+    (*myfile) << "# Model: " << modelName << std::endl;
+    (*myfile) << "#";
+    for(auto it = configDict.begin(); it != configDict.end(); it++)
+        (*myfile) << " " << it->first << "=" << (it->second).getString();
+    (*myfile) << std::endl;
+    (*myfile) << "# TotalTime=" << totalTime << " RecordPeriod=" << period << " Filename=" << filename << std::endl;
+    return;
+}
 
 //TODO
 void writeToFile(std::string strPops, float time, std::ofstream* myfile){

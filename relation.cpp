@@ -21,8 +21,14 @@ Reaction Relation::sampleReaction(PROPFLOAT remainingJuice){
         if( localJuice < 0.f )
             return *itRea;
     }
-    std::cout << "ERROR: Relation-level sampling failed. Total partial propensity of the group m_psi is likely broken\n";
-    exit(EXIT_FAILURE);
+/*  See lines 28-34 of population.cpp for explanation of what's going on in this function below this line */
+
+//    std::cout << "ERROR: Relation-level sampling failed. Total partial propensity of the group m_psi is likely broken\n";
+//    exit(EXIT_FAILURE);
+
+    auto itRea = m_listOfReactions.end();
+    itRea--;
+    return *itRea;
 }
 
 void Relation::update(MOLINT newNToSp){

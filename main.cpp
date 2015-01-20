@@ -28,21 +28,22 @@ int main (int argc, char** argv){
     /* Loading HP-model-specific data */
     catPatterns = readCatPatterns("nativeList.txt");
     wellDepths = readWellDepths("nativeList.txt");
-    
+
     /* Loading parameters */
     readConfig(&configDict, "parameters.ini");
     showConfig(&configDict);
-    
+
     int reacNum= 0;
     clock_t t1,t2;
 
     int stp;
     //total time of simulation
-    float totalTime = std::atoi((std::string(argv[1])).c_str());
+    float totalTime = std::atof(argv[1]);
     //how often to record
-    float stepLen = std::atoi((std::string(argv[2])).c_str());
+    float stepLen = std::atof(argv[2]);
     std::string filename = std::string(argv[3]);
     //reading initial conditions frmo file
+
     TotalPopulation tp("populations.txt");
 
     //std::cout << "before stepping:\n"<< tp;
@@ -50,6 +51,7 @@ int main (int argc, char** argv){
     float prevStep = 0.f;
     std::ofstream myfile;
     myfile.open (filename);
+    writeHeaderToFile(&tp, totalTime, stepLen, filename, &myfile);
     writeToFile(prevPops, 0.0, &myfile);
     t1=clock();
     while(true){

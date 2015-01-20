@@ -18,6 +18,7 @@ const float FAST_RATE = 1.1;
 class Specie
 {
 public:
+    std::string modelName;
     Specie(){};
     Specie(std::string id);
     ~Specie();

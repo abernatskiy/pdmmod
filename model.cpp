@@ -20,7 +20,7 @@
  * - if it's 'N' then it means the sequence is NOT a catalyst
  *
  * catPatterns -- dict. {string: string}
- * interp. a dictionary from monomer sequence string to catalytic pattern string
+ * interp. a dictionary from sequence string to catalytic pattern string
  *
  * wellDepth -- dict. {string: int}
  * interp. a dictionary form monomer sequence string to potential well depth (energy of folded state)
@@ -31,32 +31,44 @@ extern std::map<std::string,Parameter> configDict;
 extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
 Specie::Specie(std::string id){
-    modelName = std::string("");
-    m_id = id;
-    //if sequence doesn't have HH in its sequence it cannot be substrate for catalyzed growth
-    if (m_id.find(std::string("HH"))==std::string::npos){
+    std::cout << "Specie constructor: the very beginning" << std::endl;
+    modelName = std::string("hp-full");
+    std::cout << -1 << std::endl;
+    m_id = id; //HP sequence
+    //if sequence doesn't have HH as two last monomers in its sequence it cannot be a substrate
+    if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
+        std::cout << 0 << std::endl;
         m_substrate = std::string("N");
-        m_product = false;
     }
     //otherwise we need to check how long the substrate site is
     else{
+        std::cout << 1 << std::endl;
         std::string maxPat = std::string("HHHHHHHH");
         int patLength=8;
         for (int i=0;i<patLength-1;i++){
+            //we gonna reduce pattern length by 1 every step and compare
             int subLen=patLength-i;
+            //pat is a reduced pattern which we are looking for in the end of the sequence
             std::string pat= maxPat.substr(i,subLen);
-            if (m_id.find(pat)!=std::string::npos){
+            if (m_id.substr(m_id.length()-pat.length(), pat.length()) == maxPat.substr(0,pat.length())){
+                //if last pat.lenght() letters of the sequence are all 'H'
                 m_substrate = pat;
                 if (subLen>2){
                     m_product = true;
                 }
                 else{
-                    m_product = false;
+                    if (m_id.find(std::string("HHH")) != std::string::npos){
+                        m_product = true;
+                    }
+                    else{
+                        m_product = false;
+                    }
                 }
                 break;
             }
         }
     }
+    std::cout << 2 << std::endl;
     //if sequence isn't folded (it doesn't have 'f' letter)
     if (m_id.find(std::string("f"))==std::string::npos){
         m_folded = false;
@@ -82,6 +94,7 @@ Specie::Specie(std::string id){
         m_catalyst = catPatterns[m_id.substr(1,m_length)];
         m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
     }
+    std::cout << "Specie constructor: the very end" << std::endl;
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
@@ -155,18 +168,22 @@ std::list<Reaction> Specie::reactions(Specie specie){
         }
     }
     //binary reactions
+    //if the other molecule is a catalyst and a given one isn't folded and a substate
     else if (specie.m_catalyst != std::string("N") && m_folded == false && m_substrate != std::string("N")){
         int common = std::min(specie.m_catalyst.length(), m_substrate.length()+1);
         Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
+        //catalyst always stays
         catGrowth.addProduct(specie.m_id,1);
         if (m_length<maxLength){
             catGrowth.addProduct(m_id+std::string("H"),1);
         }
         allReactions.push_back(catGrowth);
     }
+    //if a given molecule is a catalyst and the other molecule isn't folded and a substate
     else if (m_catalyst != std::string("N") && specie.m_folded == false && specie.m_substrate != std::string("N")){
         int common = std::min(m_catalyst.length(), specie.m_substrate.length()+1);
         Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
+        //catalyst always stays
         catGrowth.addProduct(m_id,1);
         if (specie.m_length<maxLength){
             catGrowth.addProduct(specie.m_id+std::string("H"),1);

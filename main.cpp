@@ -43,10 +43,11 @@ int main (int argc, char** argv){
     float stepLen = std::atof(argv[2]);
     std::string filename = std::string(argv[3]);
     //reading initial conditions frmo file
-
+    std::cout << " before beginning" << std::endl;
     TotalPopulation tp("populations.txt");
 
     //std::cout << "before stepping:\n"<< tp;
+    std::cout << "beginning" << std::endl;
     std::string prevPops = storePopulations(&tp);
     float prevStep = 0.f;
     std::ofstream myfile;

@@ -31,18 +31,20 @@ extern std::map<std::string,Parameter> configDict;
 extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
 Specie::Specie(std::string id){
-    std::cout << "Specie constructor: the very beginning" << std::endl;
     modelName = std::string("hp-full");
-    std::cout << -1 << std::endl;
     m_id = id; //HP sequence
+    if (m_id==""){}
+    else if(m_id.length()==1){
+        m_substrate = std::string("N");
+        m_product = false;
+        
+    }
     //if sequence doesn't have HH as two last monomers in its sequence it cannot be a substrate
-    if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
-        std::cout << 0 << std::endl;
+    else if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
         m_substrate = std::string("N");
     }
     //otherwise we need to check how long the substrate site is
     else{
-        std::cout << 1 << std::endl;
         std::string maxPat = std::string("HHHHHHHH");
         int patLength=8;
         for (int i=0;i<patLength-1;i++){
@@ -50,14 +52,20 @@ Specie::Specie(std::string id){
             int subLen=patLength-i;
             //pat is a reduced pattern which we are looking for in the end of the sequence
             std::string pat= maxPat.substr(i,subLen);
-            if (m_id.substr(m_id.length()-pat.length(), pat.length()) == maxPat.substr(0,pat.length())){
-                //if last pat.lenght() letters of the sequence are all 'H'
+            if (m_id.length()<pat.length()){
+                continue;
+            }
+            else if (m_id.substr(m_id.length()-pat.length(), pat.length()) == maxPat.substr(0,pat.length())){
+                //if last pat.length() letters of the sequence are all 'H'
                 m_substrate = pat;
                 if (subLen>2){
                     m_product = true;
                 }
                 else{
-                    if (m_id.find(std::string("HHH")) != std::string::npos){
+                    if (m_id.length()<3){
+                        m_product = false;
+                    }
+                    else if (m_id.find(std::string("HHH")) != std::string::npos){
                         m_product = true;
                     }
                     else{
@@ -68,11 +76,10 @@ Specie::Specie(std::string id){
             }
         }
     }
-    std::cout << 2 << std::endl;
     //if sequence isn't folded (it doesn't have 'f' letter)
     if (m_id.find(std::string("f"))==std::string::npos){
         m_folded = false;
-        //its lenght is the length of the m_id
+        //its length is the length of the m_id
         m_length = m_id.length();
         //it's not a catalyst
         m_catalyst = std::string("N");
@@ -94,7 +101,6 @@ Specie::Specie(std::string id){
         m_catalyst = catPatterns[m_id.substr(1,m_length)];
         m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
     }
-    std::cout << "Specie constructor: the very end" << std::endl;
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)

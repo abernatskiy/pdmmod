@@ -3,15 +3,10 @@
 #include "population.h"
 
 Population::Population(std::string id, int initPop){
-    std::cout << "Population constructor: the very beginning" << std::endl;
     m_specie = Specie(id);
-    std::cout << 1 << std::endl;
     m_n = (MOLINT) initPop;
-    std::cout << 2 << std::endl;
     m_ksi = 0.f;
-    std::cout << 3 << std::endl;
     m_lambda = 0.f;
-    std::cout << "Population constructor: the very end" << std::endl;
 }
 
 Reaction Population::sampleReaction(PROPFLOAT remainingJuice){

@@ -11,11 +11,8 @@ TotalPopulation::TotalPopulation(std::string source){
 //    // This random seed is known to trigger a numerical error in top-level sampling
 //    // with older sampler code (dded6fac3a92ff3aec1d92216a66971dbc9b9605 and older).
 //    // I'll just leave it here for a while.
-    std::cout << "the very beginning of the TotalPopulation constructor" << std::endl;
     m_t = 0.f;
-    std::cout << "one line afther the very beginning of the TotalPopulation constructor" << std::endl;
-    addPopulation(std::string(""), 1); // adding "vacuum"
-    std::cout << "before reading file" << std::endl;
+    addPopulation("", 1); // adding "vacuum"
     addPopulationsFromFile(source);
     computeTotalPropensity();
 }
@@ -112,18 +109,13 @@ void TotalPopulation::removePopulation(std::list<Population>::iterator itToPopTo
 }
 
 void TotalPopulation::addPopulation(std::string specie, int initPop){
-    std::cout << "the very beginning of the addPopulation function" << std::endl;
     if( initPop <= 0 ){
         std::cout << "TotalPopulation: Addition of a population of 0 of less (" << initPop << ") molecules attempted, exiting." << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "after IF in the addPopulation function" << std::endl;
     MOLINT initPopN = (MOLINT) initPop;
-    std::cout << 1 << std::endl;
     m_listOfPopulations.push_back(Population(specie, initPopN));
-    std::cout << 2 << std::endl;
     auto itNewPop = m_listOfPopulations.rbegin();
-    std::cout << "before FOR in the addPopulation function" << std::endl;
     for( auto itOtherPop = m_listOfPopulations.begin(); itOtherPop != m_listOfPopulations.end(); itOtherPop++ ){
         itOtherPop->buildRelation(itOtherPop, itNewPop);
     }

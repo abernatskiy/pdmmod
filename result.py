@@ -176,7 +176,7 @@ class Result(object):
         
         return hist
 
-    def getSteady(self,nonSteadyPercent=0.9):#TODO
+    def getSteady(self,nonSteadyPercent=0.9):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.specPop.keys():
@@ -221,25 +221,65 @@ class Result(object):
         else:
             plt.savefig('pics/'+title + ".png")
         
-    def getLenSteady(self,nonSteadyPercent=0.9):
-        border=int(nonSteadyPercent*len(self.times))
-        steady={}
-        for seq in self.specPop.keys():
-            points=self.specPop[seq][border:]
-            steady[seq]=mean(points)
+    def getLenSteady(self,steady):
+        '''steady: OrderedDict{seq: float}
+        '''
         
         steadyLen={}
         for i in range(1,int(self.parameters['maxLength'])+1):
-            steadyLen[i]=[]
+            steadyLen[i]={}
         
-        steadySorted = OrderedDict(sorted(steady.items(), key=lambda t: t[1],reverse=True))
+        #get sorted dictionary for every key of steadyLen
+        for seq in steady:
+            if seq.find('f')==-1:
+                sLen=len(seq)
+            else:
+                sLen=len(seq)-1
+            steadyLen[sLen][seq]=steady[seq]
         
-        return steadySorted
+        for length in steadyLen.keys():
+            tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
+            steadyLen[length]=tmp
         
-        return None
+        return steadyLen
+        
+        
     
     
-    def plotHPlengths(self,steady=None,show=True):
+    def plotHPlengths(self,steady,show=True):
+        steadyLen=self.getLenSteady(steady)
+        
+        def f(key,steadyLen):
+            if key.find('f')==-1:
+                sLen=len(key)
+            else:
+                sLen=len(key)-1
+            if list(steadyLen[sLen].keys()).index(key)<3:
+                return str(key)+'='+str("%.2f" % steadyLen[sLen][key])
+            else:
+                return None
+            
+        fig=plt.figure(figsize=(8,6))
+        #for every length of polymers
+        for length in steadyLen.keys():
+            #if there are polymers of theat length
+            if not steadyLen[length]=={}:
+                #for every sequence in the dictionary
+                for seq in steadyLen[length].keys():
+                    #print(seq)
+                    plt.plot(self.times,self.specPop[seq],label=f(seq,steadyLen))
+                    
+                title = self.modelName+'\n'
+                for val in self.parameters.values():
+                    title+=' '+("%.2f" % float(val))
+                plt.title("Populations of species of length "+str(length)+' '+title)
+                plt.xlim(0,self.times[-1])
+                plt.legend(fontsize='small')
+                if show:
+                    plt.show()
+                else:
+                    plt.savefig('pics/'+title +'len'+str(length)+".png")
+                
         return None
 
     

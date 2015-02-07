@@ -14,22 +14,29 @@ from numpy import linspace
 '''DATA
 * numSpec -- int.
   interp. number of species types
-* number -- int. 
+* population -- int. 
   interp. the number of molecules of each monomer
 * command -- string. 
   interp. simulation run command with parameters, like ./pdmmdo 10 1 x
 * runs -- int.
   interp. the number of times simulation is being run
+* currPops -- List [int.]
+  interp. list of the populations with which simulations are being run
+* species -- list [int.]  
+  interp. list of number of species with which simulations are being run
+* arrayOfChanges -- one of:
+  - currPops
+  - species
 '''
 
 
-def changeInitPop(numSpec,number): 
+def changeInitPop(numSpec,population): 
     '''
     goes to populations.txt and changes population of each species to a given one
     '''
     popFile = open("populations.txt", mode='w', encoding='utf-8')
     for i in range(numSpec):
-        popFile.write(str(i)+" "+str(number)+"\n")
+        popFile.write(str(i)+" "+str(population)+"\n")
     popFile.close()
     
     return None
@@ -46,10 +53,10 @@ def getSimTime(command):
     
     return time, retValue
 
-def getTimeStat(command,numSpec,number,runs):
+def getTimeStat(command,numSpec,population,runs):
     '''runs the simulation several times with fixed parameters and then returns average time of running
     '''
-    changeInitPop(numSpec,number)
+    changeInitPop(numSpec,population)
     times=[]
     for i in range(runs):
         time, retValue = getSimTime(command)
@@ -64,31 +71,41 @@ def getTimeStat(command,numSpec,number,runs):
     print(ave, stdDev)
     return ave, stdDev
 
-def runSeveral(command,runs,minNum,number,steps):
-    '''
+def runSeveralChangePop(command,runs,numSpec,currPops):#TEST
+    '''runs several simulations with different population of the fixed number of species
     '''
     system('rm runTemp.txt && touch runTemp.txt' )
-    numPoints=len(steps)
-    numSpec=minNum
-    for i in range(numPoints):
-        pair=getTimeStat(command,numSpec,number,runs)
+    for population in currPops:
+        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
         with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(number*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        numSpec=numSpec+steps[i]
+            myfile.write(str(population*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+        #numSpec=numSpec+steps[i]
 
     
     return None
 
-def analyzeRuntime(command,runs,minpop,numPoints):
+def runSeveralChangeNumSpec(command,runs,population,species):#TEST
+    '''runs several simulations with different number of species but fixed population of every specie
+    '''
+    system('rm runTemp.txt && touch runTemp.txt' )
+    for numSpec in species:
+        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
+        with open("runTemp.txt", "a") as myfile:
+            myfile.write(str(population*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+        #numSpec=numSpec+steps[i]
+
     
+    return None
+
+def analyzeRuntime(command,runs,arrayOfChanges):
+    '''
+    '''
     runtimes=[]
     myfile = open('runTemp.txt','rt')
         
-    #number=minpop
-    for i in range(numPoints):
-        pair=((myfile.readline()).rstrip('\n')).split(' ')
-        runtimes.append((int(pair[0]),float(pair[1]),float(pair[2])))
-        #number=number*multiplier
+    for i in range(len(arrayOfChanges)):
+        raw=((myfile.readline()).rstrip('\n')).split(' ')
+        runtimes.append((int(raw[0]),float(raw[1]),float(raw[2])))
     
     
     
@@ -102,11 +119,11 @@ def analyzeRuntime(command,runs,minpop,numPoints):
     
     return runtimes, ratios
     
-def plotRuntimes(runtimes,ratios):
+def plotRuntimes(runtimes,ratios,title):
     '''runtimes fitting'''
     x=[r[0] for r in runtimes]
-    y=[r[1] for r in runtimes]
-    y_err=[r[2] for r in runtimes]
+    y=[r[1]*10**6 for r in runtimes]
+    y_err=[r[2]*10**6 for r in runtimes]
     
     z = polyfit(x, y, 1)
     f = poly1d(z)
@@ -135,33 +152,34 @@ def plotRuntimes(runtimes,ratios):
     ax1.plot(xr_new,yr_new,label='y = '+'%.2e' %zr[0]+' x +'+'%.2e' %zr[1])
     for i in range(len(runtimes)):
         element=runtimes[i]
+    
+        rat=ratios[i-1]
+        ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o')
         
-        if not element[0]==minpop*2:
-            rat=ratios[i-1]
-            ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o')
-            
     #ax0.set_yscale('log')
     #ax0.set_xscale('log')
     #ax1.set_xscale('log')
     ax0.legend(loc=4)
     ax1.legend(loc=4)
-    ax0.set_title('Simulation run time vs number of species in the simulation')
+    ax0.set_title('Simulation run time vs population of species in the simulation')
     ax1.set_title('Current slope of the graph above')
+    ax0.set_ylabel('runtime, microseconds')
     #plt.savefig('timeStats.pdf')
+    fig.suptitle(title)
     plt.show()
     return None
 
 
-minNum=5
-number=10
+
+population=50
 command = './pdmmod', '1', '1', 'x'
-runs = 5
-minpop=number
-steps=[5]*25
-numPoints=len(steps)
+runs = 3
+species=[50,100,200,500,750,1000,1100,1200,1300,1400,1500]
+
+title = 'runtimes for simulations with number of species from 20 to '+str(species[-1])
 
 
-#runSeveral(command,runs,minNum,number,steps)
-runtimes, ratios = analyzeRuntime(command,runs,minpop,numPoints)
-plotRuntimes(runtimes,ratios)
+runSeveralChangeNumSpec(command,runs,population,species)
+runtimes, ratios = analyzeRuntime(command,runs,species)
+plotRuntimes(runtimes,ratios,title)
 

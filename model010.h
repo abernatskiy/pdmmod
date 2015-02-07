@@ -12,8 +12,6 @@
  */
 
 
-const float COLL_RATE = 0.0001;
-
 
 
 class Specie
@@ -26,7 +24,12 @@ public:
     
     //attributes
     std::string m_id;
+    std::string m_catalyst;
+    std::string m_substrate;
+    bool m_product;
     int m_length;
+    bool m_folded;
+    int m_native;
     
     //constants
     

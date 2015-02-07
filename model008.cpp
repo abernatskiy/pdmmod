@@ -11,7 +11,7 @@
 //std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
-    modelName = std::string("");
+    modelName = std::string("colliding_particles");
     m_id = id;
     
 }

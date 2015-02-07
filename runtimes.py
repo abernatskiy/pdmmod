@@ -11,9 +11,21 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
-def changeInitPop(numSpec,number):
-    '''numSpec -- number of species types
-    number -- int. the number of molecules of each monomer
+'''DATA
+* numSpec -- int.
+  interp. number of species types
+* number -- int. 
+  interp. the number of molecules of each monomer
+* command -- string. 
+  interp. simulation run command with parameters, like ./pdmmdo 10 1 x
+* runs -- int.
+  interp. the number of times simulation is being run
+'''
+
+
+def changeInitPop(numSpec,number): 
+    '''
+    goes to populations.txt and changes population of each species to a given one
     '''
     popFile = open("populations.txt", mode='w', encoding='utf-8')
     for i in range(numSpec):
@@ -24,7 +36,8 @@ def changeInitPop(numSpec,number):
     
 
 def getSimTime(command):
-    '''command -- string. simulation run command with parameters
+    '''
+    runs the simulation and then retrieves its running time
     '''
     retValue=subprocess.call(command)
     
@@ -34,6 +47,8 @@ def getSimTime(command):
     return time, retValue
 
 def getTimeStat(command,numSpec,number,runs):
+    '''runs the simulation several times with fixed parameters and then returns average time of running
+    '''
     changeInitPop(numSpec,number)
     times=[]
     for i in range(runs):
@@ -50,6 +65,8 @@ def getTimeStat(command,numSpec,number,runs):
     return ave, stdDev
 
 def runSeveral(command,runs,minNum,number,steps):
+    '''
+    '''
     system('rm runTemp.txt && touch runTemp.txt' )
     numPoints=len(steps)
     numSpec=minNum
@@ -134,6 +151,7 @@ def plotRuntimes(runtimes,ratios):
     plt.show()
     return None
 
+
 minNum=5
 number=10
 command = './pdmmod', '1', '1', 'x'
@@ -146,3 +164,4 @@ numPoints=len(steps)
 #runSeveral(command,runs,minNum,number,steps)
 runtimes, ratios = analyzeRuntime(command,runs,minpop,numPoints)
 plotRuntimes(runtimes,ratios)
+

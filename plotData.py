@@ -115,4 +115,4 @@ def plotData(times,specPop):
 
 times, specPop = readData("x")
 printStats(times,specPop)
-#plotData(times, specPop)
+plotData(times, specPop)

@@ -19,6 +19,7 @@ void readConfig(std::map<std::string,Parameter>* dict, std::string filename){
     dict->emplace("hydrophobicEnergy",      (float) reader.GetReal("kinetic model", "hydrophobicEnergy", -1.0));
     dict->emplace("maxLength",              (int) reader.GetInteger("kinetic model", "maxLength", -1));
     dict->emplace("hydrolysisRate",      (float) reader.GetReal("kinetic model", "hydrolysisRate", 0.1));
+    dict->emplace("aggregation",      (float) reader.GetReal("kinetic model", "aggregation", 0.1));
     // explicit type convertions are required because GetReal() returns double and GetInteger() returns long int
 
     return;

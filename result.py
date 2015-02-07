@@ -8,12 +8,12 @@
 import matplotlib.pyplot as plt
 from statistics import mean
 from collections import OrderedDict
-
+from os import system as system
 
 class Result(object):
     def __init__(self,filename):
-        self.filename = filename
-        self.times, self.specPop, self.modelName, self.parameters, self.simParams = self.readData()
+        self.times, self.specPop, self.modelName, self.parameters, self.simParams = self.readData(filename)
+        self.directory, self.filename = self.createDestination(filename)
         
 
     def __repr__(self):
@@ -28,11 +28,11 @@ class Result(object):
             
         return string
 
-    def readData(self):
+    def readData(self,filename):
         '''times at which we are recording'''
         times = []
         specPop = {}
-        dataFile = open(self.filename, "rt")
+        dataFile = open(filename, "rt")
         #counting time instances
         count = 0
         commentCount = 0
@@ -86,8 +86,22 @@ class Result(object):
                             print('count',count)
                             raise ValueError("!")
         
+        paramDict = OrderedDict(sorted(paramDict.items(), key=lambda t: t[0]))
+        
         return times, specPop, modelName, paramDict, simParamDict
-
+    
+    def createDestination(self,filename):
+        title=''
+        for val in self.parameters.values():
+            title+='_'+("%.2f" % float(val))
+        
+        directory = 'simulations/'+self.modelName+title+'/'
+        newFilename = directory+'data.txt'
+        system('mkdir '+str(directory))
+        system('cp '+filename+' '+newFilename)
+        
+        return directory, newFilename
+    
     def readNativeList(self):
         ''' None -> {string: (int, string)}
         converts nativeList.txt to a dictionary from hp-string to a tuple of their native energies and catalytic patterns
@@ -200,7 +214,7 @@ class Result(object):
         fig=plt.figure(figsize=(8,6))
         if not steady==None:
             steadyKeys=[item for item in steady]
-            print(steadyKeys)
+            #print(steadyKeys)
             topTen=steadyKeys[0:10]
             
             for key in steady.keys():
@@ -219,7 +233,7 @@ class Result(object):
         if show:
             plt.show()
         else:
-            plt.savefig('pics/'+title + ".png")
+            plt.savefig(self.directory + "all.png")
         
     def getLenSteady(self,steady):
         '''steady: OrderedDict{seq: float}
@@ -259,15 +273,17 @@ class Result(object):
             else:
                 return None
             
-        fig=plt.figure(figsize=(8,6))
+        #fig=plt.figure(figsize=(8,6))
         #for every length of polymers
         for length in steadyLen.keys():
+            lbl=None
+            fig=plt.figure(figsize=(8,6))
             #if there are polymers of theat length
             if not steadyLen[length]=={}:
                 #for every sequence in the dictionary
                 for seq in steadyLen[length].keys():
-                    #print(seq)
-                    plt.plot(self.times,self.specPop[seq],label=f(seq,steadyLen))
+                    lbl=f(seq,steadyLen)
+                    plt.plot(self.times,self.specPop[seq],label=lbl)
                     
                 title = self.modelName+'\n'
                 for val in self.parameters.values():
@@ -277,12 +293,14 @@ class Result(object):
                 plt.legend(fontsize='small')
                 if show:
                     plt.show()
+                    #plt.savefig(self.directory+'len'+str(length)+".png")
                 else:
-                    plt.savefig('pics/'+title +'len'+str(length)+".png")
+                    plt.savefig(self.directory+str("%02d" % length)+".png")
                 
         return None
 
     
 r=Result('x')
 steady = r.getSteady()
-#r.plotData(steady)
+r.plotData(steady,False)
+r.plotHPlengths(steady,False)

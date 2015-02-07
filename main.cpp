@@ -23,9 +23,10 @@ void printUsage(){
 //    std::cout << "Step = 0: record every step" << std::endl;
     std::cout << "Usage:" << std::endl;
     std::cout << "  pdmmod simulateTime <totalTime> <timeBetweenRecords> <outputFileName>" << std::endl;
-    std::cout << "  pdmmod simulateReactions <numberOfReactions> <outputFileName>" << std::endl;
+    std::cout << "  pdmmod simulateReactions <numberOfReactions> <recordingPeriod> <outputFileName>" << std::endl;
     std::cout << "totalTime=0 causes the program to run the simulation until it runs out of possible reactions or indefinitely" << std::endl;
     std::cout << "timeBetweenRecords=0 causes the program to record the population after every reaction" << std::endl;
+    std::cout << "numberOfReactions must be a multiple of recordingPeriod" << std::endl;
 }
 
 int main (int argc, char** argv){
@@ -46,6 +47,7 @@ int main (int argc, char** argv){
     float totalTime = 0.0;
     float stepLen = 0.0;
     int totalReactions = 0;
+    int recordingPeriod = 0;
     std::string filename;
     if (argc == 5 && std::string(argv[1]).compare("simulateTime") == 0){
         simType = 0;
@@ -55,11 +57,17 @@ int main (int argc, char** argv){
         stepLen = std::atof(argv[3]);
         filename = std::string(argv[4]);
     }
-    else if (argc == 4 && std::string(argv[1]).compare("simulateReactions") == 0){
+    else if (argc == 5 && std::string(argv[1]).compare("simulateReactions") == 0){
         simType = 1;
         //total number of reactions
         totalReactions = std::atoi(argv[2]);
-        filename = std::string(argv[3]);
+        recordingPeriod = std::atoi(argv[3]);
+        if(totalReactions % recordingPeriod != 0){
+            std::cout << "Unrecognized arguments" << std::endl;
+            printUsage();
+            return 1;
+        }
+        filename = std::string(argv[4]);
     }
     else {
         std::cout << "Unrecognized arguments" << std::endl;
@@ -80,8 +88,8 @@ int main (int argc, char** argv){
     writeHeaderToFile(&tp, argc, argv, &myfile);
     writeToFile(prevPops, 0.0, &myfile);
     t1=clock();
-    while(true){
-        if (simType == 0){
+    if (simType == 0){
+        while(true){
             if (totalTime == 0.f)
             {
                 //TODO
@@ -101,10 +109,13 @@ int main (int argc, char** argv){
                 }
             }
         }
-        else if (simType == 1){
-            reacNum = reacNum + 1;
+    }
+    else if (simType == 1){
+        while(true){
             stp = tp.stepSimulation();
-            writeToFile(storePopulations(&tp), tp.m_t, &myfile);
+            reacNum = reacNum + 1;
+            if (reacNum % recordingPeriod == 0)
+                writeToFile(storePopulations(&tp), tp.m_t, &myfile);
 
             if (stp == 1 || reacNum >= totalReactions){
                 myfile.close();

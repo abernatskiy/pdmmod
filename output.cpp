@@ -26,7 +26,7 @@ int closeFile(std::string filename){
 
 //TODO
 
-void writeHeaderToFile(TotalPopulation* tp, float totalTime, float period, std::string filename, std::ofstream* myfile){
+void writeHeaderToFile(TotalPopulation* tp, int argc, char** argv, std::ofstream* myfile){
 
     std::string modelName = (((tp->m_listOfPopulations).begin())->m_specie).modelName;
     (*myfile) << "# Model: " << modelName << std::endl;
@@ -34,7 +34,10 @@ void writeHeaderToFile(TotalPopulation* tp, float totalTime, float period, std::
     for(auto it = configDict.begin(); it != configDict.end(); it++)
         (*myfile) << " " << it->first << "=" << (it->second).getString();
     (*myfile) << std::endl;
-    (*myfile) << "# TotalTime=" << totalTime << " RecordPeriod=" << period << " Filename=" << filename << std::endl;
+    (*myfile) << "# Command line:";
+    for(int i=0; i<argc; i++)
+        (*myfile) << " " << std::string(argv[i]);
+    (*myfile) << std::endl;
     return;
 }
 

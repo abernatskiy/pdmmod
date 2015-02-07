@@ -43,7 +43,7 @@
 std::string storePopulations(TotalPopulation* tp);
     //stores a list of entities of class Population
 
-void writeHeaderToFile(TotalPopulation* tp, float totalTime, float period, std::string filename, std::ofstream* myfile);
+void writeHeaderToFile(TotalPopulation* tp, int argc, char** argv, std::ofstream* myfile);
 void writeToFile(std::string populations, float time, std::ofstream* myfile);
 std::string convToString(TotalPopulation* tp);
 std::string writeOrNotTo(float stepLen, TotalPopulation* tp, float prevStep, std::string prevPops, std::ofstream* myfile);

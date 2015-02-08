@@ -52,16 +52,16 @@ void writeToFile(std::string strPops, float time, std::ofstream* myfile){
 
 //TODO
 float getPrevStep(float stepLen, float prevStep, float currTime){
-    int t = currTime - prevStep;
+    float t = currTime - prevStep;
     if (stepLen == 0){
         prevStep=currTime;
     }
     else{
         if (t >= stepLen && t < 2.f*stepLen){
-            prevStep = prevStep + 1.f;
+            prevStep = prevStep + stepLen;
         }
         else if (t >= 2.f*stepLen){
-            prevStep = prevStep + floor(t);
+            prevStep = prevStep + floor(t/stepLen)*stepLen;
         }
         else{
             prevStep = prevStep;
@@ -73,17 +73,19 @@ float getPrevStep(float stepLen, float prevStep, float currTime){
 //TEST
 std::string writeOrNotTo(float stepLen, TotalPopulation* tp, float prevStep, std::string prevPops, std::ofstream* myfile){
     //if stepLen = 0, no questions: write every stepLen
-    int t = (tp->m_t) - prevStep;
+    float t = (tp->m_t) - prevStep;
     if (stepLen == 0){
         writeToFile(storePopulations(tp),tp->m_t, myfile);
         prevPops = std::string("");
     }
     else{
         if (t >= stepLen && t < 2.f*stepLen){
+//            std::cout << "t is " << t << ", prevstep is " << prevStep << ", stepLen is " << stepLen << std::endl;
             prevPops = storePopulations(tp);
             writeToFile(prevPops,tp->m_t, myfile);
         }
         else if (t >= 2.f*stepLen){
+            std::cout << "curtime is " << tp->m_t << std::endl;
             std::cout << "prevStep is " << prevStep << std::endl;
             std::cout << "stepLen is " <<stepLen << std::endl;
             for (float time= prevStep+stepLen; time < prevStep+t; time = time + stepLen){

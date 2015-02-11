@@ -50,10 +50,15 @@ class Result(object):
                         for item in paramList:
                             paramDict[item[0]]=item[1]
                     elif commentCount == 3:
-                        rawList = (line[2:].rstrip('\n')).split(' ')
-                        paramList = [item.split('=') for item in rawList]
-                        for item in paramList:
-                            simParamDict[item[0]]=item[1]
+                        rawList = (line[25:].rstrip('\n')).split(' ')
+                        if rawList[0]=='simulateTime':
+                            simParamDict['time']=int(rawList[1])
+                            simParamDict['interval']=float(rawList[2])
+                            simParamDict['filename']=rawList[3]
+                        elif rawList[0]=='simulateReactions':
+                            simParamDict['numOfReacs']=int(rawList[1])
+                            simParamDict['interval']=float(rawList[2])
+                            simParamDict['filename']=rawList[3]
                 else:
                     count+=1
                     #get a line of raw information splitted by ","
@@ -262,7 +267,7 @@ class Result(object):
     
     def plotHPlengths(self,steady,show=True):
         steadyLen=self.getLenSteady(steady)
-        
+        natData = self.readNativeList()
         def f(key,steadyLen):
             if key.find('f')==-1:
                 sLen=len(key)
@@ -272,6 +277,19 @@ class Result(object):
                 return str(key)+'='+str("%.2f" % steadyLen[sLen][key])
             else:
                 return None
+        
+        def getColor(seq,natData):
+            if not seq.find('f')==-1:
+                temp = seq[1:]
+                if temp.find('HHH')==-1 or natData[temp][1]=='N':
+                    col = 'blue'
+                else:
+                    col = 'red'
+            else:
+                col = 'gray'
+            
+            return col
+                    
             
         #fig=plt.figure(figsize=(8,6))
         #for every length of polymers
@@ -283,7 +301,8 @@ class Result(object):
                 #for every sequence in the dictionary
                 for seq in steadyLen[length].keys():
                     lbl=f(seq,steadyLen)
-                    plt.plot(self.times,self.specPop[seq],label=lbl)
+                    col=getColor(seq,natData)
+                    plt.plot(self.times,self.specPop[seq],label=lbl,color=col)
                     
                 title = self.modelName+'\n'
                 for val in self.parameters.values():

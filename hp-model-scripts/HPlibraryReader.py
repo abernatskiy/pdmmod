@@ -4,7 +4,7 @@ import sys
 import os
 from routes import *
 import nativeChain
-dreload(nativeChain)
+
 
 def HPlibrary2sequencesList(maxLength,subClasses=None,catClasses=None):
     """
@@ -87,8 +87,8 @@ def print2File(nativeList,filename):
     
     return None
 
-nativeList=HPlibrary2sequencesList(20)
-print2File(nativeList,routePDM+'nativeList20.txt')
+nativeList=HPlibrary2sequencesList(12)
+print2File(nativeList,routePDM+'nativeList12.txt')
 
  
  

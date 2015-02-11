@@ -3,7 +3,7 @@
 #include <iostream>
 #include "specie.h"
 
-/* colliding particles  
+/* colliding particles  #008
  * there are several types of particles 
  * reactions are binary collisions, particles don't change when interact.
  */

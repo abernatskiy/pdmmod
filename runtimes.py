@@ -97,15 +97,16 @@ def runSeveralChangeNumSpec(command,runs,population,species):#TEST
     
     return None
 
-def analyzeRuntime(command,runs,arrayOfChanges):
+def analyzeRuntime(command,runs,numOfPoints):
     '''
     '''
     runtimes=[]
     myfile = open('runTemp.txt','rt')
         
-    for i in range(len(arrayOfChanges)):
+    for i in range(numOfPoints):
         raw=((myfile.readline()).rstrip('\n')).split(' ')
-        runtimes.append((int(raw[0]),float(raw[1]),float(raw[2])))
+        if not raw ==['']:
+            runtimes.append((int(raw[0]),float(raw[1]),float(raw[2])))
     
     
     
@@ -161,7 +162,7 @@ def plotRuntimes(runtimes,ratios,title):
     #ax1.set_xscale('log')
     ax0.legend(loc=4)
     ax1.legend(loc=4)
-    ax0.set_title('Simulation run time vs population of species in the simulation')
+    ax0.set_title('Simulation run time vs number species types in the simulation')
     ax1.set_title('Current slope of the graph above')
     ax0.set_ylabel('runtime, microseconds')
     #plt.savefig('timeStats.pdf')
@@ -170,16 +171,28 @@ def plotRuntimes(runtimes,ratios,title):
     return None
 
 
-
+###Change Number of species###
 population=50
-command = './pdmmod', '1', '1', 'x'
+command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
 runs = 3
-species=[50,100,200,500,750,1000,1100,1200,1300,1400,1500]
+#species=[1,2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
 
-title = 'runtimes for simulations with number of species from 20 to '+str(species[-1])
+title = 'Model: colliding particles \n Runtimes for simulations as number of types of species grows'
+numPoint = 51
 
-
-runSeveralChangeNumSpec(command,runs,population,species)
-runtimes, ratios = analyzeRuntime(command,runs,species)
+#runSeveralChangeNumSpec(command,runs,population,species)
+runtimes, ratios = analyzeRuntime(command,runs,numPoint)
 plotRuntimes(runtimes,ratios,title)
+
+###Change populations###
+#numSpec = 100
+#runs = 3
+#command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
+#numPoint = 61
+##currPops = [1,2,3,4,5,6,8,10,12,15,20,25,30,35,40,45,50,60,70,80,90,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000]
+##runSeveralChangePop(command,runs,numSpec,currPops)
+#runtimes, ratios = analyzeRuntime(command,runs,numPoint)
+#title = 'Model: colliding particles \n Runtimes for simulations as population of each species grows'
+#plotRuntimes(runtimes,ratios,title)
+
 

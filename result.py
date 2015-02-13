@@ -321,5 +321,6 @@ class Result(object):
     
 r=Result('x')
 steady = r.getSteady()
+#r.printHPstats()
 r.plotData(steady,False)
 r.plotHPlengths(steady,False)

@@ -25,7 +25,8 @@ public:
     RandomGenerator();
 
     // Methods
-    PROPFLOAT getFloat01(){return 1.f - m_distribution(m_generator);}; // this function returns uniformly distributed random float from (0,1]
+    PROPFLOAT getFloat01(){return m_distribution(m_generator);}; // this function returns uniformly distributed random float from [0,1]
+                                                                 // compare with the C++11 standard, which prescribes it to be in [0,1)
     void seedWithUInt(unsigned int seed){m_seed = seed; m_generator.seed(seed);};
     void seedWithString(std::string str);
     void seedWithClock(); // used in the default constructor

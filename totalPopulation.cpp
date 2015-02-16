@@ -170,7 +170,7 @@ float TotalPopulation::sampleTime(){
     while(r2 <= 0.0)
         r2 = 1.0 - m_randGen.getFloat01();
     float dt = -1.f*log(r2)/m_a;
-    if(dt == std::numeric_limits<float>::min())
+    if(dt == std::numeric_limits<PROPFLOAT>::max())
         std::cout << "ERROR: sampled infinite time\n";
     return dt;
 }

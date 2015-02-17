@@ -318,9 +318,19 @@ class Result(object):
                 
         return None
 
+
+    def doIcare(self,iDo=False):
+        if iDo:
+            system('mv '+self.directory+' save-'+self.directory)
+            self.directory= ' save-'+self.directory
+        else:
+            system('rm -r '+self.directory)
+            self.directory = ''
+        
+        return self.directory
     
-r=Result('x')
+r=Result('y')
 steady = r.getSteady()
 #r.printHPstats()
 r.plotData(steady,False)
-r.plotHPlengths(steady,False)
+#r.plotHPlengths(steady,False)

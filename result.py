@@ -7,6 +7,7 @@
 
 import matplotlib.pyplot as plt
 from statistics import mean
+from statistics import variance
 from collections import OrderedDict
 from os import system as system
 
@@ -206,7 +207,39 @@ class Result(object):
         
         return steadySorted
     
-
+    def getSteadyAndVar(self,nonSteadyPercent=0.9):
+        border=int(nonSteadyPercent*len(self.times))
+        steady={}
+        for seq in self.specPop.keys():
+            points=self.specPop[seq][border:]
+            steady[seq]=(mean(points),variance(points))
+        
+        steadySorted = OrderedDict(sorted(steady.items(), key=lambda t: t[1][0],reverse=True))
+        
+        return steadySorted
+    
+    def makeDictOfLengths(self,steadyAndVar):#TODO
+        '''returns dictionary of ordereder dictionaries
+        {steady: OrderedDict{seq: float}}
+        '''
+        
+        steadyLen={}
+        for i in range(1,int(self.parameters['maxLength'])+1):
+            steadyLen[i]={}
+        
+        #get sorted dictionary for every key of steadyLen
+        for seq in steadyAndVar:
+            if seq.find('f')==-1:
+                sLen=len(seq)
+            else:
+                sLen=len(seq)-1
+            steadyLen[sLen][seq]=steadyAndVar[seq]
+        
+        for length in steadyLen.keys():
+            tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
+            steadyLen[length]=tmp
+        
+        return steadyLen
 
     def plotData(self,steady=None,show=True):
         def f(key,steady,topTen):
@@ -329,8 +362,8 @@ class Result(object):
         
         return self.directory
     
-r=Result('y')
+r=Result('x')
 steady = r.getSteady()
 #r.printHPstats()
-r.plotData(steady,False)
+#r.plotData(steady,False)
 #r.plotHPlengths(steady,False)

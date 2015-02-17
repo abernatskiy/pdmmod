@@ -5,6 +5,7 @@
 #include <tuple>
 #include <cstdlib>
 #include <cmath>
+#include <limits>
 
 TotalPopulation::TotalPopulation(std::string source){
 //    m_randGen.seedWithString("shg;l ivnmsvceg dgfh d0sfdfsd ");
@@ -139,8 +140,14 @@ Reaction TotalPopulation::sampleReaction(){
      * m_ksi. First we determine which population keeps the record of the reaction, then
      * the method of class Population handles the rest of the sampling.
      */
-    PROPFLOAT juice = (1.f - m_randGen.getFloat01()) * m_a; // the "one minus" part is here because we need the juice to be in [0, m_a)
-    PROPFLOAT sumKsi = 0.f;
+
+    // we need the juice to be a uniformly distributed random number in [0, m_a)
+    PROPFLOAT juice = m_a;
+    while(juice >= m_a)
+        juice = m_randGen.getFloat01() * m_a; // this is the only way to get uniformly distributed number from [0, m_a) with the current random number generator implementation
+                                              // tested with gcc-4.8.3
+
+    PROPFLOAT sumKsi = 0.0;
     PROPFLOAT prevSumKsi;
 //    std::cout << "Sampling a reaction with " << juice << " of juice, total propensity is " << m_a << std::endl;
     for(auto pop = m_listOfPopulations.begin(); pop != m_listOfPopulations.end(); pop++){
@@ -150,13 +157,22 @@ Reaction TotalPopulation::sampleReaction(){
             return pop->sampleReaction( juice - prevSumKsi );
     }
     std::cout << "ERROR: TotalPopulation-level sampling failed. This is likely to be a rare consequence of the numerical error of the juice quantity, which is not handled in the current version\n"; // TODO
-    std::cout << "Juice in the end: " << juice << std::endl;
+    std::cout << std::scientific << "Juice in the end: " << juice << ", total propensity: " << m_a << ", difference: " << juice-m_a << std::endl;
+    if(juice - m_a == 0.0 )
+        std::cout << "Difference is exactly equal to 0.0\n";
+    else
+        std::cout << "Difference is not exactly 0\n";
     exit(2);
 }
 
 float TotalPopulation::sampleTime(){
-    float r2 = m_randGen.getFloat01();
-    return -1.f*log(r2)/m_a;
+    float r2 = 0.0;
+    while(r2 <= 0.0)
+        r2 = 1.0 - m_randGen.getFloat01();
+    float dt = -1.f*log(r2)/m_a;
+    if(dt == std::numeric_limits<float>::max())
+        std::cout << "ERROR: sampled infinite time\n";
+    return dt;
 }
 
 void TotalPopulation::addPopulationsFromFile(std::string source){

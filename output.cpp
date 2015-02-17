@@ -80,7 +80,7 @@ std::string writeOrNotTo(float stepLen, TotalPopulation* tp, float prevStep, std
     }
     else{
         if (t >= stepLen && t < 2.f*stepLen){
-//            std::cout << "t is " << t << ", prevstep is " << prevStep << ", stepLen is " << stepLen << std::endl;
+//            std::cout << std::scientific << "writing to file between " << prevStep << " and " << tp->m_t << ", for delta t of " << t << std::endl;
             prevPops = storePopulations(tp);
             writeToFile(prevPops,tp->m_t, myfile);
         }

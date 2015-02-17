@@ -11,7 +11,7 @@ void readConfig(std::map<std::string,Parameter>* dict, std::string filename){
         exit(1);
     }
     dict->emplace("specNumber",          (int) reader.GetInteger("kinetic model", "specNumber", 10));
-    dict->emplace("collRate",          (float) reader.GetInteger("kinetic model", "collRate", 0.1));
+    dict->emplace("collRate",          (float) reader.GetReal("kinetic model", "collRate", 0.1));
     /*dict->emplace("monomerBirthH",          (float) reader.GetReal("kinetic model", "monomerBirthH", 0.0));
     dict->emplace("monomerBirthP",          (float) reader.GetReal("kinetic model", "monomerBirthP", 0.0));
     dict->emplace("growth",                 (float) reader.GetReal("kinetic model", "growth", 0.0));

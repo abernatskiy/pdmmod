@@ -20,8 +20,8 @@ TotalPopulation::TotalPopulation(std::string source){
 
 int TotalPopulation::stepSimulation(){
 
-    if( m_listOfPopulations.size() == 1 && m_a == 0.f ){
-        std::cout << "All molecules died off and there are no source reactions, exiting\n";
+    if( m_a == 0.f ){
+        std::cout << "No molecules capable of chemical reactions are left, and also no source reactions. Exiting the simulation loop.\n";
         //exit(EXIT_SUCCESS);
         //break;
         return 1;

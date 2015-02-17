@@ -84,6 +84,34 @@ void Reaction::computePartialPropensity(std::string wRespectToSp, MOLINT populat
     exit(EXIT_FAILURE);
 }
 
+bool Reaction::isValid()
+{
+    std::string s, s0, s1;
+    int st, st0, st1;
+    std::tie (s0, st0) = m_records[0];
+    std::tie (s1, st1) = m_records[1];
+
+    if( (st0 != -1 && st0 != 0) || (st1 != -1 && st1 != 0) )
+        return false;
+
+    if( s0 == "" && s1 == "" && (st0 != 0 || st1 != 0) )
+        return false;
+
+    if( ((st0 == 0 && st1 != 0) || (st0 != 0 && st1 == 0)) && ( s0 != s1 ) )
+        return false;
+
+    auto itRec = m_records.begin();
+    itRec++;
+    itRec++;
+    for(; itRec != m_records.end(); itRec++){
+        std::tie (s, st) = *itRec;
+        if(st <= 0)
+            return false;
+    }
+
+    return true;
+}
+
 void Reaction::addSpecie(std::string specie, int stoichiometry){
     m_records.push_back(specieRecord_t(specie, stoichiometry));
 }

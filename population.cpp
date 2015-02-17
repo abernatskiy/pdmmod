@@ -32,12 +32,16 @@ Reaction Population::sampleReaction(PROPFLOAT remainingJuice){
  *
  *  Won't fix for the time being. */
 
-//    std::cout << "ERROR: Population-level sampling failed. Full propensity of population m_ksi is likely broken.\n";
-//    exit(EXIT_FAILURE);
+//    std::cout << "WARNING: Population-level sampling failed, perhaps due to the numerical error. Returning an invalid reaction to cause resampling.\n";
+//    std::cout << std::scientific << "Sampled with remaining juice of " << remainingJuice << ", sum of partial propensities of " << m_ksi << ", difference " << remainingJuice - m_ksi << std::endl;
 
-    auto itRel = m_listOfRelations.end();
-    itRel--;
-    return itRel->sampleReaction(itRel->m_psi);
+    Reaction invalidReaction("", -100, "", -100, 1000000.0);
+    return invalidReaction;
+
+////  Older, less precise solution to the problem of numerical errors at sampling phase
+//    auto itRel = m_listOfRelations.end();
+//    itRel--;
+//    return itRel->sampleReaction(itRel->m_psi);
 }
 
 void Population::update(int moleculesAdded){

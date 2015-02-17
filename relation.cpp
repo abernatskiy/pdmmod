@@ -23,12 +23,16 @@ Reaction Relation::sampleReaction(PROPFLOAT remainingJuice){
     }
 /*  See lines 28-34 of population.cpp for explanation of what's going on in this function below this line */
 
-//    std::cout << "ERROR: Relation-level sampling failed. Total partial propensity of the group m_psi is likely broken\n";
-//    exit(EXIT_FAILURE);
+//    std::cout << "WARNING: Relation-level sampling failed, perhaps due to the numerical error. Returning an invalid reaction to cause resampling.\n";
+//    std::cout << std::scientific << "Sampled with remaining juice of " << remainingJuice << ", sum of partial propensities of " << m_psi << ", difference " << remainingJuice - m_psi << std::endl;
 
-    auto itRea = m_listOfReactions.end();
-    itRea--;
-    return *itRea;
+    Reaction invalidReaction("", -100, "", -100, 1000000.0);
+    return invalidReaction;
+
+////  Older, less precise solution to the problem of numerical errors at sampling phase
+//    auto itRea = m_listOfReactions.end();
+//    itRea--;
+//    return *itRea;
 }
 
 void Relation::update(MOLINT newNToSp){

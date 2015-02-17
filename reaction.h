@@ -74,6 +74,15 @@ public:
      * the other reactant.
      * WARNING! The second argument is the population of the OTHER reagent, not wRespectToSp.
      */
+
+    bool isValid();
+    /* Is true if all of the below is true.
+     * - stoichiometry of reactants is in {-1,0}
+     * - if both reactants are empty stings, both stoichiometries are 0
+     * - if one of stoichiometries of reactants is zero and the other is not, the reactants are the same
+     * - stoichiometry of products is greater than 0
+     * More conditions may be added later.
+     */
 private:
     void addSpecie(std::string specie, int stoichiometry);
 };

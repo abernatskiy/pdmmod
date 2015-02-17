@@ -97,7 +97,7 @@ std::list<Population>::iterator TotalPopulation::findPopulation(std::string spec
         }
     }
     if( i > 1 ){
-        std::cout << "TotalPopulation: More than one poulation of a specie " << specie << " found during search, exiting.";
+        std::cout << "TotalPopulation: More than one population of a specie " << specie << " found during the search, exiting.";
         exit(EXIT_FAILURE);
     }
     else
@@ -154,14 +154,19 @@ Reaction TotalPopulation::sampleReaction(){
         prevSumKsi = sumKsi;
         sumKsi += pop->m_ksi;
         if( juice < sumKsi )
-            return pop->sampleReaction( juice - prevSumKsi );
+        {
+            Reaction candidateReaction = pop->sampleReaction( juice - prevSumKsi );
+            if(candidateReaction.isValid())
+                return candidateReaction;
+            else
+            {
+//                std::cout << "WARNING: Sampled invalid reaction, perhaps due to the numerical error. Resampling recursively.\n";
+                return sampleReaction();
+            }
+        }
     }
-    std::cout << "ERROR: TotalPopulation-level sampling failed. This is likely to be a rare consequence of the numerical error of the juice quantity, which is not handled in the current version\n"; // TODO
-    std::cout << std::scientific << "Juice in the end: " << juice << ", total propensity: " << m_a << ", difference: " << juice-m_a << std::endl;
-    if(juice - m_a == 0.0 )
-        std::cout << "Difference is exactly equal to 0.0\n";
-    else
-        std::cout << "Difference is not exactly 0\n";
+//    std::cout << "ERROR: TotalPopulation-level sampling failed. This is likely to be a rare consequence of the numerical error of the juice quantity, which is not handled in the current version\n";
+//    std::cout << std::scientific << "Juice in the end: " << juice << ", total propensity: " << m_a << ", difference: " << juice-m_a << std::endl;
     exit(2);
 }
 
@@ -171,7 +176,10 @@ float TotalPopulation::sampleTime(){
         r2 = 1.0 - m_randGen.getFloat01();
     float dt = -1.f*log(r2)/m_a;
     if(dt == std::numeric_limits<float>::max())
+    {
         std::cout << "ERROR: sampled infinite time\n";
+        exit(3);
+    }
     return dt;
 }
 

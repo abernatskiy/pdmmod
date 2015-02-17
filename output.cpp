@@ -54,18 +54,11 @@ void writeToFile(std::string strPops, float time, std::ofstream* myfile){
 float getPrevStep(float stepLen, float prevStep, float currTime){
     float t = currTime - prevStep;
     if (stepLen == 0){
-        prevStep=currTime;
+        prevStep = currTime;
     }
     else{
-        if (t >= stepLen && t < 2.f*stepLen){
-            prevStep = prevStep + stepLen;
-        }
-        else if (t >= 2.f*stepLen){
+        if (t >= stepLen)
             prevStep = prevStep + floor(t/stepLen)*stepLen;
-        }
-        else{
-            prevStep = prevStep;
-        }
     }
     return prevStep;
 }
@@ -73,23 +66,19 @@ float getPrevStep(float stepLen, float prevStep, float currTime){
 //TEST
 std::string writeOrNotTo(float stepLen, TotalPopulation* tp, float prevStep, std::string prevPops, std::ofstream* myfile){
     //if stepLen = 0, no questions: write every stepLen
-    float t = (tp->m_t) - prevStep;
     if (stepLen == 0){
         writeToFile(storePopulations(tp),tp->m_t, myfile);
         prevPops = std::string("");
     }
     else{
-        if (t >= stepLen && t < 2.f*stepLen){
-            writeToFile(prevPops, prevStep + stepLen, myfile);
-        }
-        else if (t >= 2.f*stepLen){
-            std::cout << "curtime is "  << tp->m_t  << std::endl;
-            std::cout << "prevStep is " << prevStep << std::endl;
-            std::cout << "stepLen is "  << stepLen  << std::endl;
-            for (float time=prevStep+stepLen; time < (tp->m_t); time=time+stepLen){
-                std::cout << "time is " << time << std::endl;
-                writeToFile(prevPops, time, myfile);
-            }
+        for (float time=prevStep+stepLen; time < tp->m_t; time=time+stepLen){
+//            std::cout << "curtime is "  << tp->m_t  << std::endl;
+//            std::cout << "prevStep is " << prevStep << std::endl;
+//            std::cout << "stepLen is "  << stepLen  << std::endl;
+//            std::cout << "time is " << time << std::endl;
+            if( time-prevStep > stepLen )
+                std::cout << "writing to the file for the " << floor( (time-prevStep)/stepLen ) << "nd time after one reaction\n";
+            writeToFile(prevPops, time, myfile);
         }
         prevPops = storePopulations(tp);
     }

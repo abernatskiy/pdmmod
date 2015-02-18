@@ -53,50 +53,26 @@ def readData(filename):
 
 def printStats(times,specPop,plot=True):
     print("total number of species is "+str(len(specPop.keys())))
-    lengths=[]
-    #dictionary where populations of all n-mers in the last moment is counted
-    popStats={}
-    lengthDistr={}
+    specTypes=[0]*len(times)
     total=[0]*(len(times))
     for key in specPop.keys():
-        if key.find('f')==-1:
-            polLen=len(key)
-            lengths.append(len(key))
-        else:
-            lengths.append(len(key)-1)
-            polLen=len(key)-1
         total=[total[i]+specPop[key][i] for i in range(len(total))]
-        if not polLen in popStats.keys():
-            #add dict entry and population of the first n-mer of the given length
-            popStats[polLen]=specPop[key][-1]
-        else:
-            #add to the population of n-mers a population of another n-mer
-            popStats[polLen]+=specPop[key][-1]
-    mL=max(lengths)
-    print("maximum length of a polymer is "+str(mL))
-    hist=[]
-    histNorm=[]
-    lengthsD=[ps/hi for (ps,hi) in zip(popStats.copy().values(),hist)]
-    
-    for i in range(1,mL+1):
-        hist.append(lengths.count(i))
-        histNorm.append(hist[i-1]/2**i)
+        specTypes=[specTypes[i]+int(bool(specPop[key][i])) for i in range(len(total))]
     if plot:
-        lengthsD=[ps/hi for (ps,hi) in zip(list(popStats.copy().values()),hist)]
-        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
-        ax1.plot(range(1,mL+1),histNorm,'o')
+        fig, (ax0, ax1) = plt.subplots(nrows=2)
+        ax1.plot(times,specTypes)
         ax0.plot(times,total)
-        ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(specPop.keys())))
-        ax2.legend()
-        ax1.grid(True)
-        ax0.set_title("Types of n-mers and populations in the last moment")
-        ax1.set_title("Total count of molecules at each moment")
-        ax2.set_title("Length distribution in the last moment")
+        #ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(specPop.keys())))
+        #ax2.legend()
+        #ax1.grid(True)
+        ax0.set_title("Total count of molecules at each moment")
+        ax1.set_title("Total count of species types at each moment")
+        #ax2.set_title("Length distribution in the last moment")
         fig.suptitle("hp-simple with folding, no unfolding")
         #plt.savefig("stats.pdf")
         plt.show()
     
-    return hist
+    return None
 
     
 
@@ -116,6 +92,6 @@ def plotData(times,specPop):
     plt.show()
 
 
-times, specPop = readData("y")
+times, specPop = readData("x")
 printStats(times,specPop)
 #plotData(times, specPop)

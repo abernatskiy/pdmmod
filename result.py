@@ -192,7 +192,7 @@ class Result(object):
         if show:
             plt.show()
         else:
-            plt.savefig('pics/stats/'+self.modelName+' '+title + ".png")
+            plt.savefig(self.directory+ "stats.png")
         
         return hist
 
@@ -241,7 +241,22 @@ class Result(object):
         
         return steadyLen
 
-    def plotData(self,steady=None,show=True):
+    def plotData(self,steady,show=True):
+        natData = self.readNativeList()
+        def getColor(seq,natData):
+            if not seq.find('f')==-1:
+                temp = seq[1:]
+                if temp.find('HHH')==-1 or natData[temp][1]=='N':
+                    col = 'blue'
+                elif temp.find('HHH')==-1 and (not natData[temp][1]=='N'):
+                    col = 'green'
+                else:
+                    col = 'red'
+            else:
+                col = 'gray'
+            
+            return col
+        
         def f(key,steady,topTen):
             try:
                 topTen.index(key)
@@ -256,7 +271,8 @@ class Result(object):
             topTen=steadyKeys[0:10]
             
             for key in steady.keys():
-                plt.plot(self.times,self.specPop[key],label=f(key,steady,topTen))
+                col = getColor(key,natData)
+                plt.plot(self.times,self.specPop[key],label=f(key,steady,topTen),color=col)
         else:
             for key in self.specPop.keys():
                 plt.plot(self.times,self.specPop[key])
@@ -316,6 +332,8 @@ class Result(object):
                 temp = seq[1:]
                 if temp.find('HHH')==-1 or natData[temp][1]=='N':
                     col = 'blue'
+                elif temp.find('HHH')==-1 and (not natData[temp][1]=='N'):
+                    col = 'green'
                 else:
                     col = 'red'
             else:
@@ -352,7 +370,7 @@ class Result(object):
         return None
 
 
-    def doIcare(self,iDo=False):
+    def doIcare(self,iDo=False):#BUG
         if iDo:
             system('mv '+self.directory+' save-'+self.directory)
             self.directory= ' save-'+self.directory
@@ -364,6 +382,7 @@ class Result(object):
     
 r=Result('x')
 steady = r.getSteady()
-#r.printHPstats()
-#r.plotData(steady,False)
-#r.plotHPlengths(steady,False)
+r.printHPstats(False)
+r.plotData(steady,False)
+r.plotHPlengths(steady,False)
+#r.doIcare(True)

@@ -172,17 +172,17 @@ def plotRuntimes(runtimes,ratios,title):
 
 
 ###Change Number of species###
-population=50
-command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
-runs = 3
-#species=[1,2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
+#population=50
+#command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
+#runs = 3
+##species=[1,2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
 
-title = 'Model: colliding particles \n Runtimes for simulations as number of types of species grows'
-numPoint = 51
+#title = 'Model: colliding particles \n Runtimes for simulations as number of types of species grows'
+#numPoint = 51
 
-#runSeveralChangeNumSpec(command,runs,population,species)
-runtimes, ratios = analyzeRuntime(command,runs,numPoint)
-plotRuntimes(runtimes,ratios,title)
+##runSeveralChangeNumSpec(command,runs,population,species)
+#runtimes, ratios = analyzeRuntime(command,runs,numPoint)
+#plotRuntimes(runtimes,ratios,title)
 
 ###Change populations###
 #numSpec = 100

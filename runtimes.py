@@ -32,15 +32,27 @@ from numpy import linspace
 
 def changeInitPop(numSpec,population): 
     '''
-    goes to populations.txt and changes population of each species to a given one
+    goes to populations.txt and changes population of each species to a given one as well as number of species
     '''
     popFile = open("populations.txt", mode='w', encoding='utf-8')
     for i in range(numSpec):
-        popFile.write(str(i)+" "+str(population)+"\n")
+        popFile.write(str("%04d" %(i+1))+"_1 "+str(population)+"\n")
     popFile.close()
     
     return None
+
+def changeParameters(numSpec,collRate):
+    '''
+    goes to parameters.ini and changes number of species and collision rate
+    '''
+    popFile = open("parameters.ini", mode='w', encoding='utf-8')
+    popFile.write("[kinetic model]\n")
+    popFile.write("specNumber = "+str(numSpec)+"\n")
+    popFile.write("collRate = "+str(collRate)+"\n")
+    popFile.close()
     
+    
+    return None
 
 def getSimTime(command):
     '''
@@ -91,7 +103,22 @@ def runSeveralChangeNumSpec(command,runs,population,species):#TEST
     for numSpec in species:
         pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
         with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(population*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+            myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+        #numSpec=numSpec+steps[i]
+
+    
+    return None
+
+def runSeveralChangeNumSpec2(command,runs,population,species,collRate):#TODO
+    '''runs several simulations with different number of species but fixed population of every specie
+    also changes parameters.ini
+    '''
+    system('rm runTemp.txt && touch runTemp.txt' )
+    for numSpec in species:
+        changeParameters(numSpec,collRate)
+        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
+        with open("runTemp.txt", "a") as myfile:
+            myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
         #numSpec=numSpec+steps[i]
 
     
@@ -172,17 +199,19 @@ def plotRuntimes(runtimes,ratios,title):
 
 
 ###Change Number of species###
-#population=50
-#command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
-#runs = 3
-##species=[1,2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
+population=1
+command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
+runs = 3
+species = [1100,1200,1300,1400,1500]
+collRate = 0.5
+##species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
 
-#title = 'Model: colliding particles \n Runtimes for simulations as number of types of species grows'
-#numPoint = 51
+title = 'Model: colliding particles with deletions \n Runtimes for simulations as number of types of species grows'
+numPoint =41#len(species)
 
-##runSeveralChangeNumSpec(command,runs,population,species)
-#runtimes, ratios = analyzeRuntime(command,runs,numPoint)
-#plotRuntimes(runtimes,ratios,title)
+#runSeveralChangeNumSpec2(command,runs,population,species,collRate)
+runtimes, ratios = analyzeRuntime(command,runs,numPoint)
+plotRuntimes(runtimes,ratios,title)
 
 ###Change populations###
 #numSpec = 100

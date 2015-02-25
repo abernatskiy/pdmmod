@@ -3,64 +3,58 @@
 #include <iostream>
 #include "specie.h"
 
-/* rigid growing balls
- * binary polymers
- * sequences grow on its own and never decay
+/* colliding particles  #007
+ * there are several types of particles 
+ * reactions are binary collisions, particles transform when interact into particles with higher index
  */
 
 //std::map<std::string,Parameter> globParams;
+extern std::map<std::string,Parameter> configDict;
 
 Specie::Specie(std::string id){
-    modelName = std::string("");
+    modelName = std::string("colliding_changing_particles");
     m_id = id;
-    m_length = m_id.length();
+    
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
 {
-    os << sp.m_id << " (of length " << sp.m_length << ")";
+    os << sp.m_id ;
     return os;
 }
 //methods
 
 
-//Defining reactions here
+//Defining reactions here BUG
 
 std::list<Reaction> Specie::reactions(Specie specie){
     //all the reactions two species can have
     std::list<Reaction> allReactions;
-
+    float N = configDict["specNumber"].getInt();
+    float COLL_RATE = configDict["collRate"].getFloat();
     //nothing is being produced from vacuum in this model
     if (m_id==std::string("")){}
-    else if(m_id==specie.m_id){
-        for (int i=1; i<m_id.length();i++){
-            Reaction hidr(m_id, 1, specie.m_id, 0, HIDR_RATE);
-            hidr.addProduct(m_id.substr(0,i),1);
-            hidr.addProduct(m_id.substr(i,m_id.length()-i),1);
-            allReactions.push_back(hidr);
+    else {
+        Reaction collision(m_id, 1, specie.m_id, 1, COLL_RATE);
+        if (atoi(m_id.c_str())<N){
+            collision.addProduct(std::to_string(atoi(m_id.c_str())+1),1);
         }
-            if (m_id.find(std::string("1"))==std::string::npos){
-                Reaction growth0(m_id, 1, specie.m_id, 1, FAST_RATE);
-                growth0.addProduct(m_id+std::string("0"),2);
-                allReactions.push_back(growth0);
-                Reaction growth1(m_id, 1, specie.m_id, 0, GROWTH_RATE);
-                growth0.addProduct(m_id+std::string("1"),1);
-                allReactions.push_back(growth0);
-            }
-            else{
-                Reaction growth0(m_id, 1, specie.m_id, 0, GROWTH_RATE);
-                growth0.addProduct(m_id+std::string("0"),1);
-                allReactions.push_back(growth0);
-                Reaction growth1(m_id, 1, specie.m_id, 0, GROWTH_RATE);
-                growth0.addProduct(m_id+std::string("1"),1);
-                allReactions.push_back(growth0);
-            }
+        else{
+            collision.addProduct(std::to_string(1),1);
         }
-    else{}
+        if (atoi(specie.m_id.c_str())<N){
+            collision.addProduct(std::to_string(atoi(specie.m_id.c_str())+1),1);
+            
+        }
+        else{
+            collision.addProduct(std::to_string(1),1);
+        }
+        allReactions.push_back(collision);
+    }
     
     return allReactions;
 }
 
 Specie::~Specie(){
-
+    
 }

@@ -42,7 +42,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         else{
             collision.addProduct(std::to_string(1),1);
         }
-        if (atoi(m_id.c_str())<N){
+        if (atoi(specie.m_id.c_str())<N){
             collision.addProduct(std::to_string(atoi(specie.m_id.c_str())+1),1);
             
         }

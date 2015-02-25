@@ -12,9 +12,7 @@
  */
 
 
-const float GROWTH_RATE = 0.01;
-const float FAST_RATE = 0.01;
-const float HIDR_RATE = 0.001;
+
 
 
 class Specie
@@ -28,6 +26,7 @@ public:
     //attributes
     std::string m_id;
     int m_length;
+    int m_specNum;
     
     //constants
     

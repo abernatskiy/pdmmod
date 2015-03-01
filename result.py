@@ -180,6 +180,8 @@ class Result(object):
         ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(self.specPop.keys())))
         ax2.legend()
         ax1.legend()
+        ax0.set_yscale('log')
+        #ax1.set_yscale('log')
         ax2.grid(True)
         ax2.set_yscale('log')
         ax0.set_title("Total count of molecules at each moment")
@@ -382,9 +384,9 @@ class Result(object):
         
         return self.directory
     
-r=Result('x')
+r=Result('y')
 steady = r.getSteady()
-#r.printHPstats(False)
+r.printHPstats(False)
 #r.plotData(steady,False)
-#r.plotHPlengths(steady,False)
+r.plotHPlengths(steady,False)
 #r.doIcare(True)

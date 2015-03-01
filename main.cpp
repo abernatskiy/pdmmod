@@ -9,8 +9,8 @@
 #include "parametersLoader.h"
 
 /* HP-model-specific global variables */
-//std::map<std::string,std::string> catPatterns;
-//std::map<std::string,int> wellDepths;
+std::map<std::string,std::string> catPatterns;
+std::map<std::string,int> wellDepths;
 
 /* General-purpose global dictionary of parameters */
 std::map<std::string,Parameter> configDict;
@@ -32,8 +32,8 @@ void printUsage(){
 int main (int argc, char** argv){
 
     /* Loading HP-model-specific data */
-    //catPatterns = readCatPatterns("nativeList.txt");
-    //wellDepths = readWellDepths("nativeList.txt");
+    catPatterns = readCatPatterns("nativeList.txt");
+    wellDepths = readWellDepths("nativeList.txt");
 
     /* Loading parameters */
     readConfig(&configDict, "parameters.ini");

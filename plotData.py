@@ -65,8 +65,9 @@ def printStats(times,specPop,plot=True):
     for i in range(maxLength):
         allSeq+=2**(i+1)
     print('maximum length reached '+str(maxLength))
+    print(allSeq)
     if plot:
-        fig, (ax0, ax1) = plt.subplots(nrows=2)
+        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
         ax1.plot(times,specTypes)
         ax0.plot(times,total)
         ax1.plot([0,times[-1]],[allSeq,allSeq],label ='number of seq. type with lengths up to '+str(maxLength))
@@ -76,8 +77,12 @@ def printStats(times,specPop,plot=True):
         #ax1.grid(True)
         ax0.set_title("Total count of molecules at each moment")
         ax1.set_title("Total count of species types at each moment, max. length reached "+str(maxLength))
-        #ax2.set_title("Length distribution in the last moment")
-        fig.suptitle("Binary polymers with hydrolysis. They grow when meet monomers\n Growth rate = fast growth = 0.1, hydrolysis = 0.001")
+        ax1.set_ylim([0,10**11])
+        for key in specPop.keys():
+            ax2.plot(times,specPop[key])
+        ax2.set_title("Populations of species")
+        ax2.set_title("Length distribution in the last moment")
+        fig.suptitle("Binary polymers with hydrolysis and deletion. They grow when on their own\n Growth rate = 0.1, slow hydrolysis = 0.0001, hydrolysis = 0.003, deletion rate 0.03")
         #plt.savefig("stats.pdf")
         plt.show()
     

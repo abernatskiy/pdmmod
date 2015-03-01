@@ -195,7 +195,9 @@ class Result(object):
             plt.savefig(self.directory+ "stats.png")
         
         return hist
-
+    
+    
+    
     def getSteady(self,nonSteadyPercent=0.9):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
@@ -382,7 +384,7 @@ class Result(object):
     
 r=Result('x')
 steady = r.getSteady()
-r.printHPstats(False)
-r.plotData(steady,False)
-r.plotHPlengths(steady,False)
+#r.printHPstats(False)
+#r.plotData(steady,False)
+#r.plotHPlengths(steady,False)
 #r.doIcare(True)

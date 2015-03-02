@@ -202,16 +202,16 @@ def plotRuntimes(runtimes,ratios,title):
 population=1
 command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
 runs = 3
-species = [1100,1200,1300,1400,1500]
+#species = [1650, 1750, 1850, 1950, 2050, 2150, 2250, 2350, 2400,2450]
 collRate = 0.5
-##species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1250,1500,1750,2000,2250,2500,2750,3000,3500,4000,4500,5000,5500,6000]
+species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
 
 title = 'Model: colliding particles with deletions \n Runtimes for simulations as number of types of species grows'
-numPoint =41#len(species)
+numPoint = len(species)
 
-#runSeveralChangeNumSpec2(command,runs,population,species,collRate)
-runtimes, ratios = analyzeRuntime(command,runs,numPoint)
-plotRuntimes(runtimes,ratios,title)
+runSeveralChangeNumSpec2(command,runs,population,species,collRate)
+#runtimes, ratios = analyzeRuntime(command,runs,numPoint)
+#plotRuntimes(runtimes,ratios,title)
 
 ###Change populations###
 #numSpec = 100

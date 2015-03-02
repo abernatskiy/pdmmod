@@ -31,6 +31,7 @@ public:
     bool m_folded;
     int m_native;
     float m_hydrophobicity;
+    bool m_active;
     
     //constants
     

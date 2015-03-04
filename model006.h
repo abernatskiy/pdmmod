@@ -7,13 +7,10 @@
 #include "parameter.h"
 #include "reaction.h"
 
-/*binary polymers
- * sequences grow on its own and never decay
- */
 
 
 
-
+const float COLL_RATE = 0.5;
 
 class Specie
 {
@@ -25,8 +22,7 @@ public:
     
     //attributes
     std::string m_id;
-    int m_length;
-    int m_specNum;
+    
     
     //constants
     

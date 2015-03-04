@@ -8,7 +8,7 @@ def setModel(oldNumber,newNumber):
     print('cp model.h model'+str('%03d' % oldNumber)+'.h')
     system ('cp model'+str('%03d' % newNumber)+'.cpp model.cpp')
     print('cp model'+str('%03d' % newNumber)+'.cpp model.cpp')
-    system ('cp model'+str('%03d' % oldNumber)+'.h model.h')
+    system ('cp model'+str('%03d' % newNumber)+'.h model.h')
     print('cp model'+str('%03d' % newNumber)+'.h model.h')
     
     return None

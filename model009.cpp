@@ -5,7 +5,7 @@
 #include <algorithm> // std::min
 #include "parameter.h"
 #include "specie.h"
-/* hp-model
+/* hp-model #009
  * monomers import
  * degradation
  * folded degradation

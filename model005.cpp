@@ -3,9 +3,11 @@
 #include <iostream>
 #include "specie.h"
 
-/* rigid growing balls
- * binary polymers
- * sequences grow on its own and never decay
+/* rigid growing binary polymers #005
+ * monomers: 0, 1
+ * sequences grow on its own and  decay
+ * 0, 1 are imported
+ * if specis is all 0 and 0 is added it grows faster
  */
 
 //std::map<std::string,Parameter> globParams;
@@ -31,7 +33,16 @@ std::list<Reaction> Specie::reactions(Specie specie){
     std::list<Reaction> allReactions;
 
     //nothing is being produced from vacuum in this model
-    if (m_id==std::string("")){}
+    if (m_id==std::string("")){
+        if (specie.m_id==std::string("")){
+            Reaction importH(m_id, 0, specie.m_id, 0, IMPORT);
+            importH.addProduct(std::string("0"),1);
+            allReactions.push_back(importH);
+            Reaction importP(m_id, 0, specie.m_id, 0, IMPORT);
+            importP.addProduct(std::string("1"),1);
+            allReactions.push_back(importP);
+        }
+    }
     else if(m_id==specie.m_id){
             if (m_id.find(std::string("1"))==std::string::npos){
                 Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
@@ -42,8 +53,15 @@ std::list<Reaction> Specie::reactions(Specie specie){
                 allReactions.push_back(growth0);
             }
             else{
-                
+                Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);
+                growth1.addProduct(m_id+std::string("1"),2);
+                allReactions.push_back(growth1);
+                Reaction growth0(m_id, 1, specie.m_id, 1, GROWTH_RATE);
+                growth0.addProduct(m_id+std::string("0"),2);
+                allReactions.push_back(growth0);
             }
+            Reaction del(m_id,1,specie.m_id,0,DEL_RATE);
+            allReactions.push_back(del);
         }
     else{
         Reaction growth1(m_id, 1, specie.m_id, 1, GROWTH_RATE);

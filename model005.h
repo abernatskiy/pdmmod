@@ -11,9 +11,10 @@
  * sequences grow on its own and never decay
  */
 
-
-const float GROWTH_RATE = 0.01;
-const float FAST_RATE = 0.01;
+const float IMPORT = 0.1;
+const float GROWTH_RATE = 0.1;
+const float FAST_RATE = 0.1;
+const float DEL_RATE = 0.1;
 
 
 class Specie

@@ -124,11 +124,11 @@ def runSeveralChangeNumSpec2(command,runs,population,species,collRate):#TODO
     
     return None
 
-def analyzeRuntime(command,runs,numOfPoints):
+def analyzeRuntime(command,runs,numOfPoints,filename):
     '''
     '''
     runtimes=[]
-    myfile = open('runTemp.txt','rt')
+    myfile = open(filename,'rt')
         
     for i in range(numOfPoints):
         raw=((myfile.readline()).rstrip('\n')).split(' ')
@@ -210,7 +210,7 @@ title = 'Model: colliding particles with deletions \n Runtimes for simulations a
 numPoint =41#len(species)
 
 #runSeveralChangeNumSpec2(command,runs,population,species,collRate)
-runtimes, ratios = analyzeRuntime(command,runs,numPoint)
+runtimes, ratios = analyzeRuntime(command,runs,numPoint,filename)
 plotRuntimes(runtimes,ratios,title)
 
 ###Change populations###

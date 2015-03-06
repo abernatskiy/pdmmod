@@ -1,4 +1,4 @@
-#include "specie.h"
+#include "models/current/model.h" // class Specie
 #include "parameter.h"
 #include <stdio.h>
 #include <iostream>

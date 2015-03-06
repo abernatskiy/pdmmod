@@ -5,7 +5,7 @@
 #include <list>
 #include "types.h"
 #include "reaction.h"
-#include "specie.h"
+#include "models/current/model.h" // class Specie
 #include "relation.h"
 
 /* Class representing a population of molecules of a specie.

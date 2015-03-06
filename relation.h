@@ -3,7 +3,7 @@
 
 #include <list>
 #include "reaction.h"
-#include "specie.h"
+#include "models/current/model.h" // class Specie
 #include "types.h"
 
 /* This class represents a relation of a population of

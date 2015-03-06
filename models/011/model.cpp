@@ -4,8 +4,8 @@
 #include <math.h>
 #include <algorithm> // std::min
 #include "parameter.h"
-#include "specie.h"
-/* hp-model #009
+#include "model.h"
+/* hp-model "hp-full-hydrolysis-phobicCut"
  * monomers import
  * degradation
  * folded degradation
@@ -26,12 +26,15 @@
  * interp. a dictionary form monomer sequence string to potential well depth (energy of folded state)
  */
 #include <map>
+#include <algorithm>
+
 extern std::map<std::string,Parameter> configDict;
 /* HP-model-specific global variables */
 extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
+
 Specie::Specie(std::string id){
-    modelName = std::string("hp-full");
+    modelName = std::string("hp-full-hydrolysis-phobicCut");
     m_id = id; //HP sequence
     if (m_id==""){}
     else if(m_id.length()==1){
@@ -101,6 +104,15 @@ Specie::Specie(std::string id){
         m_catalyst = catPatterns[m_id.substr(1,m_length)];
         m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
     }
+    
+    if (m_length <5 || m_id == ""){
+        m_hydrophobicity = 0;
+    }
+    else{
+        size_t n = std::count(m_id.begin(), m_id.end(), 'H');
+        m_hydrophobicity = ((float)  n)/m_length;
+    }
+    
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
@@ -120,6 +132,8 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float dF = configDict["foldedDegradation"].getFloat();
     float k_unf = configDict["unfolding"].getFloat();
     float eH = configDict["hydrophobicEnergy"].getFloat();
+    float dH = configDict["hydrolysisRate"].getFloat();
+    float dAgg = configDict["aggregation"].getFloat();
     //all the reactions two species can have
     std::list<Reaction> allReactions;
     // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.
@@ -140,6 +154,19 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //it degrades
             Reaction degradation(m_id,1,specie.m_id,0,d);
             allReactions.push_back(degradation);
+            if (m_hydrophobicity >=0.8){
+                Reaction aggregation(m_id,1,specie.m_id,0,dAgg);
+                allReactions.push_back(aggregation);
+            }
+            
+            //hydrolysis of any bond can happen
+            for (int i=1; i<(m_length); i++){
+                Reaction hydrolysis(m_id,1,specie.m_id,0,dH);
+                hydrolysis.addProduct(m_id.substr(0,i),1);
+                hydrolysis.addProduct(m_id.substr(i,m_length-i),1);
+                allReactions.push_back(hydrolysis);
+            }
+            
             //and might fold
             if (m_native!=0){
                 Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));

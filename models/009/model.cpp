@@ -4,8 +4,8 @@
 #include <math.h>
 #include <algorithm> // std::min
 #include "parameter.h"
-#include "specie.h"
-/* hp-model
+#include "model.h"
+/* hp-model #009
  * monomers import
  * degradation
  * folded degradation
@@ -31,7 +31,7 @@ extern std::map<std::string,Parameter> configDict;
 extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
 Specie::Specie(std::string id){
-    modelName = std::string("hp-full-hydrolysis");
+    modelName = std::string("hp-full");
     m_id = id; //HP sequence
     if (m_id==""){}
     else if(m_id.length()==1){
@@ -120,7 +120,6 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float dF = configDict["foldedDegradation"].getFloat();
     float k_unf = configDict["unfolding"].getFloat();
     float eH = configDict["hydrophobicEnergy"].getFloat();
-    float dH = configDict["hydrolysisRate"].getFloat();
     //all the reactions two species can have
     std::list<Reaction> allReactions;
     // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.
@@ -141,14 +140,6 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //it degrades
             Reaction degradation(m_id,1,specie.m_id,0,d);
             allReactions.push_back(degradation);
-            //hydrolysis of any bond can happen
-            for (int i=1; i<(m_length); i++){
-                Reaction hydrolysis(m_id,1,specie.m_id,0,dH);
-                hydrolysis.addProduct(m_id.substr(0,i),1);
-                hydrolysis.addProduct(m_id.substr(i,m_length-i),1);
-                allReactions.push_back(hydrolysis);
-            }
-            
             //and might fold
             if (m_native!=0){
                 Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));

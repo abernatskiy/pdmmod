@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 #include <iostream>
-#include "specie.h"
+#include "model.h"
 
 /*binary polymers
  * sequences grow on its own and never decay

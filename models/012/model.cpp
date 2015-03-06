@@ -4,16 +4,14 @@
 #include <math.h>
 #include <algorithm> // std::min
 #include "parameter.h"
-#include "specie.h"
-/* hp-model "hp-full-hydrolysis-phobicCut-limitMonomers" #013
- * activated monomers import
- * deactivation
- * degradation/solution
- * folded degradation/solution
+#include "model.h"
+/* hp-model "hp-full-hydrolysis-phobicCut-limitMonomers" #012
+ * monomers import
+ * degradation
+ * folded degradation
  * growth
  * false degradation
- * aggregation
- * catalyzed growth
+ *
  */
 /*DATA
  * catPattern -- string. (cases)
@@ -39,30 +37,17 @@ Specie::Specie(std::string id){
     modelName = std::string("hp-full-hydrolysis-phobicCut");
     m_id = id; //HP sequence
     if (m_id==""){}
-    else if(m_id.find(std::string("_"))){
-        //TODO save objects in conglomerat
-    }
     else if(m_id.length()==1){
         m_substrate = std::string("N");
         m_product = false;
-        m_length = 1
-        m_active = false;
-    }
-    else if (m_id == std::string("H*") || m_id == std::string("P*"){
-        //introducing activated monomers
-        m_substrate = std::string("N");
-        m_product = false;
-        m_length = 1
-        m_active = true;
+        
     }
     //if sequence doesn't have HH as two last monomers in its sequence it cannot be a substrate
     else if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
         m_substrate = std::string("N");
-        m_active = false;
     }
     //otherwise we need to check how long the substrate site is
     else{
-        m_active = false;
         std::string maxPat = std::string("HHHHHHHH");
         int patLength=8;
         for (int i=0;i<patLength-1;i++){
@@ -95,7 +80,7 @@ Specie::Specie(std::string id){
         }
     }
     //if sequence isn't folded (it doesn't have 'f' letter)
-    if (m_id.find(std::string("f"))==std::string::npos &&  m_active = false){
+    if (m_id.find(std::string("f"))==std::string::npos){
         m_folded = false;
         //its length is the length of the m_id
         m_length = m_id.length();
@@ -155,21 +140,17 @@ std::list<Reaction> Specie::reactions(Specie specie){
     if (m_id==std::string("")){
         if (specie.m_id==std::string("")){
             Reaction importH(m_id, 0, specie.m_id, 0, aH);
-            importH.addProduct(std::string("H*"),1);
+            importH.addProduct(std::string("H"),1);
             allReactions.push_back(importH);
             Reaction importP(m_id, 0, specie.m_id, 0, aP);
-            importP.addProduct(std::string("P*"),1);
+            importP.addProduct(std::string("P"),1);
             allReactions.push_back(importP);
         }
     }
     //monomolecular reactions
     else if (m_id == specie.m_id){
-        //if it's an activated monomer
-        if (m_active == true){
-            //TODO
-        }
         //if it's not folded
-        else if (m_folded == false){
+        if (m_folded == false){
             //it degrades
             Reaction degradation(m_id,1,specie.m_id,0,d);
             allReactions.push_back(degradation);

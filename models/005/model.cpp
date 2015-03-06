@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 #include <iostream>
-#include "specie.h"
+#include "model.h"
 
 /* rigid growing binary polymers #005
  * monomers: 0, 1

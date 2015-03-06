@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 #include <iostream>
-#include "specie.h"
+#include "model.h"
 
 /* colliding particles  #008
  * there are several types of particles 

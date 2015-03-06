@@ -4,7 +4,7 @@ CFLAGS          = -g -ggdb -Wall -std=c++11 -I"." -O2
 LDFLAGS         = -g -ggdb -Wall
 CPPFLAGS        = ${CFLAGS}
 engineObjects   = reaction.o relation.o population.o randomGenerator.o totalPopulation.o
-modelObjects    = specie.o model.o
+modelObjects    = models/current/model.o
 ioObjects       = output.o nativeListLoader.o inih/cpp/INIReader.o inih/ini.o parametersLoader.o parameter.o
 objects         = ${engineObjects} ${modelObjects} ${ioObjects}
 

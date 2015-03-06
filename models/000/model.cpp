@@ -1,11 +1,12 @@
-/*#include <map>
+#include <map>
 #include <string>
 #include <iostream>
-#include "specie.h"
+#include "model.h"
 
 std::map<std::string,Parameter> globParams;
 
 Specie::Specie(std::string id){
+    modelName = std::string("");
     m_id = id;
     if (m_id==std::string("a")){
         m_length=1;
@@ -75,4 +76,3 @@ std::list<Reaction> Specie::reactions(Specie specie){
 Specie::~Specie(){
 
 }
-*/

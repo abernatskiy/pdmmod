@@ -1,6 +1,6 @@
 #include <iostream>
 #include "relation.h"
-#include "specie.h"
+#include "models/current/model.h" // class Specie
 
 int main(){
     Specie a("a");

@@ -1,3 +1,0 @@
-X   int   10
-a   float 1
-d   float 0.1

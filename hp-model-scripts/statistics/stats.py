@@ -30,9 +30,12 @@ def makeLenDict():
 
 def plotCommulStats(theDict):
     commulDict = {}
+    total = [2]
     for i in range(1,26):
         commulDict[i]=[0,0,0]#fold, cats autocats
     for i in range(2,26):
+        imers = 2**i
+        total.append(imers+total[int(i-2)])
         numFolds = len(theDict[i])
         commulDict[i][0]=numFolds+commulDict[i-1][0]
         numCats = sum([bool(item[2]) for item in theDict[i]])
@@ -41,12 +44,21 @@ def plotCommulStats(theDict):
         commulDict[i][2]=numAuto+commulDict[i-1][2]
         
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
-    ax0.plot(list(commulDict.keys()),[commulDict[i][0] for i in range(1,26)])
-    ax0.plot(list(commulDict.keys()),[commulDict[i][1] for i in range(1,26)])
-    ax0.plot(list(commulDict.keys()),[commulDict[i][2] for i in range(1,26)])
+    ax0.plot(list(commulDict.keys()),[commulDict[i][0] for i in range(1,26)],label = 'with unique fold')
+    ax0.plot(list(commulDict.keys()),[commulDict[i][1] for i in range(1,26)],label = 'catalysts')
+    ax0.plot(list(commulDict.keys()),[commulDict[i][2] for i in range(1,26)],label = 'autocats')
+    ax1.plot(list(commulDict.keys()),[commulDict[i][0]/total[int(i-1)] for i in range(1,26)],label = 'with unique fold')
+    ax1.plot(list(commulDict.keys()),[commulDict[i][1]/total[int(i-1)] for i in range(1,26)],label = 'catalysts')
+    ax1.plot(list(commulDict.keys()),[commulDict[i][2]/total[int(i-1)] for i in range(1,26)],label = 'autocats')
     ax0.set_yscale('log')
+    ax1.set_yscale('log')
+    ax0.legend()
+    ax1.legend()
+    ax0.set_title('Absolute',fontsize=20)
+    ax1.set_title('Relative to total number of sequences types',fontsize=20)
+    fig.suptitle('Number of different types of sequences with the lengths up to X',fontsize=24)
     plt.show()
-    
+    #print(total)
     return commulDict
 
 theDict= makeLenDict()

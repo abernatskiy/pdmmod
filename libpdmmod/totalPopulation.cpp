@@ -201,7 +201,11 @@ void TotalPopulation::addPopulationsFromFile(std::string source){
             linestream >> name >> population;
             addPopulation(name, population);
         }
+        file.close();
     }
-
-    file.close();
+    else
+    {
+        std::cout << "Could not read initial population file " << source << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }

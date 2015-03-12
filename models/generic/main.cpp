@@ -12,10 +12,11 @@
 std::map<std::string,Parameter> configDict;
 
 /* HP-model-specific headers and global variables */
-#include "nativeListLoader.h"
-#include "parametersLoader.h"
-std::map<std::string,std::string> catPatterns;
-std::map<std::string,int> wellDepths;
+// In order to use these dictionaries, uncomment the four lines above and lines 104 and 105
+//#include "nativeListLoader.h"
+//#include "parametersLoader.h"
+//std::map<std::string,std::string> catPatterns;
+//std::map<std::string,int> wellDepths;
 
 void printUsage(){
     std::cout << "Usage:" << std::endl;
@@ -100,8 +101,8 @@ int main (int argc, char** argv){
     TotalPopulation tp(initialPopulationFileName);
 
     /* Loading HP-model-specific data */
-    catPatterns = readCatPatterns("nativeList.txt");
-    wellDepths = readWellDepths("nativeList.txt");
+//    catPatterns = readCatPatterns("nativeList.txt");
+//    wellDepths = readWellDepths("nativeList.txt");
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;

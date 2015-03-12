@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& os, const Specie& sp)
 //methods
 
 
-//Defining reactions here BUG
+//Defining reactions here
 
 std::list<Reaction> Specie::reactions(Specie specie){
     //all the reactions two species can have

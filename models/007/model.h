@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <list>
-#include "parameter.h"
 #include "reaction.h"
 
 /*binary polymers

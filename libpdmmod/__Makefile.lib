@@ -1,5 +1,0 @@
-pdmmodObjects       = reaction.o relation.o population.o randomGenerator.o totalPopulation.o
-ioObjects           = output.o parametersLoader.o parameter.o
-inihObjects         = inih/cpp/INIReader.o inih/ini.o
-localLibraryObjects = ${pdmmodObjects} ${ioObjects} ${inihObjects}
-

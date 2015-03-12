@@ -3,6 +3,8 @@
 '''
 from os import system as system
 from os import walk as walk
+from statistics import mean
+from statistics import variance
 import subprocess
 import routes
 import itertools
@@ -101,21 +103,55 @@ class Simulation(object):
         files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
         handles = [open(t, 'r') for t in files]
         print(files)
-        
+        count = 0 #counts time instances
+        evolutions = {}
         records = set([])#FIXME probably gonna be slow
-        for i in range(10):#FIXME
-            lines = []
+        for i in range(4):#FIXME remove 10. this one has to be fluid to handle simulateTillSteady
+            points = {}#keeps populations of species at the given moment across files
+            fileCount = 0
             for inFile in handles:
                 line = inFile.readline()
                 if line[0]=="#":
                     continue
                 else:
+                    fileCount += 1
+                    #count+=1
                     raw = (line.rstrip('\n')).split(',')
                     records.add(int(float(raw[0])))#FIXME remove int
                     for item in raw[1:len(raw)-1]:
                         #get a couple specie -- its population
                         point=item.split(' ')
+                        if point[0] not in points:
+                            #add it and its population
+                            #also add 0s as prev times populations
+                            if not fileCount==1:
+                                #print('point in the second file',point)
+                                points[point[0]]=[0]*(fileCount-1)
+                                points[point[0]].append(int(point[1]))
+                            else:
+                                #print('point in the first file',point)
+                                points[point[0]]=[int(point[1])]
+                        else:
+                            #otherwise append new point to the existing list of points
+                            points[point[0]].append(int(point[1]))
+            for spec in points.keys():
+                if len(points[spec])==fileCount:
+                    continue
+                elif len(points[spec])==fileCount-1:
+                    points[spec].append(0)
+                else:
+                    print(spec)
+                    print('length',len(points[spec]))
+                    print('fileCount',fileCount)
+                    raise ValueError("!")
+            if not self.numOfRuns ==1:
+                for spec in points.keys():
+                    insert into evolutions dict.
+                
+            
+        print(points)
         print(records)
+        [t.close() for t in handles]
 
     def runSeveralParallelPC():#TODO
         '''

@@ -384,7 +384,7 @@ class Result(object):
         
         return self.directory
     
-r=Result('y')
+r=Result('w')
 steady = r.getSteady()
 r.printHPstats(False)
 #r.plotData(steady,False)

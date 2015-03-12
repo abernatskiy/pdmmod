@@ -106,6 +106,6 @@ def plotData(times,specPop):
     plt.show()
 
 
-times, specPop = readData("x")
+times, specPop = readData("y")
 printStats(times,specPop)
 #plotData(times, specPop)

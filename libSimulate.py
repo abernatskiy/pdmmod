@@ -50,7 +50,7 @@ class Simulation(object):
         elif termCond[0]=='simulateReactions':
             return 'simulateReactions', termCond[1],termCond[2]
         elif termCond[0]=='simulateTillSteady':
-            return 'simulateTillSteady', '',termCond[1]
+            return 'simulateTillSteady', '',termCond[2]#FIXME '' won't do in the future
         else:
             raise ValueError("Unknown termination condition, check if typo")
     
@@ -102,14 +102,20 @@ class Simulation(object):
         handles = [open(t, 'r') for t in files]
         print(files)
         
-        
-        for i in range(2):
+        records = set([])#FIXME probably gonna be slow
+        for i in range(10):#FIXME
             lines = []
             for inFile in handles:
+                line = inFile.readline()
                 if line[0]=="#":
                     continue
-                
-            print(lines)
+                else:
+                    raw = (line.rstrip('\n')).split(',')
+                    records.add(int(float(raw[0])))#FIXME remove int
+                    for item in raw[1:len(raw)-1]:
+                        #get a couple specie -- its population
+                        point=item.split(' ')
+        print(records)
 
     def runSeveralParallelPC():#TODO
         '''
@@ -118,7 +124,7 @@ class Simulation(object):
         return None
 
 modelNum = 12
-termCond = ('simulateTime',100,1)
+termCond = ('simulateTime',500,5)
 numOfRuns = 2
 s = Simulation(modelNum,termCond,numOfRuns)
 #s.runSeveralSeries(True)

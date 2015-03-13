@@ -97,7 +97,7 @@ class Simulation(object):
             
         return None
     
-    def reorganizeOutput(self,outputDir=None):
+    def reorganizeOutput(self,outputDir=None):#TEST
         if outputDir == None:
             outputDir = self.outputDir
         files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
@@ -106,14 +106,16 @@ class Simulation(object):
         count = 0 #counts time instances
         evolutions = {}
         records = set([])#FIXME probably gonna be slow
-        for i in range(4):#FIXME remove 10. this one has to be fluid to handle simulateTillSteady
+        for i in range(int(self.whenTerm/self.records)):#FIXME this one has to be fluid to handle simulateTillSteady
             points = {}#keeps populations of species at the given moment across files
             fileCount = 0
             for inFile in handles:
                 line = inFile.readline()
                 if line[0]=="#":
-                    continue
+                    continue ##FIXME header reader goes in here
                 else:
+                    if fileCount ==0:
+                        count+=1
                     fileCount += 1
                     #count+=1
                     raw = (line.rstrip('\n')).split(',')
@@ -144,14 +146,38 @@ class Simulation(object):
                     print('length',len(points[spec]))
                     print('fileCount',fileCount)
                     raise ValueError("!")
-            if not self.numOfRuns ==1:
-                for spec in points.keys():
-                    insert into evolutions dict.
+            for spec in points.keys():
+                if self.numOfRuns ==1:
+                    points[spec]=(mean(points[spec]),0)
+                else:
+                    points[spec]=(mean(points[spec]),variance(points[spec]))
                 
-            
-        print(points)
-        print(records)
+                if spec not in evolutions:
+                    #add it and its population
+                    #also add 0s as prev times populations
+                    if not count==1:
+                        evolutions[spec]=[(0,0)]*(count-1)
+                        evolutions[spec].append(points[spec])
+                    else:
+                        evolutions[spec]=[points[spec]]
+                else:
+                    #otherwise append new point to the existing list of points
+                    evolutions[spec].append(points[spec])
+            for spec in evolutions.keys():
+                        if len(evolutions[spec])==count:
+                            continue
+                        elif len(evolutions[spec])==count-1:
+                            evolutions[spec].append(0)
+                        else:
+                            print(spec)
+                            print('length',len(evolutions[spec]))
+                            print('count',count)
+                            raise ValueError("!")
+        
+        
         [t.close() for t in handles]
+        
+        return evolutions
 
     def runSeveralParallelPC():#TODO
         '''
@@ -161,11 +187,11 @@ class Simulation(object):
 
 modelNum = 12
 termCond = ('simulateTime',500,5)
-numOfRuns = 2
+numOfRuns = 3
 s = Simulation(modelNum,termCond,numOfRuns)
 #s.runSeveralSeries(True)
 outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output0/'
-s.reorganizeOutput(outputDir)
+evo = s.reorganizeOutput(outputDir)
 
 
 

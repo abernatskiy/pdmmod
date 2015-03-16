@@ -3,8 +3,10 @@
 '''
 from os import system as system
 from os import walk as walk
-from statistics import mean
-from statistics import variance
+import numpy as np
+
+import cProfile
+
 import subprocess
 import routes
 import itertools
@@ -14,13 +16,13 @@ class Simulation(object):
         '''
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
-             * ('simulateTime',int:simulation time,int: how often to record)
-             * ('simulateReactions',int:number of reactions,int: how often to record)
-             * ('simulateTillSteady',int: how often to record (time))
+              * ('simulateTime',int:simulation time,int: how often to record)
+              * ('simulateReactions',int:number of reactions,int: how often to record)
+              * ('simulateTillSteady',int: how often to record (time))
             numOfRuns: is Int repr. number of runs of the simulation
             traj: Bool, repr.:
-             * True: keep data from individual runs
-             * False: do not keep them, only mean and st.dev.
+              * True: keep data from individual runs
+              * False: do not keep them, only mean and st.dev.
         '''
         self.modelNum = modelNum
         self.howTerm, self.whenTerm, self.records = self.getTermConds(termCond)
@@ -86,18 +88,18 @@ class Simulation(object):
         self.outputDir = outputDir
         return outputDir
     
-    def runSeveralSeries(self,rewrite):#TEST
+    def runSeveralSeries(self,rewrite):
         '''runs several simulations sequentially, store average, st.deviation and optionally trajectories
         '''
         outputDir = self.makeOutputFolder(rewrite)
         for i in range(numOfRuns):
             command = (self.path2Folder+'pdmmod'),str(self.howTerm), str(self.whenTerm), str(self.records),outputDir+'traj'+str(i)
-            #subprocess.call(command)TODO
+            subprocess.call(command)
             print(command)
             
         return None
     
-    def reorganizeOutput(self,outputDir=None):#TEST
+    def makeStatistics(self,outputDir=None):
         if outputDir == None:
             outputDir = self.outputDir
         files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
@@ -105,13 +107,18 @@ class Simulation(object):
         print(files)
         count = 0 #counts time instances
         evolutions = {}
-        records = set([])#FIXME probably gonna be slow
-        for i in range(int(self.whenTerm/self.records)):#FIXME this one has to be fluid to handle simulateTillSteady
+        records = set([])
+        breakCondition = False
+        while not breakCondition:
+            #print(count)
             points = {}#keeps populations of species at the given moment across files
             fileCount = 0
             for inFile in handles:
                 line = inFile.readline()
-                if line[0]=="#":
+                if line =='':
+                    breakCondition = True
+                    print('i met condition in ',count,'line, in',str(inFile))
+                elif line[0]=="#":
                     continue ##FIXME header reader goes in here
                 else:
                     if fileCount ==0:
@@ -119,65 +126,67 @@ class Simulation(object):
                     fileCount += 1
                     #count+=1
                     raw = (line.rstrip('\n')).split(',')
-                    records.add(int(float(raw[0])))#FIXME remove int
+                    records.add(float(raw[0]))
                     for item in raw[1:len(raw)-1]:
                         #get a couple specie -- its population
                         point=item.split(' ')
                         if point[0] not in points:
                             #add it and its population
                             #also add 0s as prev times populations
-                            if not fileCount==1:
                                 #print('point in the second file',point)
-                                points[point[0]]=[0]*(fileCount-1)
-                                points[point[0]].append(int(point[1]))
-                            else:
-                                #print('point in the first file',point)
-                                points[point[0]]=[int(point[1])]
+                                points[point[0]]=np.zeros(self.numOfRuns)
+                                points[point[0]][fileCount-1]=int(point[1])#TEST
                         else:
-                            #otherwise append new point to the existing list of points
-                            points[point[0]].append(int(point[1]))
-            for spec in points.keys():
-                if len(points[spec])==fileCount:
-                    continue
-                elif len(points[spec])==fileCount-1:
-                    points[spec].append(0)
-                else:
-                    print(spec)
-                    print('length',len(points[spec]))
-                    print('fileCount',fileCount)
-                    raise ValueError("!")
-            for spec in points.keys():
-                if self.numOfRuns ==1:
-                    points[spec]=(mean(points[spec]),0)
-                else:
-                    points[spec]=(mean(points[spec]),variance(points[spec]))
-                
-                if spec not in evolutions:
-                    #add it and its population
-                    #also add 0s as prev times populations
-                    if not count==1:
-                        evolutions[spec]=[(0,0)]*(count-1)
-                        evolutions[spec].append(points[spec])
+                            points[point[0]][fileCount-1]=int(point[1])
+            if not breakCondition:
+                #print('b',count,str(points['P']))
+                for spec in points.keys():
+                    if self.numOfRuns ==1:
+                        points[spec]=(np.mean(points[spec]),0)
                     else:
-                        evolutions[spec]=[points[spec]]
-                else:
-                    #otherwise append new point to the existing list of points
-                    evolutions[spec].append(points[spec])
-            for spec in evolutions.keys():
-                        if len(evolutions[spec])==count:
-                            continue
-                        elif len(evolutions[spec])==count-1:
-                            evolutions[spec].append(0)
-                        else:
-                            print(spec)
-                            print('length',len(evolutions[spec]))
-                            print('count',count)
-                            raise ValueError("!")
-        
+                        points[spec]=(np.mean(points[spec]),np.std(points[spec]))
+                    
+                    if spec not in evolutions:
+                        #add it and its population
+                        #also add 0s as prev times populations
+                        evolutions[spec]=np.zeros(int(self.whenTerm/self.records), dtype=(float,2))#FIXME this one has to be fluid to handle simulateTillSteady
+                        evolutions[spec][count-1]=points[spec]
+                    else:
+                        #otherwise append new point to the existing list of points
+                        evolutions[spec][count-1]=points[spec]
+            else:
+                actRecords = count -1
+                print('number of points is',actRecords)
+                break
         
         [t.close() for t in handles]
         
-        return evolutions
+        return evolutions, actRecords
+    
+    def reorganizeOutput(self,outputDir=None):
+        def writeEvolutions(evolutions,actRecords):
+            system('rm '+outputDir+'means.txt')
+            system('rm '+outputDir+'standDivs.txt')
+            fMeans = open(outputDir+'means.txt','a')
+            fStd = open(outputDir+'standDivs.txt','a')
+            for spec in evolutions:
+                printMean = spec
+                printStd = spec
+                for item in evolutions[spec][0:actRecords]:
+                    printMean+=' '+str(item[0])
+                    printStd+=' '+str(item[1])
+                fMeans.write(printMean+'\n')
+                fStd.write(printStd+'\n')
+            fMeans.close()
+            fStd.close()
+            
+            return None
+        evolutions, actRecords = self.makeStatistics(outputDir)
+        if traj:
+            writeEvolutions(evolutions,actRecords)
+        else:
+            writeEvolutions(evolutions,actRecords)
+            deleteTraj()#TODO
 
     def runSeveralParallelPC():#TODO
         '''
@@ -186,13 +195,15 @@ class Simulation(object):
         return None
 
 modelNum = 12
-termCond = ('simulateTime',500,5)
-numOfRuns = 3
-s = Simulation(modelNum,termCond,numOfRuns)
-#s.runSeveralSeries(True)
-outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output0/'
-evo = s.reorganizeOutput(outputDir)
-
+termCond = ('simulateTime',100,1)
+numOfRuns = 100
+traj = True
+rewrite = False
+s = Simulation(modelNum,termCond,numOfRuns,traj)
+s.runSeveralSeries(rewrite)
+#outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output1/'
+#evo = s.makeStatistics(outputDir)
+#cProfile.run('s.reorganizeOutput(outputDir)')
 
 
 

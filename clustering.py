@@ -1,116 +1,19 @@
 #! /usr/bin/python2
-from result import *
-from numpy import array
-from math import sqrt
+from analysis import *
 
-from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
-from sklearn.preprocessing import StandardScaler
-
-
-class ClusteredResults(Result):
-    def __init__(self,filename,minLength=6,samp = None,epsilonModifyer={0:0},cluster=True):
-        Result.__init__(self,filename)
+class ClusteredResults(Results):
+    def __init__(self,modelNum,simNum,minLength=6,howMany=0.01,samp=None,epsilonModifyer={0:0},cluster=True):
+        Results.__init__(self,modelNum,simNum)
         if cluster:
             self.minLength=minLength
-            self.maxLength = int(self.parameters['maxLength'])
-            self.steadyAndVar = self.getSteadyAndVar()
-            #self.jointData created in clustLengths(self,minLength=6,samp=None,epsilonModifyer={0:0})
-            self.jointLabels, self.jointEpsilon=self.clustLengths(minLength,samp,epsilonModifyer)#labels for each length#BUG???
-            #self.clustDict=self.makeClustDict()
+            self.jointLabels, self.jointEpsilon=self.clustLengths(minLength,samp,epsilonModifyer)#labels for each length
+            self.clustDict=self.makeClustDict()
     
+    def __repr__(self):
+        str1='Results for the simulation #'+str(self.indx)+' named '+str(self.name)+' maxLength='+str(self.maxLength)+'\n'
+        str1+='with '+str(self.clustDict)
+        return str1
     
-    def clustLengths(self,minLength=6,samp=None,epsilonModifyer={0:0}):# returns dict jointLabels#TODO HERE!!!
-        '''
-        '''
-        self.jointData=self.makeDictOfLengths(self.steadyAndVar)
-        jointLabels={}
-        jointEpsilon={}
-        
-        def median(mylist):
-            sorts = sorted(mylist)
-            length = len(sorts)
-            #if length is even
-            if not length % 2:
-                med = (sorts[int(length / 2)] + sorts[int(length / 2) - 1]) / 2.0
-            med=sorts[int(length / 2)]
-            print('true median '+str(med))
-            if med==0.0:
-                i=1
-                while med==0.0:
-                    med=sorts[int(length *i/(i+1))]
-                    i+=1
-                    if i>=length:
-                        break
-                print('variance at '+str(i)+'/'+str(i+1))
-                if med==0.0:
-                    print('Average=0!!!!!')
-            
-            return med
-        
-        def clustList(myData,variances,length,samp,epsilonModifyer):
-            X=array([[item,0] for item in myData])
-            med=median(variances)
-            '''
-            if length>8:
-                epsilon=sqrt(med)*4
-            elif length>12:
-                epsilon=sqrt(med)*8
-            else:
-                epsilon=sqrt(med)
-            '''
-            epsilon=sqrt(med)
-            if length in epsilonModifyer.keys():
-                epsilon=epsilon*epsilonModifyer[length]
-            print('epsilon='+str(epsilon))
-            jointEpsilon[length]=epsilon
-            Y=StandardScaler(copy=True, with_mean=True, with_std=True).fit_transform(X)
-            db = DBSCAN(epsilon, min_samples=samp).fit(X)
-            core_samples = db.core_sample_indices_
-            labels = db.labels_
-            
-            return labels, core_samples
-        
-               
-        for length in range(minLength,self.maxLength+1):
-            print('analyzing length '+str(length))
-            grInd=length-minLength
-            #data = []
-            originalVariances=[self.jointData[length][key][1] for key in list(self.jointData[length].keys())]
-            #variances = []
-            #names = []
-            if not sum(originalVariances)==0.0:
-                data=[self.jointData[length][key][0] for key in list(self.jointData[length].keys())]
-                variances=[self.jointData[length][key][1] for key in list(self.jointData[length].keys())]
-            
-                if length>14:
-                    if samp==None:
-                        samp=20
-                    else:
-                        samp=samp*2
-                else:
-                    if samp==None:
-                        samp=10
-                    else:
-                        samp=samp
-                jointLabels[length]=clustList(data,variances,length,samp,epsilonModifyer)[0]
-                n_clusters = len(set(jointLabels[length])) - (1 if -1 in jointLabels[length] else 0)
-                print('Estimated number of clusters: %d' % n_clusters)
-                count=0
-                for key in list(self.jointData[length].keys()):
-                    self.jointData[length][key]=(self.jointData[length][key],jointLabels[length][count])
-                    print(self.jointData[length][key])
-                    count+=1
-            else:
-                jointLabels[length]=None
-                jointEpsilon[length]=None
-                print('length '+str(length)+' has 0 population')
-                continue
-            
-        
-        return jointLabels, jointEpsilon
-        
     def getClustLen(self,length):
         return self.clustDict[length]
     
@@ -391,7 +294,7 @@ class ClusteredResults(Result):
         
         return theseSeqs
         
-class Clusters(object):#TODO
+class Clusters(object):#TEST
     '''class Clusters(length,clustResults)
     the clusters belonging to certain length
     '''
@@ -482,7 +385,7 @@ class Clusters(object):#TODO
         
         return None
     
-class Cluster(object):#TODO
+class Cluster(object):#TESTED
     '''class Cluster(length,label,clustResults)
     '''
     def __init__(self,length,label,clustResults,empty=False):
@@ -537,4 +440,3 @@ class Cluster(object):#TODO
         
         return surfaces
 
-r=ClusteredResults('x')

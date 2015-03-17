@@ -30,11 +30,11 @@ void writeHeaderToFile(TotalPopulation* tp, int argc, char** argv, std::ofstream
 
     std::string modelName = (((tp->m_listOfPopulations).begin())->m_specie).modelName;
     (*myfile) << "# Model: " << modelName << std::endl;
-    (*myfile) << "#";
+    (*myfile) << "# Parameters:";
     for(auto it = configDict.begin(); it != configDict.end(); it++)
         (*myfile) << " " << it->first << "=" << (it->second).getString();
     (*myfile) << std::endl;
-    (*myfile) << "# Command line:";
+    (*myfile) << "# Command:";
     for(int i=0; i<argc; i++)
         (*myfile) << " " << std::string(argv[i]);
     (*myfile) << std::endl;

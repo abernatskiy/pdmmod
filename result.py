@@ -26,10 +26,13 @@ class Result(object):
         '''
         self.modelNum = modelNum
         self.simNum = simNum
-        self.howTerm, self.whenTerm, self.records, self.numOfRuns, self.traj = self.readSimData()
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
-        self.means = self.readMeans()
+        self.outputDir = self.path2Folder+str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/'
+        self.parameters = self.readSimData()
+        self.means, self.times = self.readMeans()
         self.stds = self.readStds()
+        
+        
         
     def readMeans(self):
         evolutions = {}
@@ -38,7 +41,9 @@ class Result(object):
             raw = (line.rstrip('\n')).split(' ')
             evolutions[raw[0]]=[float(item) for item in raw[1:]]
         
-        return evolutions
+        times =[i*self.records for i in range(len(evolutions[raw[0]]))]
+        
+        return evolutions, times
     
     def readStds(self):
         evolutions = {}
@@ -49,9 +54,29 @@ class Result(object):
         
         return evolutions
     
-    def readSimData(self):#TODO
-        
-        return 'time', 100, 1, 10, True
+    def readSimData(self):
+        header = open(self.outputDir+'parameters.txt','r')
+        line = header.readline()
+        parameters ={}
+        while not line =='==Parameters==\n':
+            self.name = line.rstrip('\n')
+            line = header.readline()
+        line = header.readline()
+        while not line =='==Command==\n':
+            _list = line.rstrip('\n').split(' ')
+            parameters[_list[0]]=float(_list[1])
+            line = header.readline()
+        line = header.readline()
+        self.howTerm = line.rstrip('\n').replace('howTerm ','')
+        line = header.readline()
+        self.whenTerm = int(line.rstrip('\n').replace('whenTerm ',''))
+        line = header.readline()
+        self.records = int(line.rstrip('\n').replace('records ',''))
+        line = header.readline()
+        line = header.readline()
+        self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ',''))
+        self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
+        return parameters
 
     def readNativeList(self):
         ''' None -> {string: (int, string)}
@@ -150,8 +175,6 @@ class Result(object):
         
         return hist
     
-    
-    
     def getSteady(self,nonSteadyPercent=0.9):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
@@ -163,30 +186,68 @@ class Result(object):
         
         return steadySorted
     
+    def getSteadyVar(self,nonSteadyPercent=0.9):
+        border=int(nonSteadyPercent*len(self.times))
+        steady={}
+        for seq in self.stds.keys():
+            points=self.stds[seq][border:]
+            steady[seq]=mean(points)
+        
+        steadySorted = OrderedDict(sorted(steady.items(), key=lambda t: t[1],reverse=True))
+        
+        return steadySorted
+    
+    def makeDictOfLengths(self,nonSteadyPercent=0.9):#TODO
+        '''returns dictionary of ordereder dictionaries
+        {steady: OrderedDict{seq: float}}
+        '''
+        
+        steadyLen={}
+        for i in range(1,int(self.parameters['maxLength'])+1):
+            steadyLen[i]={}
+        
+        #get sorted dictionary for every key of steadyLen
+        for seq in steadyAndVar:
+            if seq.find('f')==-1:
+                sLen=len(seq)
+            else:
+                sLen=len(seq)-1
+            steadyLen[sLen][seq]=steadyAndVar[seq]
+        
+        for length in steadyLen.keys():
+            tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
+            steadyLen[length]=tmp
+        
+        return steadyLen
+    
+    def clustLengths(self,minLength=6,samp=None,epsilonModifyer={0:0}):# returns dict jointLabels
+        self.jointData=self.makeDictOfLengths()
+        jointLabels={}
+        jointEpsilon={}
+        
+        def median(mylist):
+            sorts = sorted(mylist)
+            length = len(sorts)
+            if not length % 2:
+                med = (sorts[length / 2] + sorts[length / 2 - 1]) / 2.0
+            med=sorts[length / 2]
+            print('true median '+str(med))
+            if med==0.0:
+                i=1
+                while med==0.0:
+                    med=sorts[length *i/(i+1)]
+                    i+=1
+                print('variance at '+str(i)+'/'+str(i+1))
+                if med==0.0:
+                    raise ValueError('Average=0!!!!!')
+            
+            return med
     
     
-    #def makeDictOfLengths(self,steadyAndVar):#TODO
-        #'''returns dictionary of ordereder dictionaries
-        #{steady: OrderedDict{seq: float}}
-        #'''
-        
-        #steadyLen={}
-        #for i in range(1,int(self.parameters['maxLength'])+1):
-            #steadyLen[i]={}
-        
-        ##get sorted dictionary for every key of steadyLen
-        #for seq in steadyAndVar:
-            #if seq.find('f')==-1:
-                #sLen=len(seq)
-            #else:
-                #sLen=len(seq)-1
-            #steadyLen[sLen][seq]=steadyAndVar[seq]
-        
-        #for length in steadyLen.keys():
-            #tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
-            #steadyLen[length]=tmp
-        
-        #return steadyLen
+    
+    
+    
+    
 
     #def plotData(self,steady,show=True):
         #natData = self.readNativeList()
@@ -317,9 +378,10 @@ class Result(object):
         #return None
 
 modelNum=12
-simNum =0
+simNum =3
 r=Result(modelNum,simNum)
-r.printHPstats(True)
-
-
+#r.printHPstats(True)
+#s=r.getSteady()
+#v = r.getSteadyVar()
+p = r.readSimData()
 

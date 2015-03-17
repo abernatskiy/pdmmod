@@ -99,6 +99,37 @@ class Simulation(object):
             
         return None
     
+    def makeHeader(self,outputDir=None):
+        filename = 'traj0'
+        system('rm '+outputDir+'parameters.txt')
+        header = open(outputDir+'parameters.txt','a')
+        f =open(outputDir+filename,'r')
+        for line in f:
+            if line[0]=='#':
+                raw = (line[2:].rstrip('\n')).split(' ')
+                group = '=='+raw[0].rstrip(':')+'==\n'
+                header.write(group)
+                if raw[0]=='Model:':
+                    header.write(raw[1]+'\n')
+                elif raw[0]=='Parameters:':
+                    for item in raw[1:]:
+                        pair = item.split('=')
+                        header.write(pair[0]+' '+pair[1]+'\n')
+                elif raw[0]=='Command:':
+                    header.write('howTerm '+raw[2]+'\n')
+                    header.write('whenTerm '+raw[3]+'\n')
+                    header.write('records '+raw[4]+'\n')
+                    
+            else:
+                break
+        
+        header.write('==Simulation Parameters==\n')
+        header.write('numOfRuns '+str(self.numOfRuns )+'\n')
+        header.write('keepTrajectories '+str(self.traj)+'\n')
+            
+        return None
+            
+    
     def makeStatistics(self,outputDir=None):
         if outputDir == None:
             outputDir = self.outputDir
@@ -119,7 +150,7 @@ class Simulation(object):
                     breakCondition = True
                     print('i met condition in ',count,'line, in',str(inFile))
                 elif line[0]=="#":
-                    continue ##FIXME header reader goes in here
+                    continue
                 else:
                     if fileCount ==0:
                         count+=1
@@ -164,7 +195,9 @@ class Simulation(object):
         return evolutions, actRecords
     
     def reorganizeOutput(self,outputDir=None):
-        def writeEvolutions(evolutions,actRecords):
+        if outputDir == None:
+            outputDir = self.outputDir
+        def writeEvolutions(evolutions,actRecords,outputDir):
             system('rm '+outputDir+'means.txt')
             system('rm '+outputDir+'standDivs.txt')
             fMeans = open(outputDir+'means.txt','a')
@@ -183,9 +216,9 @@ class Simulation(object):
             return None
         evolutions, actRecords = self.makeStatistics(outputDir)
         if traj:
-            writeEvolutions(evolutions,actRecords)
+            writeEvolutions(evolutions,actRecords,outputDir)
         else:
-            writeEvolutions(evolutions,actRecords)
+            writeEvolutions(evolutions,actRecords,outputDir)
             deleteTraj()#TODO
 
     def runSeveralParallelPC():#TODO
@@ -196,15 +229,15 @@ class Simulation(object):
 
 modelNum = 12
 termCond = ('simulateTime',100,1)
-numOfRuns = 100
+numOfRuns = 10
 traj = True
 rewrite = False
 s = Simulation(modelNum,termCond,numOfRuns,traj)
-s.runSeveralSeries(rewrite)
-#outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output1/'
-#evo = s.makeStatistics(outputDir)
-#cProfile.run('s.reorganizeOutput(outputDir)')
-
+#s.runSeveralSeries(rewrite)
+outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/'
+s.makeHeader(outputDir)
+#evo = s.makeStatistics()
+#s.reorganizeOutput(outputDir)
 
 
 

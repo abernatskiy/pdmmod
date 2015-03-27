@@ -227,17 +227,17 @@ class Simulation(object):
         
         return None
 
-modelNum = 12
-termCond = ('simulateTime',100,1)
-numOfRuns = 10
-traj = True
-rewrite = False
-s = Simulation(modelNum,termCond,numOfRuns,traj)
-#s.runSeveralSeries(rewrite)
-outputDir = '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/'
-s.makeHeader(outputDir)
-#evo = s.makeStatistics()
-#s.reorganizeOutput(outputDir)
+if __name__ == "__main__":
+    modelNum = 12
+    termCond = ('simulateTime',200,2)
+    numOfRuns = 10
+    traj = True
+    rewrite = False
+    s = Simulation(modelNum,termCond,numOfRuns,traj)
+    s.runSeveralSeries(rewrite)
+    s.makeHeader(outputDir)
+    #evo = s.makeStatistics()
+    s.reorganizeOutput(outputDir)
 
 
 

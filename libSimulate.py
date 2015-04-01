@@ -4,15 +4,18 @@
 from os import system as system
 from os import walk as walk
 import numpy as np
-
-import cProfile
+import logging
+#import cProfile
 
 import subprocess
-import routes
 import itertools
 
+from log_utils import init_log
+import routes
+
 class Simulation(object):
-    def __init__(self,modelNum,termCond,numOfRuns=1,traj=False):
+    def __init__(self,modelNum,termCond,
+                 numOfRuns=1,traj=False,log_level='WARNING'):
         '''
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
@@ -29,32 +32,28 @@ class Simulation(object):
         self.numOfRuns = numOfRuns
         self.traj = traj
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
+        self.log_level = log_level
         
     def __str__(self):
-        str1 = 'Simulation of the model '+str(self.modelNum)+'. Termination condition: '+str(self.howTerm)\
-            +' ('+str(self.whenTerm)+' rec. every '+str(self.records)+') with '+str(self.numOfRuns)+' repetitions. '
+        str1 = ('Simulation of the model '+str(self.modelNum)+
+                '. Termination condition: '+str(self.howTerm)+
+                ' ('+str(self.whenTerm)+' rec. every '+str(self.records)+')'+
+                ' with '+str(self.numOfRuns)+' repetitions. ')
         if self.traj:
             str1+='Trajectories are kept\n'
         else:
             str1+='Trajectories are NOT kept\n'
         return str1
     
-    def __repr__(self):
-        str1 = 'Simulation of the model '+str(self.modelNum)+'. Termination condition: '+str(self.howTerm)\
-            +' ('+str(self.whenTerm)+' rec. every '+str(self.records)+') with '+str(self.numOfRuns)+' repetitions. '
-        if self.traj:
-            str1+='Trajectories are kept\n'
-        else:
-            str1+='Trajectories are NOT kept\n'
-        return str1
-    
+        
     def getTermConds(self,termCond):
         if termCond[0]=='simulateTime':
             return 'simulateTime', termCond[1],termCond[2]
         elif termCond[0]=='simulateReactions':
             return 'simulateReactions', termCond[1],termCond[2]
         elif termCond[0]=='simulateTillSteady':
-            return 'simulateTillSteady', '',termCond[2]#FIXME '' won't do in the future
+            return 'simulateTillSteady', '',termCond[2]
+            #FIXME '' won't do in the future
         else:
             raise ValueError("Unknown termination condition, check if typo")
     
@@ -63,8 +62,8 @@ class Simulation(object):
         if rewrite:
             system('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
             system('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
-            print('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
-            print('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
+            #print('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
+            #print('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
             currentRun = 0
         else:
             dirs=(next(walk(path))[1])
@@ -81,27 +80,37 @@ class Simulation(object):
                 currentRun = 0
             else:
                 currentRun = max(nums)+1
-            system('mkdir '+path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/')
-            print('mkdir '+path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/')
+            system('mkdir '+path+str("%03d" %self.modelNum)+
+                   '_output'+str(currentRun)+'/')
+            #print('mkdir '+path+str("%03d" %self.modelNum)+
+            #      '_output'+str(currentRun)+'/')
         
         outputDir = path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/'
         self.outputDir = outputDir
+        self.log = init_log(self.log_level,log_path=outputDir+'sim.log')
         return outputDir
     
     def runSeveralSeries(self,rewrite):
-        '''runs several simulations sequentially, store average, st.deviation and optionally trajectories
+        '''runs several simulations sequentially, 
+        stores average, st.deviation and optionally trajectories
         '''
-        outputDir = self.makeOutputFolder(rewrite)
+        self.outputDir = self.makeOutputFolder(rewrite)
         for i in range(numOfRuns):
-            command = (self.path2Folder+'pdmmod'),str(self.howTerm), str(self.whenTerm), str(self.records),outputDir+'traj'+str(i)
+            command = (self.path2Folder+'pdmmod',
+                        str(self.howTerm), 
+                        str(self.whenTerm), 
+                        str(self.records),
+                        self.outputDir+'traj'+str(i))
             subprocess.call(command)
-            print(command)
+            self.log.info(str(command))
             
         return None
     
-    def makeHeader(self,outputDir=None):
+    def _makeHeader(self,outputDir):
         filename = 'traj0'
-        system('rm '+outputDir+'parameters.txt')
+        proc =subprocess.call(
+            ('rm '+outputDir+'parameters.txt'),shell=True)
+        self.log.warning(proc)
         header = open(outputDir+'parameters.txt','a')
         f =open(outputDir+filename,'r')
         for line in f:
@@ -128,50 +137,9 @@ class Simulation(object):
         header.write('keepTrajectories '+str(self.traj)+'\n')
             
         return None
-            
     
-    def makeStatistics(self,outputDir=None):
-        if outputDir == None:
-            outputDir = self.outputDir
-        files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
-        handles = [open(t, 'r') for t in files]
-        print(files)
-        count = 0 #counts time instances
-        evolutions = {}
-        records = set([])
-        breakCondition = False
-        while not breakCondition:
-            #print(count)
-            points = {}#keeps populations of species at the given moment across files
-            fileCount = 0
-            for inFile in handles:
-                line = inFile.readline()
-                if line =='':
-                    breakCondition = True
-                    print('i met condition in ',count,'line, in',str(inFile))
-                elif line[0]=="#":
-                    continue
-                else:
-                    if fileCount ==0:
-                        count+=1
-                    fileCount += 1
-                    #count+=1
-                    raw = (line.rstrip('\n')).split(',')
-                    records.add(float(raw[0]))
-                    for item in raw[1:len(raw)-1]:
-                        #get a couple specie -- its population
-                        point=item.split(' ')
-                        if point[0] not in points:
-                            #add it and its population
-                            #also add 0s as prev times populations
-                                #print('point in the second file',point)
-                                points[point[0]]=np.zeros(self.numOfRuns)
-                                points[point[0]][fileCount-1]=int(point[1])#TEST
-                        else:
-                            points[point[0]][fileCount-1]=int(point[1])
-            if not breakCondition:
-                #print('b',count,str(points['P']))
-                for spec in points.keys():
+    def _points2Evolutions(self,points,evolutions,count):
+        for spec in points.keys():
                     if self.numOfRuns ==1:
                         points[spec]=(np.mean(points[spec]),0)
                     else:
@@ -180,47 +148,118 @@ class Simulation(object):
                     if spec not in evolutions:
                         #add it and its population
                         #also add 0s as prev times populations
-                        evolutions[spec]=np.zeros(int(self.whenTerm/self.records), dtype=(float,2))#FIXME this one has to be fluid to handle simulateTillSteady
-                        evolutions[spec][count-1]=points[spec]
+                        evolutions[spec]=np.zeros(
+                            int(self.whenTerm/self.records+1), dtype=(float,2))
+                        #FIXME this one has to be fluid to handle simulateTillSteady
+                        evolutions[spec][count]=points[spec]
                     else:
                         #otherwise append new point to the existing list of points
-                        evolutions[spec][count-1]=points[spec]
+                        evolutions[spec][count]=points[spec]
+
+        return None
+    
+    def _line2Data(self,raw,points,fileCount):
+        for item in raw[1:len(raw)-1]:
+            #get a couple specie -- its population
+            point=item.split(' ')
+            if point[0] not in points:
+                #add it and its population
+                #also add 0s as prev times populations
+                #print('point in the second file',point)
+                points[point[0]]=np.zeros(self.numOfRuns)
+                points[point[0]][fileCount-1]=int(point[1])
             else:
-                actRecords = count -1
-                print('number of points is',actRecords)
+                points[point[0]][fileCount-1]=int(point[1])
+        return None
+    
+    
+    def _makeStatistics(self,outputDir):
+        files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
+        handles = [open(t, 'r') for t in files]
+        self.log.info(str(files))
+        count = -1 #counts time instances
+        evolutions = {}
+        self.times = []
+        breakCondition = False
+        while not breakCondition:
+            points = {}
+            #keeps populations of species at the given moment across files
+            fileCount = 0
+            for inFile in handles:
+                line = inFile.readline()
+                if line =='':
+                    breakCondition = True
+                    self.log.info(
+                        'Termination condition is met on line '+
+                        str(count)+' in '+str(inFile))
+                elif line[0]=="#":
+                    continue
+                else:
+                    raw = (line.rstrip('\n')).split(',')
+                    if fileCount == 0:
+                        count+=1
+                        self.times.append(float(raw[0]))
+                    fileCount += 1
+                    self._line2Data(raw,points,fileCount)
+            
+            if not breakCondition:
+                self._points2Evolutions(points,evolutions,count)
+            else:
+                actRecords = count+1
+                self.log.info('number of points is '+str(actRecords))
                 break
         
         [t.close() for t in handles]
         
         return evolutions, actRecords
     
+    def _deleteTraj(self,outputDir):
+        files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
+        for traj in files:
+            system('rm '+traj)
+        
+        return None
+    
+    def _writeEvolutions(self,outputDir):#TEST
+        evolutions, actRecords = self._makeStatistics(outputDir)
+        system('rm '+outputDir+'means.txt')
+        system('rm '+outputDir+'standDivs.txt')
+        fMeans = open(outputDir+'means.txt','a')
+        fStd = open(outputDir+'standDivs.txt','a')
+        for spec in evolutions:
+            printMean = spec
+            printStd = spec
+            for item in evolutions[spec][0:actRecords]:
+                printMean+=' '+str(item[0])
+                printStd+=' '+str(item[1])
+            fMeans.write(printMean+'\n')
+            fStd.write(printStd+'\n')
+        fMeans.close()
+        fStd.close()
+        return None
+        
+    def _writeTimes(self,outputDir):
+        string = str(self.times[0])
+        for item in self.times[1:]:
+            string += ' '+str(item)
+        fTimes = open(outputDir+'times.txt','w')
+        fTimes.write(string)
+        fTimes.close()
+        return None
+    
     def reorganizeOutput(self,outputDir=None):
         if outputDir == None:
             outputDir = self.outputDir
-        def writeEvolutions(evolutions,actRecords,outputDir):
-            system('rm '+outputDir+'means.txt')
-            system('rm '+outputDir+'standDivs.txt')
-            fMeans = open(outputDir+'means.txt','a')
-            fStd = open(outputDir+'standDivs.txt','a')
-            for spec in evolutions:
-                printMean = spec
-                printStd = spec
-                for item in evolutions[spec][0:actRecords]:
-                    printMean+=' '+str(item[0])
-                    printStd+=' '+str(item[1])
-                fMeans.write(printMean+'\n')
-                fStd.write(printStd+'\n')
-            fMeans.close()
-            fStd.close()
-            
-            return None
-        evolutions, actRecords = self.makeStatistics(outputDir)
-        if traj:
-            writeEvolutions(evolutions,actRecords,outputDir)
-        else:
-            writeEvolutions(evolutions,actRecords,outputDir)
-            deleteTraj()#TODO
-
+        self._makeHeader(outputDir)
+        self._writeEvolutions(outputDir)
+        self._writeTimes(outputDir)
+        if not self.traj:
+            self._deleteTraj(outputDir)
+        return None
+    
+    
+        
+    
     def runSeveralParallelPC():#TODO
         '''
         '''
@@ -229,15 +268,14 @@ class Simulation(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',200,2)
-    numOfRuns = 10
-    traj = True
+    termCond = ('simulateTime',20,1)
+    numOfRuns = 3
+    traj = False
     rewrite = False
-    s = Simulation(modelNum,termCond,numOfRuns,traj)
+    log_level = 'INFO'
+    s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
     s.runSeveralSeries(rewrite)
-    s.makeHeader(outputDir)
-    #evo = s.makeStatistics()
-    s.reorganizeOutput(outputDir)
+    s.reorganizeOutput()
 
 
 

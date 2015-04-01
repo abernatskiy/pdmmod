@@ -10,6 +10,14 @@ from statistics import mean
 from statistics import variance
 from collections import OrderedDict
 from os import system as system
+import numpy as np
+import math
+
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.preprocessing import StandardScaler
+
 
 class Result(object):
     def __init__(self,modelNum,simNum):
@@ -17,7 +25,8 @@ class Result(object):
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
               * ('simulateTime',int:simulation time,int: how often to record)
-              * ('simulateReactions',int:number of reactions,int: how often to record)
+              * ('simulateReactions',int:number of reactions,int: 
+                    how often to record)
               * ('simulateTillSteady',int: how often to record (time))
             numOfRuns: is Int repr. number of runs of the simulation
             traj: Bool, repr.:
@@ -27,34 +36,41 @@ class Result(object):
         self.modelNum = modelNum
         self.simNum = simNum
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
-        self.outputDir = self.path2Folder+str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/'
-        self.parameters = self.readSimData()
-        self.means, self.times = self.readMeans()
-        self.stds = self.readStds()
-        
-        
-        
-    def readMeans(self):
-        evolutions = {}
-        f = open(self.path2Folder+str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/means.txt','r')
-        for line in f:
-            raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=[float(item) for item in raw[1:]]
-        
-        times =[i*self.records for i in range(len(evolutions[raw[0]]))]
-        
-        return evolutions, times
+        self.outputDir = self.path2Folder+\
+            str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/'
+        self.parameters = self._readSimData()
+        self.means= self._readMeans()
+        self.stds = self._readStds()
+        self.times = self._readTimes()
     
-    def readStds(self):
+    def _readTimes(self):
+        with open(self.outputDir+'times.txt','r') as content_file:
+            content = content_file.read()
+        times =[float(item) for item in content.split(' ')]
+        return times
+        
+        
+    def _readMeans(self):
         evolutions = {}
-        f = open(self.path2Folder+str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/standDivs.txt','r')
+        f = open(self.path2Folder+str("%03d" %self.modelNum)+
+                 '_output'+str(self.simNum)+'/means.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
             evolutions[raw[0]]=[float(item) for item in raw[1:]]
         
         return evolutions
     
-    def readSimData(self):
+    def _readStds(self):
+        evolutions = {}
+        f = open(self.path2Folder+str("%03d" %self.modelNum)+
+                 '_output'+str(self.simNum)+'/standDivs.txt','r')
+        for line in f:
+            raw = (line.rstrip('\n')).split(' ')
+            evolutions[raw[0]]=[float(item) for item in raw[1:]]
+        
+        return evolutions
+    
+    def _readSimData(self):
         header = open(self.outputDir+'parameters.txt','r')
         line = header.readline()
         parameters ={}
@@ -80,7 +96,8 @@ class Result(object):
 
     def readNativeList(self):
         ''' None -> {string: (int, string)}
-        converts nativeList.txt to a dictionary from hp-string to a tuple of their native energies and catalytic patterns
+        converts nativeList.txt to a dictionary from hp-string 
+        to a tuple of their native energies and catalytic patterns
         '''
         dataFile = open(routes.routePDM+'nativeList.txt', "rt")
         count = 0
@@ -92,296 +109,241 @@ class Result(object):
             count +=1
         
         return natData
-
-    def printHPstats(self,show=True):#FIXME I am aweful
-        '''means/stds -- {name: [populations during time steps]}'''
+    
+    def makeStats(self): 
+        '''return countAll, countFold, countCat, countAuto, popStats, length
+        means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
         natData=self.readNativeList()
-        times = [0]
-        i=0
-        m = 0
-        while m < self.whenTerm-1:#FIXME this definitely can be done better
-            i+=1
-            times.append(self.records*i)
-            m = times[-1]
-        print(times)
-        lengths=[]
-        countAll = [(0)]*(len(times)) 
-        countFold = [(0)]*(len(times)) 
-        countCat = [(0)]*(len(times)) 
-        countAuto = [(0)]*(len(times)) 
-        popStats={}
-        lengthDistr={}
-        total=[0]*(len(times))
+        lengths=set([])     #keeps lengths present in simulation
+        countAll = [(0)]*(len(self.times)) 
+        countFold = [(0)]*(len(self.times)) 
+        countCat = [(0)]*(len(self.times)) 
+        countAuto = [(0)]*(len(self.times)) 
+        popStats={}#lengths distribution in the last moment of simulation
         for key in self.means.keys():
             if key.find('f')==-1:
                 polLen=len(key)
-                lengths.append(len(key))
+                lengths.add(len(key))
             else:
-                lengths.append(len(key)-1)
+                lengths.add(len(key)-1)
                 polLen=len(key)-1
-            
-            #total=[total[i]+self.means[key][i] for i in range(len(total))]
-            for i in range(len(times)):
-                countAll[i]+=self.means[key][i]
-                if not key.find('f')==-1:
-                    #print(key)
-                    countFold[i]+=self.means[key][i]
-                    if not natData[key[1:]][1]=='N':
-                        countCat[i]+=self.means[key][i]
-                        if not key.find('HHH')==-1:
-                            countAuto[i]+=self.means[key][i]
-            
-            
+            for i in range(len(self.times)):
+                    countAll[i]+=self.means[key][i] 
+                    #adds population of current sequence at time i to 
+                    #total population of all the sequences seen before 
+                    if not key.find('f')==-1:
+                        countFold[i]+=self.means[key][i]
+                        if not natData[key[1:]][1]=='N':
+                            countCat[i]+=self.means[key][i]
+                            if not key.find('HHH')==-1:
+                                countAuto[i]+=self.means[key][i]
+            #here we store lengths distribution in the last moment of simulation                    
             if not polLen in popStats.keys():
                 #add dict entry and population of the first n-mer of the given length
                 popStats[polLen]=self.means[key][-1]
             else:
                 #add to the population of n-mers a population of another n-mer
                 popStats[polLen]+=self.means[key][-1]
+        return countAll, countFold, countCat, countAuto, popStats, lengths
+        
+    
+    def _plotTotalPop(self,fig,countAll):
+        fig.plot(self.times,countAll)
+        fig.set_yscale('log')
+        fig.set_ylabel('molecules count')
+        fig.set_xlabel('time')
+        fig.set_title("Total count of molecules at each moment")
+        return None
+    
+    def _plotTypes(self,fig,countFold,countCat,countAuto):
+        fig.plot(self.times,countFold,label='folded')
+        fig.plot(self.times,countCat,label='catalysts')
+        fig.plot(self.times,countAuto,label='autocats')
+        fig.legend()
+        fig.set_ylabel('molecules count')
+        fig.set_xlabel('time')
+        fig.set_title("count of molecules of various types at each moment")
+        return None
+    
+    def _plotLenDistr(self,fig,mL,seqNames,lengthsDistr):
+        fig.plot(seqNames,lengthsDistr,label=\
+            str(mL)+'/'+str(len(self.means.keys())))
+        fig.grid(True)
+        fig.set_yscale('log')
+        fig.set_ylabel('average population')
+        fig.set_xlabel('length')
+        fig.set_title("Length distribution in the last moment")
+        return None
+        
+    def printHPstats(self,show=True):
+        countAll, countFold, countCat, countAuto, popStats, lengths = \
+            self.makeStats()
+            
+            
         mL=max(lengths)
         print("maximum length of a polymer is "+str(mL))
-        hist=[]
-        histNorm=[]
-        #lengthsD=[ps/hi for (ps,hi) in zip(popStats.copy().values(),hist)]
-        
-        for i in range(1,mL+1):
-            hist.append(lengths.count(i))
-            histNorm.append(hist[i-1]/2**i)
-        lengthsD=[ps/2**li for (ps,li) in zip(list(popStats.copy().values()),list(popStats.copy().keys()))]
+        seqNames = list(popStats.copy().keys())
+        lengthsDistr=[ps/2**li for (ps,li) in 
+                  zip(list(popStats.copy().values()),
+                      seqNames)]
+
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
-        #ax1.plot(range(1,mL+1),histNorm,'o')
-        ax0.plot(times,countAll)
-        ax1.plot(times,countFold,label='folded')
-        ax1.plot(times,countCat,label='catalysts')
-        ax1.plot(times,countAuto,label='autocats')
-        ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(self.means.keys())))
-        ax2.legend()
-        ax1.legend()
-        ax0.set_yscale('log')
-        #ax1.set_yscale('log')
-        ax2.grid(True)
-        ax2.set_yscale('log')
-        ax0.set_title("Total count of molecules at each moment")
-        ax1.set_title("count of molecules of various types at each moment")
-        ax2.set_title("Length distribution in the last moment")
-        title = ''
-        #for val in self.parameters.values():
-            #title+=("%.2f" % float(val))+' '
-        #fig.suptitle(self.modelName +' with '+title)
+        self._plotTotalPop(ax0,countAll)
+        self._plotTypes(ax1,countFold,countCat,countAuto)
+        self._plotLenDistr(ax2,mL,seqNames,lengthsDistr)
+        
+        title = 'Statistics of a HP-wordl simulation run'
+        fig.suptitle(title + ' for '+self.name)
         if show:
             plt.show()
         
-        
-        return hist
+        return None
     
-    def getSteady(self,nonSteadyPercent=0.9):
+    def getSteadyMean(self,nonSteadyPercent):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.means.keys():
             points=self.means[seq][border:]
             steady[seq]=mean(points)
         
-        steadySorted = OrderedDict(sorted(steady.items(), key=lambda t: t[1],reverse=True))
+        steadySorted = OrderedDict(
+            sorted(steady.items(), key=lambda t: t[1],reverse=True)
+            )
         
         return steadySorted
     
-    def getSteadyVar(self,nonSteadyPercent=0.9):
+    def getSteadyStd(self,nonSteadyPercent):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.stds.keys():
             points=self.stds[seq][border:]
             steady[seq]=mean(points)
         
-        steadySorted = OrderedDict(sorted(steady.items(), key=lambda t: t[1],reverse=True))
+        steadySorted = OrderedDict(
+            sorted(steady.items(), key=lambda t: t[1],reverse=True)
+            )
         
         return steadySorted
     
-    def makeDictOfLengths(self,nonSteadyPercent=0.9):#TODO
+    def makeDictOfLengths(self,maxLength,nonSteadyPercent=0.9):
         '''returns dictionary of ordereder dictionaries
-        {steady: OrderedDict{seq: float}}
+        {length: OrderedDict{seq: float}}
         '''
-        
+        steadyMean = self.getSteadyMean(nonSteadyPercent)   #sortedDict
+        steadyStd = self.getSteadyStd(nonSteadyPercent)     #sortedDict
         steadyLen={}
-        for i in range(1,int(self.parameters['maxLength'])+1):
+        for i in range(1,maxLength+1):      #initialyze dicts
             steadyLen[i]={}
         
         #get sorted dictionary for every key of steadyLen
-        for seq in steadyAndVar:
+        for seq in steadyMean:
             if seq.find('f')==-1:
                 sLen=len(seq)
             else:
                 sLen=len(seq)-1
-            steadyLen[sLen][seq]=steadyAndVar[seq]
+            steadyLen[sLen][seq]=(steadyMean[seq],steadyStd[seq])
         
         for length in steadyLen.keys():
-            tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
+            tmp = OrderedDict(
+                sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True)
+                )
             steadyLen[length]=tmp
         
         return steadyLen
     
-    def clustLengths(self,minLength=6,samp=None,epsilonModifyer={0:0}):# returns dict jointLabels
-        self.jointData=self.makeDictOfLengths()
+    def clustLengths(self,minLength,maxLength,
+                     nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):#TEST
+        ''' returns dict jointLabels'''
+        self.jointData=self.makeDictOfLengths(maxLength)
         jointLabels={}
-        jointEpsilon={}
+        labels={}
         
-        def median(mylist):
-            sorts = sorted(mylist)
-            length = len(sorts)
-            if not length % 2:
-                med = (sorts[length / 2] + sorts[length / 2 - 1]) / 2.0
-            med=sorts[length / 2]
-            print('true median '+str(med))
-            if med==0.0:
-                i=1
-                while med==0.0:
-                    med=sorts[length *i/(i+1)]
+        for length in range(minLength,maxLength+1):
+            labels[length]=[]
+            if not self.jointData[length]=={}:
+                print('analyzing length '+str(length))
+                lenOffset=length-minLength
+                means = []
+                stds = []
+                indxes = {}
+                i=-1
+                for seq in self.jointData[length].keys():
                     i+=1
-                print('variance at '+str(i)+'/'+str(i+1))
-                if med==0.0:
-                    raise ValueError('Average=0!!!!!')
-            
-            return med
-    
-    
-    
-    
-    
-    
-
-    #def plotData(self,steady,show=True):
-        #natData = self.readNativeList()
-        #def getColor(seq,natData):
-            #if not seq.find('f')==-1:
-                #temp = seq[1:]
-                #if temp.find('HHH')==-1 or natData[temp][1]=='N':
-                    #col = 'blue'
-                #elif temp.find('HHH')==-1 and (not natData[temp][1]=='N'):
-                    #col = 'green'
-                #else:
-                    #col = 'red'
-            #else:
-                #col = 'gray'
-            
-            #return col
-        
-        #def f(key,steady,topTen):
-            #try:
-                #topTen.index(key)
-            #except:
-                #return None
-            #else:
-                #return str(key)+'='+str("%.2f" % steady[key])
-        #fig=plt.figure(figsize=(8,6))
-        #if not steady==None:
-            #steadyKeys=[item for item in steady]
-            ##print(steadyKeys)
-            #topTen=steadyKeys[0:10]
-            
-            #for key in steady.keys():
-                #col = getColor(key,natData)
-                #plt.plot(self.times,self.specPop[key],label=f(key,steady,topTen),color=col)
-        #else:
-            #for key in self.specPop.keys():
-                #plt.plot(self.times,self.specPop[key])
-        ##plt.legend(fontsize='small') 
-        #title = self.modelName+'\n'
-        #for val in self.parameters.values():
-            #title+=' '+("%.2f" % float(val))
-        #plt.title("Populations of species"+title)
-        #plt.xlim(0,self.times[-1])
-        #if not steady==None:
-            #plt.legend(fontsize='small')
-        #if show:
-            #plt.show()
-        #else:
-            #plt.savefig(self.directory + "all.png")
-        
-    #def getLenSteady(self,steady):
-        #'''steady: OrderedDict{seq: float}
-        #'''
-        
-        #steadyLen={}
-        #for i in range(1,int(self.parameters['maxLength'])+1):
-            #steadyLen[i]={}
-        
-        ##get sorted dictionary for every key of steadyLen
-        #for seq in steady:
-            #if seq.find('f')==-1:
-                #sLen=len(seq)
-            #else:
-                #sLen=len(seq)-1
-            #steadyLen[sLen][seq]=steady[seq]
-        
-        #for length in steadyLen.keys():
-            #tmp = OrderedDict(sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True))
-            #steadyLen[length]=tmp
-        
-        #return steadyLen
-        
-        
-    
-    
-    #def plotHPlengths(self,steady,show=True):
-        #steadyLen=self.getLenSteady(steady)
-        #natData = self.readNativeList()
-        #def f(key,steadyLen):
-            #if key.find('f')==-1:
-                #sLen=len(key)
-            #else:
-                #sLen=len(key)-1
-            #if list(steadyLen[sLen].keys()).index(key)<3:
-                #return str(key)+'='+str("%.2f" % steadyLen[sLen][key])
-            #else:
-                #return None
-        
-        #def getColor(seq,natData):
-            #if not seq.find('f')==-1:
-                #temp = seq[1:]
-                #if temp.find('HHH')==-1 or natData[temp][1]=='N':
-                    #col = 'blue'
-                #elif temp.find('HHH')==-1 and (not natData[temp][1]=='N'):
-                    #col = 'green'
-                #else:
-                    #col = 'red'
-            #else:
-                #col = 'gray'
-            
-            #return col
-                    
-            
-        ##fig=plt.figure(figsize=(8,6))
-        ##for every length of polymers
-        #for length in steadyLen.keys():
-            #lbl=None
-            #fig=plt.figure(figsize=(8,6))
-            ##if there are polymers of theat length
-            #if not steadyLen[length]=={}:
-                ##for every sequence in the dictionary
-                #for seq in steadyLen[length].keys():
-                    #lbl=f(seq,steadyLen)
-                    #col=getColor(seq,natData)
-                    #plt.plot(self.times,self.specPop[seq],label=lbl,color=col)
-                    
-                #title = self.modelName+'\n'
-                #for val in self.parameters.values():
-                    #title+=' '+("%.2f" % float(val))
-                #plt.title("Populations of species of length "+str(length)+' '+title)
-                #plt.xlim(0,self.times[-1])
-                #plt.legend(fontsize='small')
-                #if show:
-                    #plt.show()
-                    ##plt.savefig(self.directory+'len'+str(length)+".png")
-                #else:
-                    #plt.savefig(self.directory+str("%02d" % length)+".png")
+                    means.append(self.jointData[length][seq][0])
+                    stds.append(self.jointData[length][seq][1])
+                    indxes[i]=seq
                 
-        #return None
+                if length>14:
+                    if samp==None:
+                        samp=20
+                    else:
+                        samp=samp*2
+                else:
+                    if samp==None:
+                        samp=10
+                    else:
+                        samp=samp
+                jointLabels[length]=clustList(
+                        means,stds,length,samp,epsilonModifyer)[0]
+                
+                n_clusters = len(set(jointLabels[length])) - (1 if -1 in jointLabels[length] else 0)
+                print('Estimated number of clusters: %d' % n_clusters)
+            else:
+                jointLabels[length] = np.array([])
+            #i=-1
+            for (i,seq) in indxes.items():
+                labels[length].append((seq, jointLabels[length][i]))
+    
+        return labels
+    
 
-modelNum=12
-simNum =3
-r=Result(modelNum,simNum)
-#r.printHPstats(True)
-#s=r.getSteady()
-#v = r.getSteadyVar()
-p = r.readSimData()
+
+
+def median(mylist):
+    sorts = sorted(mylist)
+    length = len(sorts)
+    if not length % 2:
+        med = (sorts[int(length / 2)] + sorts[int(length / 2) - 1]) / 2.0
+    med=sorts[int(length / 2)]
+    if med==0.0:
+        i=1
+        while med==0.0:
+            med=sorts[int(length *i/(i+1))]
+            i+=1
+        print('variance at '+str(i)+'/'+str(i+1))
+        if med==0.0:
+            raise ValueError('Average=0!!!!!')
+    
+    return med
+
+def clustList(means,stds,length,samp,epsilonModifyer):
+    X=np.array([means,[1]*len(means)]).T
+    med=median(stds)
+    '''
+    if length>8:
+        epsilon=sqrt(med)*4
+    elif length>12:
+        epsilon=sqrt(med)*8
+    else:
+        epsilon=sqrt(med)
+    '''
+    epsilon=med
+    if length in epsilonModifyer.keys():
+        epsilon=epsilon*epsilonModifyer[length]
+    print('epsilon='+str(epsilon))
+    #jointEpsilon[length]=epsilon
+    Y=StandardScaler(copy=True, with_mean=True, with_std=True).fit_transform(X)
+    db = DBSCAN(epsilon, min_samples=samp).fit(X)
+    core_samples = db.core_sample_indices_
+    labels = db.labels_
+    
+    return labels, core_samples
+
+if __name__ == "__main__":
+    modelNum = 12
+    simNum = 0
+    r = Result(modelNum,simNum)
+    steadyLen = r.makeDictOfLengths(25)
+    jointLabels = r.clustLengths(6,25)
 

@@ -5,6 +5,8 @@
 
 #specPop -- {name: [populations during time steps]}
 import routes
+from dictUtils import *
+
 import matplotlib.pyplot as plt
 from statistics import mean
 from statistics import variance
@@ -138,13 +140,9 @@ class Result(object):
                             countCat[i]+=self.means[key][i]
                             if not key.find('HHH')==-1:
                                 countAuto[i]+=self.means[key][i]
-            #here we store lengths distribution in the last moment of simulation                    
-            if not polLen in popStats.keys():
-                #add dict entry and population of the first n-mer of the given length
-                popStats[polLen]=self.means[key][-1]
-            else:
-                #add to the population of n-mers a population of another n-mer
-                popStats[polLen]+=self.means[key][-1]
+            #here we store lengths distribution in the last moment of simulation  
+            addToDictNum(popStats,polLen,self.means[key][-1])
+            
         return countAll, countFold, countCat, countAuto, popStats, lengths
         
     
@@ -255,12 +253,17 @@ class Result(object):
     def clustLengths(self,minLength,maxLength,
                      nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):#TEST
         ''' returns dict jointLabels'''
+        if self.numOfRuns == 1:
+            raise ValueError('I cannot cluster data from 1 simulation:'+
+                ' standard deviation isn\'t defined')
         self.jointData=self.makeDictOfLengths(maxLength)
         jointLabels={}
+        _labels={}
         labels={}
         
         for length in range(minLength,maxLength+1):
-            labels[length]=[]
+            _labels[length] = []
+            labels[length] = {}
             if not self.jointData[length]=={}:
                 print('analyzing length '+str(length))
                 lenOffset=length-minLength
@@ -292,9 +295,16 @@ class Result(object):
             else:
                 jointLabels[length] = np.array([])
             #i=-1
-            for (i,seq) in indxes.items():
-                labels[length].append((seq, jointLabels[length][i]))
-    
+            for (i,seq) in indxes.items():#BUG
+                try:
+                    _labels[length].append((seq, jointLabels[length][i]))
+                except IndexError:
+                    print(i,seq)
+            if not _labels[length]==[]:
+                for couple in _labels[length]:
+                    addToDictList(labels[length],couple[1],couple[0])
+            
+            
         return labels
     
 
@@ -340,10 +350,13 @@ def clustList(means,stds,length,samp,epsilonModifyer):
     
     return labels, core_samples
 
+
+
+
 if __name__ == "__main__":
     modelNum = 12
     simNum = 0
     r = Result(modelNum,simNum)
-    steadyLen = r.makeDictOfLengths(25)
-    jointLabels = r.clustLengths(6,25)
+    #steadyLen = r.makeDictOfLengths(25)
+    #jointLabels = r.clustLengths(6,25)
 

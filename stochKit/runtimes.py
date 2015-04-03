@@ -11,6 +11,8 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
+from balls import *
+
 '''DATA
 * numSpec -- int.
   interp. number of species types
@@ -30,29 +32,7 @@ from numpy import linspace
 '''
 
 
-def changeInitPop(numSpec,population): 
-    '''
-    goes to populations.txt and changes population of each species to a given one as well as number of species
-    '''
-    popFile = open("populations.txt", mode='w', encoding='utf-8')
-    for i in range(numSpec):
-        popFile.write(str("%04d" %(i+1))+"_1 "+str(population)+"\n")
-    popFile.close()
-    
-    return None
 
-def changeParameters(numSpec,collRate):
-    '''
-    goes to parameters.ini and changes number of species and collision rate
-    '''
-    popFile = open("parameters.ini", mode='w', encoding='utf-8')
-    popFile.write("[kinetic model]\n")
-    popFile.write("specNumber = "+str(numSpec)+"\n")
-    popFile.write("collRate = "+str(collRate)+"\n")
-    popFile.close()
-    
-    
-    return None
 
 def getSimTime(command):
     '''
@@ -65,14 +45,14 @@ def getSimTime(command):
     
     return time, retValue
 
-def getTimeStat(command,numSpec,population,runs):
+def getTimeStat(command,numSpec,population,collRate,runs):
     '''runs the simulation several times with fixed parameters and then returns average time of running
     '''
-    changeInitPop(numSpec,population)
+    filewriter(filename,numSpec,population,collRate)
     times=[]
     for i in range(runs):
         time, retValue = getSimTime(command)
-        while retValue == 2:
+        while retValue == 2:#WTF
             print('rerun')
             time, retValue = getSimTime(command)
             
@@ -83,25 +63,13 @@ def getTimeStat(command,numSpec,population,runs):
     print(ave, stdDev)
     return ave, stdDev
 
-def runSeveralChangePop(command,runs,numSpec,currPops):#TEST
-    '''runs several simulations with different population of the fixed number of species
-    '''
-    system('rm runTemp.txt && touch runTemp.txt' )
-    for population in currPops:
-        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
-        with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(population*numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        #numSpec=numSpec+steps[i]
 
-    
-    return None
-
-def runSeveralChangeNumSpec(command,runs,population,species):#TEST
+def runSeveralChangeNumSpec(command,runs,population,collRate,species):#TEST
     '''runs several simulations with different number of species but fixed population of every specie
     '''
     system('rm runTemp.txt && touch runTemp.txt' )
     for numSpec in species:
-        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
+        pair=getTimeStat(command,numSpec,population,collRate,runs)#average time and standard deviation of it.
         with open("runTemp.txt", "a") as myfile:
             myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
         #numSpec=numSpec+steps[i]
@@ -109,20 +77,7 @@ def runSeveralChangeNumSpec(command,runs,population,species):#TEST
     
     return None
 
-def runSeveralChangeNumSpec2(command,runs,population,species,collRate):#TODO
-    '''runs several simulations with different number of species but fixed population of every specie
-    also changes parameters.ini
-    '''
-    system('rm runTemp.txt && touch runTemp.txt' )
-    for numSpec in species:
-        changeParameters(numSpec,collRate)
-        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
-        with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
-        #numSpec=numSpec+steps[i]
 
-    
-    return None
 
 def analyzeRuntime(command,runs,numOfPoints,filename):
     '''
@@ -242,8 +197,8 @@ def plotSeveral(filenames):#TODO
         data, lines, slope, ratios, fits = analyzeFile(filename)
 
         ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o')
-        ax0.plot(lines[0],lines[1],label='y = '+'%.2e' %fits[0][0]+' x +'+'%.2e' %fits[0][1])
-        #ax0.plot(lines[0],lines[2],label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2])
+        #ax0.plot(lines[0],lines[1],label='y = '+'%.2e' %fits[0][0]+' x +'+'%.2e' %fits[0][1])
+        ax0.plot(lines[0],lines[2],label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2])
         #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
         for i in range(len(data[1])):
             element=data[1][i]
@@ -263,12 +218,29 @@ def plotSeveral(filenames):#TODO
     return None
 
 ###Change Number of species###
-population=1
-command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
+population=50
+filename = 'b.xml'
+command = '/data/research/06.origins_of_life/codes/stochKit/StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
 runs = 3
-#species = [1650, 1750, 1850, 1950, 2050, 2150, 2250, 2350, 2400,2450]
 collRate = 0.5
-species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
+
+species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000]#,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
+
+numOfPoints = len(species)
+title = ''
+
+#runSeveralChangeNumSpec(command,runs,population,collRate,species)
+#runtimes, ratios = analyzeRuntime(command,runs,numOfPoints,'runTemp.txt')
+#plotRuntimes(runtimes,ratios,title)
+filenames = ['runTemp.txt','pdmmodBalls.txt']
+
+plotSeveral(filenames)
+
+
+
+
+
+
 
 
 

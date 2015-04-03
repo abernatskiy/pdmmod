@@ -70,14 +70,14 @@ def printStats(times,specPop,plot=True):
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
         ax1.plot(times,specTypes)
         ax0.plot(times,total)
-        ax1.plot([0,times[-1]],[allSeq,allSeq],label ='number of seq. type with lengths up to '+str(maxLength))
+        #ax1.plot([0,times[-1]],[allSeq,allSeq],label ='number of seq. type with lengths up to '+str(maxLength))
         ax1.set_yscale('log')
         #ax2.plot(list(popStats.copy().keys()),lengthsD,label=str(mL)+'/'+str(len(specPop.keys())))
         ax1.legend(loc=4)
         #ax1.grid(True)
         ax0.set_title("Total count of molecules at each moment")
         ax1.set_title("Total count of species types at each moment, max. length reached "+str(maxLength))
-        ax1.set_ylim([0,10**11])
+        #ax1.set_ylim([0,10**11])
         for key in specPop.keys():
             ax2.plot(times,specPop[key])
         ax2.set_title("Populations of species")
@@ -106,6 +106,6 @@ def plotData(times,specPop):
     plt.show()
 
 
-times, specPop = readData("x")
+times, specPop = readData("y")
 printStats(times,specPop)
 #plotData(times, specPop)

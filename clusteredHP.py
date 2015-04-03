@@ -24,6 +24,87 @@ class ClusteredResults(result.Result):
             clustDict[length]=Clusters(length,self)
             
         return clustDict
+    
+    def plotClustLen(self,saveFig=False):#FIXME I am aweful
+        numPlots=self.maxLength-self.minLength+1
+        numRows=(numPlots-1)/2+1
+        f, names = plt.subplots(numRows, 2, figsize=(18,14))
+        plt.title(self.kin2str())
+        for length in range(self.minLength, len(self.jointData.keys())+1):
+            grInd=length-self.minLength
+            labels=self.jointLabels[length]
+            
+            unique_labels = list(set(labels))
+            #unique_labels.append(-2.0)
+            n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+            labCols = dict(zip( unique_labels,cm.rainbow(np.linspace(0, 1, len(unique_labels)))))
+            metClusts=set([])
+            for seq in self.jointData[length]:
+                Legend=None
+                anno=None
+                x=seq.concentration
+                if seq.ifInAutoCatSet:
+                    if 'f' in seq.HPsequence:
+                        markersize = 12
+                        mark='v'
+                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)#TODO format and seq.status
+                        #anno=str(seq.indx)
+                        if seq.inClustLen==-1.0:
+                            col='k'
+                        else:
+                            col=labCols[seq.inClustLen]
+                    else:
+                        markersize = 14
+                        mark='x'
+                        col=labCols[seq.inClustLen]
+                        #Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)
+                elif seq.inClustLen==-1.0:
+                    markersize = 4
+                    mark = 'o'
+                    col = 'k'
+                    if 'f' in seq.HPsequence:
+                        markersize = 5
+                        mark = 'D'
+                    if (seq.indx in self.clustDict[length].outstanders.keys()) and (seq.concentration>self.clustDict[length].maxClustered+0.25*self.jointEpsilon[length]):
+                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)
+                        if 'f' in seq.HPsequence:
+                            Legend=str(seq.indx)+' F '+str(seq.status)+': '+str( seq.concentration)
+                else:
+                    markersize = 8
+                    mark = 'o'
+                    if 'f' in seq.HPsequence:
+                        mark = 'D'
+                        markersize = 9
+                    col = labCols[seq.inClustLen]
+                    currClNum=len(metClusts)
+                    metClusts.add(seq.inClustLen)
+                    newClNum=len(metClusts)
+                    if not newClNum==currClNum:
+                         Legend='cluster with '+str(self.clustDict[length].theClusters[seq.inClustLen].numOfseqs)+' seqs'
+                if grInd<numRows:
+                    name=names[grInd,0]
+                else:
+                    name=names[grInd-numRows,1]
+                name.plot(x, 0, mark, markerfacecolor=col,\
+                                    markeredgecolor='k', markersize=markersize,label=Legend)
+                name.legend(prop={'size':8},ncol=2)
+                name.set_ylim((-0.1,0.5))
+                if not anno==None:
+                    name.annotate(anno,xy=(x, 0),xytext=(x, 0.1),textcoords='figure fraction')
+            theTitle='Length '+str(length)+'. Est. number of clusters: '+str(n_clusters)
+            name.set_title(theTitle)
+        
+        plt.setp([a.get_yticklabels() for a in f.axes], visible=False)
+        
+        if not saveFig:
+            plt.show()
+        else:
+            #plt.set_size__inches(12,16)
+            plt.suptitle(self.kin2str(), fontsize=20)
+            plt.savefig(self.writeGraphFilename())
+        return None
+    
+    
         
 class Clusters(object):
     '''class Clusters(length,clustResults)
@@ -31,7 +112,7 @@ class Clusters(object):
     '''
     def __init__(self,length,clustResults):
         self.length=length
-        #self.epsilon=clustResults.jointEpsilon[length] TODO Shoul we?
+        #self.epsilon=clustResults.jointEpsilon[length] Should we?
         self.clusters, self.noise=self.makeClusters(length,clustResults)
         self.minClustered, self.maxClustered=self.findMinMax()
         self.outstanders=self.findOutst()

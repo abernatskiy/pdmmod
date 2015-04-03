@@ -295,11 +295,15 @@ class Result(object):
             else:
                 jointLabels[length] = np.array([])
             #i=-1
-            for (i,seq) in indxes.items():#BUG
+            for (i,seq) in indxes.items():
                 try:
                     _labels[length].append((seq, jointLabels[length][i]))
                 except IndexError:
-                    print(i,seq)
+                    if not self.jointData[length]==OrderedDict():
+                        raise IndexError
+                    else:
+                        continue
+                    
             if not _labels[length]==[]:
                 for couple in _labels[length]:
                     addToDictList(labels[length],couple[1],couple[0])
@@ -355,8 +359,8 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 0
+    simNum = 1
     r = Result(modelNum,simNum)
     #steadyLen = r.makeDictOfLengths(25)
-    #jointLabels = r.clustLengths(6,25)
+    jointLabels = r.clustLengths(14,25)
 

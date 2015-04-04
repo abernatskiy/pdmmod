@@ -1,4 +1,8 @@
 #! /usr/bin/python2
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+
 import result
 
 class ClusteredResults(result.Result):
@@ -7,7 +11,7 @@ class ClusteredResults(result.Result):
         result.Result.__init__(self,modelNum,simNum)
         self.minLength=minLength
         self.maxLength=maxLength
-        self.jointLabels = self.clustLengths(minLength,maxLength,
+        self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
                      nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0})
                     #labels for each length
         self.clustDict=self.makeClustDict()
@@ -27,9 +31,8 @@ class ClusteredResults(result.Result):
     
     def plotClustLen(self,saveFig=False):#FIXME I am aweful
         numPlots=self.maxLength-self.minLength+1
-        numRows=(numPlots-1)/2+1
+        numRows=int((numPlots-1)/2)+1#WTF
         f, names = plt.subplots(numRows, 2, figsize=(18,14))
-        plt.title(self.kin2str())
         for length in range(self.minLength, len(self.jointData.keys())+1):
             grInd=length-self.minLength
             labels=self.jointLabels[length]
@@ -42,33 +45,34 @@ class ClusteredResults(result.Result):
             for seq in self.jointData[length]:
                 Legend=None
                 anno=None
-                x=seq.concentration
-                if seq.ifInAutoCatSet:
+                x=self.jointData[length][seq][0]
+                if seq.ifInAutoCatSet:#TODO maybe global script to determine
+                    #if the seq is an autocat: nativeList load+
                     if 'f' in seq.HPsequence:
                         markersize = 12
                         mark='v'
-                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)#TODO format and seq.status
+                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str(x)#TODO format and seq.status
                         #anno=str(seq.indx)
-                        if seq.inClustLen==-1.0:
+                        if seq.inClustLen==-1.0:#FIXME
                             col='k'
                         else:
-                            col=labCols[seq.inClustLen]
+                            col=labCols[seq.inClustLen]#FIXME
                     else:
                         markersize = 14
                         mark='x'
-                        col=labCols[seq.inClustLen]
-                        #Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)
-                elif seq.inClustLen==-1.0:
+                        col=labCols[seq.inClustLen]#FIXME
+                        #Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.meanPop)
+                elif seq.inClustLen==-1.0:#FIXME
                     markersize = 4
                     mark = 'o'
                     col = 'k'
                     if 'f' in seq.HPsequence:
                         markersize = 5
                         mark = 'D'
-                    if (seq.indx in self.clustDict[length].outstanders.keys()) and (seq.concentration>self.clustDict[length].maxClustered+0.25*self.jointEpsilon[length]):
-                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.concentration)
+                    if (seq.indx in self.clustDict[length].outstanders.keys()) and (seq.meanPop>self.clustDict[length].maxClustered+0.25*self.jointEpsilon[length]):
+                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.meanPop)
                         if 'f' in seq.HPsequence:
-                            Legend=str(seq.indx)+' F '+str(seq.status)+': '+str( seq.concentration)
+                            Legend=str(seq.indx)+' F '+str(seq.status)+': '+str( seq.meanPop)
                 else:
                     markersize = 8
                     mark = 'o'
@@ -289,13 +293,12 @@ class SeqInClust(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 1
+    simNum = 3
     minLength = 4
     maxLength = 25
     cr = ClusteredResults(modelNum,simNum,minLength,maxLength)
-    #cl4m1 = Cluster(4,-1,cr,empty=False)
-    #cl40 = Cluster(4,0,cr,empty=False)
-    cls = Clusters(6,cr)
+    cr.plotClustLen(False)
+    
     
 
 

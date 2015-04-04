@@ -260,6 +260,7 @@ class Result(object):
         jointLabels={}
         _labels={}
         labels={}
+        epsilons = {}
         
         for length in range(minLength,maxLength+1):
             _labels[length] = []
@@ -277,18 +278,10 @@ class Result(object):
                     stds.append(self.jointData[length][seq][1])
                     indxes[i]=seq
                 
-                if length>14:
-                    if samp==None:
-                        samp=20
-                    else:
-                        samp=samp*2
-                else:
-                    if samp==None:
-                        samp=10
-                    else:
-                        samp=samp
-                jointLabels[length]=clustList(
-                        means,stds,length,samp,epsilonModifyer)[0]
+                if samp == None:
+                    samp = 10
+                jointLabels[length], epsilons[length]=clustList(
+                        means,stds,length,samp,epsilonModifyer)
                 
                 n_clusters = len(set(jointLabels[length])) - (1 if -1 in jointLabels[length] else 0)
                 print('Estimated number of clusters: %d' % n_clusters)
@@ -309,7 +302,7 @@ class Result(object):
                     addToDictList(labels[length],couple[1],couple[0])
             
             
-        return labels
+        return labels, epsilons
     
 
 
@@ -352,15 +345,16 @@ def clustList(means,stds,length,samp,epsilonModifyer):
     core_samples = db.core_sample_indices_
     labels = db.labels_
     
-    return labels, core_samples
+    return labels, epsilon
 
 
 
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 1
+    simNum = 3
     r = Result(modelNum,simNum)
     #steadyLen = r.makeDictOfLengths(25)
-    jointLabels = r.clustLengths(14,25)
+    jointLabels, epsilons = r.clustLengths(14,25)
+    
 

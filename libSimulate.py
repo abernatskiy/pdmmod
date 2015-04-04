@@ -268,9 +268,9 @@ class Simulation(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',20,1)
+    termCond = ('simulateTime',100,1)
     numOfRuns = 3
-    traj = False
+    traj = True
     rewrite = False
     log_level = 'INFO'
     s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)

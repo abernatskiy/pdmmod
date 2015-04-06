@@ -96,27 +96,13 @@ class Result(object):
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
         return parameters
 
-    def readNativeList(self):
-        ''' None -> {string: (int, string)}
-        converts nativeList.txt to a dictionary from hp-string 
-        to a tuple of their native energies and catalytic patterns
-        '''
-        dataFile = open(routes.routePDM+'nativeList.txt', "rt")
-        count = 0
-        natData ={}
-        for line in dataFile:
-            if not count == 0:
-                raw = (line.rstrip('\n')).split(' ')
-                natData[raw[0]]=(int(raw[1]),raw[2])
-            count +=1
-        
-        return natData
+    
     
     def makeStats(self): 
         '''return countAll, countFold, countCat, countAuto, popStats, length
         means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
-        natData=self.readNativeList()
+        natData=hpClasses.readNativeList(int(self.parameters[maxLength]))#FIXME
         lengths=set([])     #keeps lengths present in simulation
         countAll = [(0)]*(len(self.times)) 
         countFold = [(0)]*(len(self.times)) 
@@ -134,11 +120,12 @@ class Result(object):
                     countAll[i]+=self.means[key][i] 
                     #adds population of current sequence at time i to 
                     #total population of all the sequences seen before 
-                    if not key.find('f')==-1:
+                    fold, cat , autocat = hpClasses.getHPClassOfSeq(key,natData)
+                    if fold:#TEST
                         countFold[i]+=self.means[key][i]
-                        if not natData[key[1:]][1]=='N':
+                        if cat:
                             countCat[i]+=self.means[key][i]
-                            if not key.find('HHH')==-1:
+                            if autocat:
                                 countAuto[i]+=self.means[key][i]
             #here we store lengths distribution in the last moment of simulation  
             addToDictNum(popStats,polLen,self.means[key][-1])

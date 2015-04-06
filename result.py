@@ -4,9 +4,6 @@
 # time,specName specPopulation,specName specPopulation .....
 
 #specPop -- {name: [populations during time steps]}
-import routes
-from dictUtils import *
-
 import matplotlib.pyplot as plt
 from statistics import mean
 from statistics import variance
@@ -19,6 +16,11 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
+
+import routes
+from dictUtils import *
+#if dealing with HP-model import this
+import hpClasses
 
 
 class Result(object):
@@ -96,13 +98,11 @@ class Result(object):
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
         return parameters
 
-    
-    
     def makeStats(self): 
         '''return countAll, countFold, countCat, countAuto, popStats, length
         means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
-        natData=hpClasses.readNativeList(int(self.parameters[maxLength]))#FIXME
+        natData=hpClasses.readNativeList(int(self.parameters['maxLength']))
         lengths=set([])     #keeps lengths present in simulation
         countAll = [(0)]*(len(self.times)) 
         countFold = [(0)]*(len(self.times)) 
@@ -339,9 +339,10 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 3
+    simNum = 2
     r = Result(modelNum,simNum)
+    r.printHPstats()
     #steadyLen = r.makeDictOfLengths(25)
-    jointLabels, epsilons = r.clustLengths(14,25)
+    #jointLabels, epsilons = r.clustLengths(14,25)
     
 

@@ -65,7 +65,7 @@ class ColorFormatter(logging.Formatter):
 
 
 def init_log(log_level=logging.WARNING, logger='simulation',
-             log_path=routes.routePDM+'sim.log'):
+             log_path=None):#TEST
     
     log = getLogger(logger)
     log.setLevel(log_level)
@@ -95,6 +95,6 @@ def init_log(log_level=logging.WARNING, logger='simulation',
     )
     log.addHandler(handler)
 
-    log.warning('Starting %s' % logger.title())
+    log.info('Starting %s' % logger.title())
         
     return log

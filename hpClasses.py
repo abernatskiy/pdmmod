@@ -1,8 +1,13 @@
 #!/usr/bin/python
+#import logging
 
+import routes
+#from log_utils import init_log
+
+#log = init_log(log_level='WARNING',logger='analysis')
 catPattern = 'HHH'
     
-def readNativeList(filename,maxLength):
+def readNativeList(maxLength):
     ''' string, int -> {string: (int, string)}
     converts nativeList<maxLength>.txt to a dictionary from hp-string 
     to a tuple of their native energies and catalytic patterns
@@ -27,8 +32,28 @@ def getHPClassOfSeq(seq,natData):
     fold, cat, autocat = False, False, False
     if not seq.find('f')==-1:
         fold = True
-        if not natData[seq[1:]][1]=='N':
-            cat = True
-            if not seq.find('HHH')==-1:
-                autocat = True
+        try:
+            if not natData[seq[1:]][1]=='N':
+                cat = True
+                if not seq.find('HHH')==-1:
+                    autocat = True
+        except KeyError:
+            fold, cat, autocat = False, False, False
+            print('the sequence '+str(seq)+
+                ' wasn\'t in the native List. '+
+                'Something went wrong. all classes are False.')
+            
     return fold, cat, autocat
+
+#TESTING
+if __name__ == "__main__":
+    maxLength = 25
+    natData = readNativeList(25)
+    fold, cat, autocat = getHPClassOfSeq('fHPPPHHPPHHHHPHHPPHHPHHH',natData)
+    
+    
+    
+
+
+
+    

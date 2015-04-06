@@ -4,6 +4,7 @@ import matplotlib.cm as cm
 import numpy as np
 
 import result
+import hpClasses
 
 class ClusteredResults(result.Result):
     def __init__(self,modelNum,simNum,minLength,maxLength,
@@ -11,6 +12,7 @@ class ClusteredResults(result.Result):
         result.Result.__init__(self,modelNum,simNum)
         self.minLength=minLength
         self.maxLength=maxLength
+        self.natData = hpClasses.readNativeList(self.maxLength)
         self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
                      nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0})
                     #labels for each length
@@ -42,55 +44,23 @@ class ClusteredResults(result.Result):
             n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
             labCols = dict(zip( unique_labels,cm.rainbow(np.linspace(0, 1, len(unique_labels)))))
             metClusts=set([])
-            for seq in self.jointData[length]:
-                Legend=None
-                anno=None
-                x=self.jointData[length][seq][0]
-                if seq.ifInAutoCatSet:#TODO maybe global script to determine
-                    #if the seq is an autocat: nativeList load+
-                    if 'f' in seq.HPsequence:
-                        markersize = 12
-                        mark='v'
-                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str(x)#TODO format and seq.status
-                        #anno=str(seq.indx)
-                        if seq.inClustLen==-1.0:#FIXME
-                            col='k'
-                        else:
-                            col=labCols[seq.inClustLen]#FIXME
+            
+            #plotOutstanders()#TODO #FINISH
+            for clustIndx in self.clustDict[length].clusters:
+                cluster = self.clustDict[length].clusters[clustIndx]
+                for seq in cluster.sequences:
+                    mark, marksize, col = seq.howPlot()
+            
+                    Legend=None
+                    anno=None
+                    x=self.jointData[length][seq][0]
+                    
+                    if grInd<numRows:
+                        name=names[grInd,0]
                     else:
-                        markersize = 14
-                        mark='x'
-                        col=labCols[seq.inClustLen]#FIXME
-                        #Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.meanPop)
-                elif seq.inClustLen==-1.0:#FIXME
-                    markersize = 4
-                    mark = 'o'
-                    col = 'k'
-                    if 'f' in seq.HPsequence:
-                        markersize = 5
-                        mark = 'D'
-                    if (seq.indx in self.clustDict[length].outstanders.keys()) and (seq.meanPop>self.clustDict[length].maxClustered+0.25*self.jointEpsilon[length]):
-                        Legend=str(seq.indx)+' '+str(seq.status)+': '+str( seq.meanPop)
-                        if 'f' in seq.HPsequence:
-                            Legend=str(seq.indx)+' F '+str(seq.status)+': '+str( seq.meanPop)
-                else:
-                    markersize = 8
-                    mark = 'o'
-                    if 'f' in seq.HPsequence:
-                        mark = 'D'
-                        markersize = 9
-                    col = labCols[seq.inClustLen]
-                    currClNum=len(metClusts)
-                    metClusts.add(seq.inClustLen)
-                    newClNum=len(metClusts)
-                    if not newClNum==currClNum:
-                         Legend='cluster with '+str(self.clustDict[length].theClusters[seq.inClustLen].numOfseqs)+' seqs'
-                if grInd<numRows:
-                    name=names[grInd,0]
-                else:
-                    name=names[grInd-numRows,1]
-                name.plot(x, 0, mark, markerfacecolor=col,\
-                                    markeredgecolor='k', markersize=markersize,label=Legend)
+                        name=names[grInd-numRows,1]
+                    name.plot(x, 0, mark, markerfacecolor=col,\
+                                        markeredgecolor='k', markersize=markersize,label=Legend)
                 name.legend(prop={'size':8},ncol=2)
                 name.set_ylim((-0.1,0.5))
                 if not anno==None:
@@ -172,7 +142,7 @@ class Clusters(object):
         #nativeStrings=[ns.hpstring for ns in nativeList]
         #for seq in self.outstanders.values():
             #try:
-                #indx=nativeStrings.index(seq.binarySeq.HPsequence)
+                #indx=nativeStrings.index(seq.binarySeq.hpstring)
             #except:
                 #continue
                 ##print(str(seq.indx)+' doesn\'t fold' )
@@ -235,12 +205,13 @@ class Cluster(object):#TEST
     def makeSequences(self,clustResults):#TESTED
         sequences=[]
         for seq in clustResults.jointLabels[self.length][self.label]:
+            hp_classes = hpClasses.getHPClassOfSeq(seq,clustResults.natData)
             sequences.append(
                 SeqInClust(seq,
                            self.length,
                            clustResults.jointData[self.length][seq][0],
                            clustResults.jointData[self.length][seq][1],
-                           self.label))
+                           self.label,hp_classes))
         if sequences==[]:
             raise ValueError('The cluster '+str(self.label)+' is empty')
         return sequences
@@ -258,7 +229,7 @@ class Cluster(object):#TEST
         #nativeStrings=[ns.hpstring for ns in nativeList]
         #for seq in self.sequences.values():
             #try:
-                #indx=nativeStrings.index(seq.binarySeq.HPsequence)
+                #indx=nativeStrings.index(seq.binarySeq.hpstring)
             #except:
                 #continue
                 ##print(str(seq.indx)+' doesn\'t fold' )
@@ -275,12 +246,13 @@ class Cluster(object):#TEST
     
 
 class SeqInClust(object):
-    def __init__(self,hpstring,length,meanPop,std,cluster):
+    def __init__(self,hpstring,length,meanPop,std,cluster,hp_classes):
         self.hpstring = hpstring
         self.length = length
         self.meanPop = meanPop
         self.std = std
         self.cluster = cluster
+        self.fold, self.cat, self.autocat = hp_classes
         
     def __str__(self):
         str1 = 'Sequence with\n'
@@ -290,10 +262,39 @@ class SeqInClust(object):
     
     def __repr__(self):
         return self.hpstring+': '+str(self.meanPop)+' '+str(self.cluster)
+    
+    
+    def howPlot(self):
+        if self.autocat:
+            markersize = 12
+            mark='v'
+            if self.cluster==-1.0:#TEST
+                col='k'
+            else:
+                col=labCols[self.cluster]#TEST
+            
+        elif self.cluster==-1.0:#TEST
+            markersize = 4
+            mark = 'o'
+            col = 'k'
+            if 'f' in self.hpstring:
+                markersize = 5
+                mark = 'D'
+            
+        else:
+            markersize = 8
+            mark = 'o'
+            if 'f' in self.hpstring:
+                mark = 'D'
+                markersize = 9
+            col = labCols[self.cluster]
+            
+            
+        return mark, marksize, col
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 3
+    simNum = 2
     minLength = 4
     maxLength = 25
     cr = ClusteredResults(modelNum,simNum,minLength,maxLength)

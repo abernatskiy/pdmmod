@@ -1,18 +1,10 @@
-2015-04-04 13:57:29,955 WARNING init_log:98 Starting Simulation
-2015-04-04 13:57:53,059 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj0')
-2015-04-04 13:58:15,725 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1')
-2015-04-04 13:58:38,714 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj2')
-2015-04-04 13:58:38,718 WARNING _makeHeader:113 1
-2015-04-04 13:58:38,719 INFO _makeStatistics:179 ['/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj0', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj2']
-2015-04-04 13:58:45,682 INFO _makeStatistics:194 Termination condition is met on line 99 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1' mode='r' encoding='UTF-8'>
-2015-04-04 13:58:45,686 INFO _makeStatistics:209 number of points is 100
-2015-04-04 14:07:26,101 WARNING init_log:98 Starting Simulation
-2015-04-04 14:07:49,024 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj0')
-2015-04-04 14:08:12,542 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj1')
-2015-04-04 14:08:35,707 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj2')
-2015-04-04 14:08:35,715 WARNING _makeHeader:113 1
-2015-04-04 14:08:35,716 INFO _makeStatistics:179 ['/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj0', '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj2']
-2015-04-04 14:08:42,985 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj0' mode='r' encoding='UTF-8'>
-2015-04-04 14:08:42,986 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj1' mode='r' encoding='UTF-8'>
-2015-04-04 14:08:42,986 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output3/traj2' mode='r' encoding='UTF-8'>
-2015-04-04 14:08:42,986 INFO _makeStatistics:209 number of points is 101
+2015-04-06 13:59:21,911 INFO init_log:98 Starting Simulation
+2015-04-06 13:59:38,808 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj0')
+2015-04-06 13:59:55,256 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1')
+2015-04-06 14:00:11,279 INFO runSeveralSeries:105 ('/data/research/06.origins_of_life/pdmmod/models/012/pdmmod', 'simulateTime', '100', '1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj2')
+2015-04-06 14:00:11,286 WARNING _makeHeader:113 1
+2015-04-06 14:00:11,287 INFO _makeStatistics:179 ['/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj0', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1', '/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj2']
+2015-04-06 14:00:13,189 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj0' mode='r' encoding='UTF-8'>
+2015-04-06 14:00:13,189 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj1' mode='r' encoding='UTF-8'>
+2015-04-06 14:00:13,189 INFO _makeStatistics:194 Termination condition is met on line 100 in <_io.TextIOWrapper name='/data/research/06.origins_of_life/pdmmod/models/012/012_output2/traj2' mode='r' encoding='UTF-8'>
+2015-04-06 14:00:13,189 INFO _makeStatistics:209 number of points is 101

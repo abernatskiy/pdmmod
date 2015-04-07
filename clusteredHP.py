@@ -31,12 +31,20 @@ class ClusteredResults(result.Result):
             
         return clustDict
     
-    def plotClustLen(self,saveFig=False):#FIXME I am aweful
-        numPlots=self.maxLength-self.minLength+1
-        numRows=int((numPlots-1)/2)+1#WTF
+    def plotClustLen(self,minLength=None,maxLength=None,saveFig=False):
+        '''plots sequences as dots of various shape
+        lists outstanders.
+        '''
+        if minLength == None:
+            minLength = self.minLength
+        if maxLength == None:
+            maxLength = self.maxLength
+        numPlots=maxLength-minLength+1
+        numRows=int((numPlots-1)/2)+1
+        #plt.clf()
         f, names = plt.subplots(numRows, 2, figsize=(18,14))
-        for length in range(self.minLength, len(self.jointData.keys())+1):
-            grInd=length-self.minLength
+        for length in range(minLength, maxLength+1):
+            grInd=length-minLength #grid index
             labels=self.jointLabels[length]
             
             unique_labels = list(set(labels))
@@ -45,26 +53,35 @@ class ClusteredResults(result.Result):
             labCols = dict(zip( unique_labels,cm.rainbow(np.linspace(0, 1, len(unique_labels)))))
             metClusts=set([])
             
-            #plotOutstanders()#TODO #FINISH
+            if grInd<numRows:
+                name=names[grInd,0]
+            else:
+                name=names[grInd-numRows,1]
             for clustIndx in self.clustDict[length].clusters:
                 cluster = self.clustDict[length].clusters[clustIndx]
-                for seq in cluster.sequences:
-                    mark, marksize, col = seq.howPlot()
-            
-                    Legend=None
-                    anno=None
-                    x=self.jointData[length][seq][0]
-                    
-                    if grInd<numRows:
-                        name=names[grInd,0]
-                    else:
-                        name=names[grInd-numRows,1]
-                    name.plot(x, 0, mark, markerfacecolor=col,\
-                                        markeredgecolor='k', markersize=markersize,label=Legend)
-                name.legend(prop={'size':8},ncol=2)
-                name.set_ylim((-0.1,0.5))
-                if not anno==None:
-                    name.annotate(anno,xy=(x, 0),xytext=(x, 0.1),textcoords='figure fraction')
+                def plotClusterSeqsAsDots(cluster,name):
+                    for seq in cluster.sequences:
+                        mark, markersize, col = seq.howPlotAsDots(labCols)
+                        Legend=None
+                        x=seq.meanPop
+                        name.plot(x, 0, mark, markerfacecolor=col,
+                                        markeredgecolor='k', 
+                                        markersize=markersize,label=Legend)
+                    return None
+                plotClusterSeqsAsDots(cluster,name)
+            for seq in self.clustDict[length].outstanders:
+                mark, markersize, col = seq.howPlotAsDots(labCols)
+                Legend=seq.hpstring+'='+str('%.2e' % seq.meanPop)
+                x = seq.meanPop
+                name.plot(x, 0, mark, markerfacecolor=col,
+                                    markeredgecolor='k', 
+                                    markersize=markersize,label=Legend)
+        
+            name.legend(prop={'size':8},ncol=2)
+            name.set_ylim((-0.1,0.5))
+            anno = None
+            if not anno==None:
+                name.annotate(anno,xy=(x, 0),xytext=(x, 0.1),textcoords='figure fraction')
             theTitle='Length '+str(length)+'. Est. number of clusters: '+str(n_clusters)
             name.set_title(theTitle)
         
@@ -264,7 +281,7 @@ class SeqInClust(object):
         return self.hpstring+': '+str(self.meanPop)+' '+str(self.cluster)
     
     
-    def howPlot(self):
+    def howPlotAsDots(self,labCols):
         if self.autocat:
             markersize = 12
             mark='v'
@@ -290,15 +307,15 @@ class SeqInClust(object):
             col = labCols[self.cluster]
             
             
-        return mark, marksize, col
+        return mark, markersize, col
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 2
-    minLength = 4
-    maxLength = 25
-    cr = ClusteredResults(modelNum,simNum,minLength,maxLength)
-    cr.plotClustLen(False)
+    simNum = 1
+    minL = 4
+    maxL = 25
+    cr = ClusteredResults(modelNum,simNum,minL,maxL)
+    cr.plotClustLen(20,25,False)
     
     
 

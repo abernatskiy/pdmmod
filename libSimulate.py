@@ -335,11 +335,11 @@ class Simulation(object):
         if kernels == None:
             kernels = self.numOfRuns
         self.outputDir = self.makeOutputFolder(rewrite)
-        perKernel = math.ceil(self.numOfRuns/kernels)
+        perKernel = int(math.ceil(self.numOfRuns/kernels))
         lastKernel = self.numOfRuns - perKernel*(kernels-1)
         for i in range(kernels-1):
             trajFirst = i*perKernel
-            trajLast = (i+1)*perKernel - 1
+            trajLast = int((i+1)*perKernel - 1)
             print('kernel',i)
             self._addToQueue(self.outputDir,i,trajFirst,trajLast)
         print('last kernel')

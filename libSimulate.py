@@ -311,7 +311,7 @@ class Simulation(object):
             for i in range(kernels):
                 try:
                     open(outputDir+'done'+str(i)+'.txt')
-                except FileNotFoundError:
+                except NameError or FileNotFoundError:
                     print('kernel '+str(i)+ ' hasn\'t finished yet')
                     notAll = True
                     return notAll
@@ -335,11 +335,11 @@ class Simulation(object):
         if kernels == None:
             kernels = self.numOfRuns
         self.outputDir = self.makeOutputFolder(rewrite)
-        perKernel = math.ceil(self.numOfRuns/kernels)
+        perKernel = int(math.ceil(self.numOfRuns/kernels))
         lastKernel = self.numOfRuns - perKernel*(kernels-1)
         for i in range(kernels-1):
             trajFirst = i*perKernel
-            trajLast = (i+1)*perKernel - 1
+            trajLast = int((i+1)*perKernel - 1)
             print('kernel',i)
             self._addToQueue(self.outputDir,i,trajFirst,trajLast)
         print('last kernel')
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     termCond = ('simulateTime',100,1)
     numOfRuns = 6
     traj = True
-    rewrite = True
+    rewrite = False
     log_level = 'INFO'
     s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
     #s.runSeveralSeries(rewrite)

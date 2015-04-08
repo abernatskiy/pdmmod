@@ -305,6 +305,7 @@ class Simulation(object):
         return None
     
     def _wait(self,kernels):
+        '''waits until all the simulations done running'''
         def checkFiles(outputDir,kernels):
             notAll = True
             for i in range(kernels):

@@ -358,7 +358,7 @@ class Simulation(object):
 if __name__ == "__main__":
     modelNum = 12
     termCond = ('simulateTime',100,1)
-    numOfRuns = 8
+    numOfRuns = 6
     traj = True
     rewrite = True
     log_level = 'INFO'
@@ -366,6 +366,7 @@ if __name__ == "__main__":
     #s.runSeveralSeries(rewrite)
     #s.reorganizeOutput()
     s.runSeveralParallelCluster(rewrite,kernels=3, oneNode=False)
+    s.reorganizeOutput()
 
 
 

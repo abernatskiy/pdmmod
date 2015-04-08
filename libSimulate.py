@@ -311,7 +311,7 @@ class Simulation(object):
             for i in range(kernels):
                 try:
                     open(outputDir+'done'+str(i)+'.txt')
-                except FileNotFoundError:
+                except NameError or FileNotFoundError:
                     print('kernel '+str(i)+ ' hasn\'t finished yet')
                     notAll = True
                     return notAll
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     termCond = ('simulateTime',100,1)
     numOfRuns = 6
     traj = True
-    rewrite = True
+    rewrite = False
     log_level = 'INFO'
     s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
     #s.runSeveralSeries(rewrite)

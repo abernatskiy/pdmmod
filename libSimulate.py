@@ -311,7 +311,7 @@ class Simulation(object):
             for i in range(kernels):
                 try:
                     open(outputDir+'done'+str(i)+'.txt')
-                except NameError or FileNotFoundError:
+                except:
                     print('kernel '+str(i)+ ' hasn\'t finished yet')
                     notAll = True
                     return notAll
@@ -321,7 +321,7 @@ class Simulation(object):
         
         notAll = True
         while notAll:
-            time.sleep(30)
+            time.sleep(10)
             notAll = checkFiles(self.outputDir,kernels)
             
         return None

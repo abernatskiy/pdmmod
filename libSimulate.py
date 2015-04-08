@@ -6,7 +6,8 @@ from os import walk as walk
 import numpy as np
 import logging
 #import cProfile
-
+import math
+import time
 import subprocess
 import itertools
 
@@ -257,7 +258,95 @@ class Simulation(object):
             self._deleteTraj(outputDir)
         return None
     
+    def _makeShell(self,outputDir,kernelNum,pythonFile):
+        shell = self.outputDir+'shell'+str(kernelNum)
+        inFile = open(shell,'a')
+        inFile.write('#!/bin/bash\n')
+        inFile.write('#$ -S /bin/bash\n')
+        inFile.write('#$ -N sim'+str(kernelNum)+'\n')
+        inFile.write('#$ -cwd\n')
+        inFile.write('#$ -q cpu_long\n')
+        inFile.write('#$ -P kenprj\n')
+        inFile.write('\n')
+        inFile.write(routes.path2python+' '+str(pythonFile)+'\n')
+        inFile.close()
+        
+        
+        return shell
     
+    def _writePython(self,outputDir,kernelNum,trajFirst,trajLast):
+        pythonFile = self.outputDir+'run'+str(kernelNum)+'.py'
+        #system('echo "" > '+str(pythonFile))
+        inFile = open(pythonFile,'a')
+        inFile.write('#!'+routes.path2python+'\n')
+        inFile.write('import subprocess\n')
+        
+        for j in range(trajFirst,trajLast+1):
+            command = (self.path2Folder+'pdmmod',
+                        str(self.howTerm), 
+                        str(self.whenTerm), 
+                        str(self.records),
+                        self.outputDir+'traj'+str(j))
+            inFile.write('subprocess.call('+str(command)+')'+'\n')
+        inFile.write(
+            'subprocess.call(("touch","'+self.outputDir+'done'+str(kernelNum)+'.txt"))\n')
+            
+        inFile.close()
+        return pythonFile
+    
+    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast):
+        pythonFile = self._writePython(outputDir,kernelNum,trajFirst,trajLast)
+        shell = self._makeShell(outputDir,kernelNum,pythonFile)
+        #system('cat '+pythonFile)
+        #system('cat '+shell)
+        system('qsub '+shell)
+        #print('qsub '+shell)
+            
+        return None
+    
+    def _wait(self,kernels):
+        '''waits until all the simulations done running'''
+        def checkFiles(outputDir,kernels):
+            notAll = True
+            for i in range(kernels):
+                try:
+                    open(outputDir+'done'+str(i)+'.txt')
+                except FileNotFoundError:
+                    print('kernel '+str(i)+ ' hasn\'t finished yet')
+                    notAll = True
+                    return notAll
+                else:
+                    notAll = False
+            return notAll
+        
+        notAll = True
+        while notAll:
+            time.sleep(30)
+            notAll = checkFiles(self.outputDir,kernels)
+            
+        return None
+    
+    def runSeveralParallelCluster(self,
+                                  rewrite,
+                                  kernels=None,
+                                  oneNode=False):
+        '''
+        '''
+        if kernels == None:
+            kernels = self.numOfRuns
+        self.outputDir = self.makeOutputFolder(rewrite)
+        perKernel = math.ceil(self.numOfRuns/kernels)
+        lastKernel = self.numOfRuns - perKernel*(kernels-1)
+        for i in range(kernels-1):
+            trajFirst = i*perKernel
+            trajLast = (i+1)*perKernel - 1
+            print('kernel',i)
+            self._addToQueue(self.outputDir,i,trajFirst,trajLast)
+        print('last kernel')
+        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1)
+        self._wait(kernels)
+        
+        return None
         
     
     def runSeveralParallelPC():#TODO
@@ -268,13 +357,15 @@ class Simulation(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',20,1)
-    numOfRuns = 3
-    traj = False
-    rewrite = False
+    termCond = ('simulateTime',100,1)
+    numOfRuns = 6
+    traj = True
+    rewrite = True
     log_level = 'INFO'
     s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
-    s.runSeveralSeries(rewrite)
+    #s.runSeveralSeries(rewrite)
+    #s.reorganizeOutput()
+    s.runSeveralParallelCluster(rewrite,kernels=3, oneNode=False)
     s.reorganizeOutput()
 
 

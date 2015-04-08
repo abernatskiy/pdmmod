@@ -4,9 +4,6 @@
 # time,specName specPopulation,specName specPopulation .....
 
 #specPop -- {name: [populations during time steps]}
-import routes
-from dictUtils import *
-
 import matplotlib.pyplot as plt
 from statistics import mean
 from statistics import variance
@@ -19,6 +16,11 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
+
+import routes
+from dictUtils import *
+#if dealing with HP-model import this
+import hpClasses
 
 
 class Result(object):
@@ -96,27 +98,11 @@ class Result(object):
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
         return parameters
 
-    def readNativeList(self):
-        ''' None -> {string: (int, string)}
-        converts nativeList.txt to a dictionary from hp-string 
-        to a tuple of their native energies and catalytic patterns
-        '''
-        dataFile = open(routes.routePDM+'nativeList.txt', "rt")
-        count = 0
-        natData ={}
-        for line in dataFile:
-            if not count == 0:
-                raw = (line.rstrip('\n')).split(' ')
-                natData[raw[0]]=(int(raw[1]),raw[2])
-            count +=1
-        
-        return natData
-    
     def makeStats(self): 
         '''return countAll, countFold, countCat, countAuto, popStats, length
         means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
-        natData=self.readNativeList()
+        natData=hpClasses.readNativeList(int(self.parameters['maxLength']))
         lengths=set([])     #keeps lengths present in simulation
         countAll = [(0)]*(len(self.times)) 
         countFold = [(0)]*(len(self.times)) 
@@ -134,11 +120,12 @@ class Result(object):
                     countAll[i]+=self.means[key][i] 
                     #adds population of current sequence at time i to 
                     #total population of all the sequences seen before 
-                    if not key.find('f')==-1:
+                    fold, cat , autocat = hpClasses.getHPClassOfSeq(key,natData)
+                    if fold:#TEST
                         countFold[i]+=self.means[key][i]
-                        if not natData[key[1:]][1]=='N':
+                        if cat:
                             countCat[i]+=self.means[key][i]
-                            if not key.find('HHH')==-1:
+                            if autocat:
                                 countAuto[i]+=self.means[key][i]
             #here we store lengths distribution in the last moment of simulation  
             addToDictNum(popStats,polLen,self.means[key][-1])
@@ -260,6 +247,7 @@ class Result(object):
         jointLabels={}
         _labels={}
         labels={}
+        epsilons = {}
         
         for length in range(minLength,maxLength+1):
             _labels[length] = []
@@ -277,35 +265,31 @@ class Result(object):
                     stds.append(self.jointData[length][seq][1])
                     indxes[i]=seq
                 
-                if length>14:
-                    if samp==None:
-                        samp=20
-                    else:
-                        samp=samp*2
-                else:
-                    if samp==None:
-                        samp=10
-                    else:
-                        samp=samp
-                jointLabels[length]=clustList(
-                        means,stds,length,samp,epsilonModifyer)[0]
+                if samp == None:
+                    samp = 10
+                jointLabels[length], epsilons[length]=clustList(
+                        means,stds,length,samp,epsilonModifyer)
                 
                 n_clusters = len(set(jointLabels[length])) - (1 if -1 in jointLabels[length] else 0)
                 print('Estimated number of clusters: %d' % n_clusters)
             else:
                 jointLabels[length] = np.array([])
             #i=-1
-            for (i,seq) in indxes.items():#BUG
+            for (i,seq) in indxes.items():
                 try:
                     _labels[length].append((seq, jointLabels[length][i]))
                 except IndexError:
-                    print(i,seq)
+                    if not self.jointData[length]==OrderedDict():
+                        raise IndexError
+                    else:
+                        continue
+                    
             if not _labels[length]==[]:
                 for couple in _labels[length]:
                     addToDictList(labels[length],couple[1],couple[0])
             
             
-        return labels
+        return labels, epsilons
     
 
 
@@ -348,15 +332,17 @@ def clustList(means,stds,length,samp,epsilonModifyer):
     core_samples = db.core_sample_indices_
     labels = db.labels_
     
-    return labels, core_samples
+    return labels, epsilon
 
 
 
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 0
+    simNum = 2
     r = Result(modelNum,simNum)
+    r.printHPstats()
     #steadyLen = r.makeDictOfLengths(25)
-    #jointLabels = r.clustLengths(6,25)
+    #jointLabels, epsilons = r.clustLengths(14,25)
+    
 

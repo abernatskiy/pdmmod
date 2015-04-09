@@ -280,6 +280,7 @@ class Simulation(object):
         inFile = open(pythonFile,'a')
         inFile.write('#!'+routes.path2python+'\n')
         inFile.write('import subprocess\n')
+        inFile.write('subprocess.call("pwd",)'+'\n')
         inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
         
         for j in range(trajFirst,trajLast+1):

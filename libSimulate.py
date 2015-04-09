@@ -280,7 +280,7 @@ class Simulation(object):
         inFile = open(pythonFile,'a')
         inFile.write('#!'+routes.path2python+'\n')
         inFile.write('import subprocess\n')
-        inFile.write('subprocess.cal(("cp","../parameters.ini","./"))')
+        inFile.write('subprocess.cal(("cp","../parameters.ini","./"))'+'\n')
         
         for j in range(trajFirst,trajLast+1):
             command = (self.path2Folder+'pdmmod',
@@ -289,7 +289,7 @@ class Simulation(object):
                         str(self.records),
                         self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
-            inFile.write('subprocess.cal(("rm","parameters.ini"))')
+            inFile.write('subprocess.cal(("rm","parameters.ini"))'+'\n')
         inFile.write(
             'subprocess.call(("touch","'+self.outputDir+'done'+str(kernelNum)+'.txt"))\n')
             

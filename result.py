@@ -362,7 +362,7 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 2
+    simNum = 3
     r = Result(modelNum,simNum)
     r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)

@@ -292,8 +292,6 @@ class Simulation(object):
                         self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
             #inFile.write('subprocess.call(("rm","parameters.ini"))'+'\n')
-        inFile.write(
-            'subprocess.call(("touch","'+self.outputDir+'done'+str(kernelNum)+'.txt"))\n')
             
         inFile.close()
         return pythonFile
@@ -303,20 +301,19 @@ class Simulation(object):
         shell = self._makeShell(outputDir,kernelNum,pythonFile)
         #system('cat '+pythonFile)
         #system('cat '+shell)
-        p =subprocess.Popen(('qsub ',shell),
+        p =subprocess.Popen(('qsub',shell),
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
         out, err = p.communicate()
+        self.log.info(out.decode())
         output = out.decode().split(' ')
-        print(output)
         jobsRun.append(int(output[2]))
-        print(jobsRun)
             
         return None
     
-    def _wait(self,kernels):
+    def _wait(self,jobsRun):
         '''waits until all the simulations done running'''
-        def checkJobsOnClust()
+        def checkJobsOnClust():
             p = subprocess.Popen('qstat', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = p.communicate()
 
@@ -329,24 +326,24 @@ class Simulation(object):
                 except:
                     continue
             return jobsOnClust
-            
-        def checkFiles(outputDir,kernels):
-            notAll = True
-            for i in range(kernels):
-                try:
-                    open(outputDir+'done'+str(i)+'.txt')
-                except:
-                    print('kernel '+str(i)+ ' hasn\'t finished yet')
-                    notAll = True
-                    return notAll
-                else:
-                    notAll = False
-            return notAll
         
-        notAll = True
-        while notAll:
+        def ifJobsDone(jobsOnClust,jobsRun):
+            jobsDoneList = []
+            for job in jobsRun:
+                if job in jobsOnClust:
+                    return False
+                else:
+                    jobsDoneList.append(job)
+            if set(jobsRun)==set(jobsDoneList):
+                return True
+            
+            
+        
+        jobsDone = False
+        while not jobsDone:
             time.sleep(10)
-            notAll = checkFiles(self.outputDir,kernels)
+            jobsOnClust = checkJobsOnClust()
+            jobsDone = ifJobsDone(jobsOnClust,jobsRun)
             
         return None
     
@@ -365,12 +362,12 @@ class Simulation(object):
         for i in range(kernels-1):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
-            print('kernel',i)
+            self.log.info('kernel'+str(i))
             self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun)
-        print('last kernel')
+        self.log.info('last kernel')
         self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun)
-        self._wait(kernels)
-        print(jobsRun)
+        self._wait(jobsRun)
+        self.log.warning('all simulation finished running. calculationg averages and stds')
         return None
         
     
@@ -382,7 +379,7 @@ class Simulation(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',300,3)
+    termCond = ('simulateTime',30,3)
     numOfRuns = 6
     traj = True
     rewrite = False

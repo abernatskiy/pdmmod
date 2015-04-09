@@ -298,18 +298,38 @@ class Simulation(object):
         inFile.close()
         return pythonFile
     
-    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast):
+    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast,jobsRun):
         pythonFile = self._writePython(outputDir,kernelNum,trajFirst,trajLast)
         shell = self._makeShell(outputDir,kernelNum,pythonFile)
         #system('cat '+pythonFile)
         #system('cat '+shell)
-        system('qsub '+shell)
-        #print('qsub '+shell)
+        p =subprocess.Popen(('qsub ',shell),
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        output = out.decode().split(' ')
+        print(output)
+        jobsRun.append(int(output[2]))
+        print(jobsRun)
             
         return None
     
     def _wait(self,kernels):
         '''waits until all the simulations done running'''
+        def checkJobsOnClust()
+            p = subprocess.Popen('qstat', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = p.communicate()
+
+            lines = (out.decode().split('\n'))[2:]
+            jobsOnClust = []
+            for line in lines:
+                items =line.split(' ')
+                try:
+                    jobsOnClust.append(int(items[1]))
+                except:
+                    continue
+            return jobsOnClust
+            
         def checkFiles(outputDir,kernels):
             notAll = True
             for i in range(kernels):
@@ -336,6 +356,7 @@ class Simulation(object):
                                   oneNode=False):
         '''
         '''
+        jobsRun = []
         if kernels == None:
             kernels = self.numOfRuns
         self.outputDir = self.makeOutputFolder(rewrite)
@@ -345,11 +366,11 @@ class Simulation(object):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
             print('kernel',i)
-            self._addToQueue(self.outputDir,i,trajFirst,trajLast)
+            self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun)
         print('last kernel')
-        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1)
+        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun)
         self._wait(kernels)
-        
+        print(jobsRun)
         return None
         
     

@@ -268,6 +268,7 @@ class Simulation(object):
         inFile.write('#$ -q cpu_long\n')
         inFile.write('#$ -P kenprj\n')
         inFile.write('\n')
+        inFile.write('cd '+self.path2Folder+'\n')
         inFile.write(routes.path2python+' '+str(pythonFile)+'\n')
         inFile.close()
         
@@ -281,7 +282,7 @@ class Simulation(object):
         inFile.write('#!'+routes.path2python+'\n')
         inFile.write('import subprocess\n')
         inFile.write('subprocess.call("pwd",)'+'\n')
-        inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
+        #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
         
         for j in range(trajFirst,trajLast+1):
             command = (self.path2Folder+'pdmmod',
@@ -290,7 +291,7 @@ class Simulation(object):
                         str(self.records),
                         self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
-            inFile.write('subprocess.call(("rm","parameters.ini"))'+'\n')
+            #inFile.write('subprocess.call(("rm","parameters.ini"))'+'\n')
         inFile.write(
             'subprocess.call(("touch","'+self.outputDir+'done'+str(kernelNum)+'.txt"))\n')
             

@@ -263,7 +263,7 @@ class Simulation(object):
         inFile = open(shell,'a')
         inFile.write('#!/bin/bash\n')
         inFile.write('#$ -S /bin/bash\n')
-        inFile.write('#$ -N sim'+str(kernelNum)+'\n')
+        inFile.write('#$ -N simpdm'+str(kernelNum)+'\n')
         inFile.write('#$ -cwd\n')
         inFile.write('#$ -q cpu_long\n')
         inFile.write('#$ -P kenprj\n')
@@ -280,6 +280,7 @@ class Simulation(object):
         inFile = open(pythonFile,'a')
         inFile.write('#!'+routes.path2python+'\n')
         inFile.write('import subprocess\n')
+        inFile.write('subprocess.cal(("cp","../parameters.ini","./"))')
         
         for j in range(trajFirst,trajLast+1):
             command = (self.path2Folder+'pdmmod',
@@ -288,6 +289,7 @@ class Simulation(object):
                         str(self.records),
                         self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
+            inFile.write('subprocess.cal(("rm","parameters.ini"))')
         inFile.write(
             'subprocess.call(("touch","'+self.outputDir+'done'+str(kernelNum)+'.txt"))\n')
             
@@ -357,15 +359,14 @@ class Simulation(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',100,1)
-    numOfRuns = 6
+    termCond = ('simulateTime',600,3)
+    numOfRuns = 7
     traj = True
     rewrite = False
     log_level = 'INFO'
     s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
-    #s.runSeveralSeries(rewrite)
-    #s.reorganizeOutput()
-    s.runSeveralParallelCluster(rewrite,kernels=3, oneNode=False)
+    s.runSeveralSeries(rewrite)
+    #s.runSeveralParallelCluster(rewrite,kernels=3, oneNode=False)
     s.reorganizeOutput()
 
 

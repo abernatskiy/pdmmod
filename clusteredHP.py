@@ -31,7 +31,7 @@ class ClusteredResults(result.Result):
             
         return clustDict
     
-    def plotClustLen(self,minLength=None,maxLength=None,saveFig=False):
+    def plot2DClustLen(self,minLength=None,maxLength=None,saveFig=False):
         '''plots sequences as dots of various shape
         lists outstanders.
         '''
@@ -311,11 +311,12 @@ class SeqInClust(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 1
+    simNum = 2
     minL = 4
     maxL = 25
     cr = ClusteredResults(modelNum,simNum,minL,maxL)
-    cr.plotClustLen(20,25,False)
+    #cr.plotHPstats()
+    cr.plot2DClustLen(20,25,False)
     
     
 

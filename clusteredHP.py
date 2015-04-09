@@ -311,11 +311,11 @@ class SeqInClust(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 1
+    simNum = 2
     minL = 4
     maxL = 25
     cr = ClusteredResults(modelNum,simNum,minL,maxL)
-    cr.plotHPstats()
+    #cr.plotHPstats()
     cr.plot2DClustLen(20,25,False)
     
     

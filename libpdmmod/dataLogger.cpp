@@ -9,7 +9,7 @@
 extern std::map<std::string,Parameter> configDict;
 
 DataLogger::DataLogger(TotalPopulation* tp, float timeStep, float totalTime, std::string fileName){
-    if !checkTimes(timeStep, totalTime){
+    if(!checkTimes(timeStep, totalTime)){
         std::cout << "ERROR: Total time must be divisible by time step\n";
         exit(EXIT_FAILURE); // TODO: throw exception instead
     }
@@ -27,7 +27,7 @@ DataLogger::DataLogger(TotalPopulation* tp, float timeStep, float totalTime, std
 }
 
 DataLogger::DataLogger(TotalPopulation* tp, int recordingPeriod, int totalReactions, std::string fileName){
-    if !checkReacNum(recordingPeriod, totalReactions){
+    if(!checkReacNum(recordingPeriod, totalReactions)){
         std::cout << "ERROR: Total numer of reactions must be divisible by the recording period\n";
         exit(EXIT_FAILURE); // TODO: throw exception instead
     }
@@ -49,16 +49,16 @@ DataLogger::~DataLogger(){
 }
 
 void DataLogger::makeHeader(int argc, char** argv){
-    std::string modelName = (((tp->m_listOfPopulations).begin())->m_specie).modelName;
-    (*myfile) << "# Model: " << modelName << std::endl;
-    (*myfile) << "# Parameters:";
+    std::string modelName = (((m_tp->m_listOfPopulations).begin())->m_specie).modelName;
+    m_file << "# Model: " << modelName << std::endl;
+    m_file << "# Parameters:";
     for(auto it = configDict.begin(); it != configDict.end(); it++)
-        (*myfile) << " " << it->first << "=" << (it->second).getString();
-    (*myfile) << std::endl;
-    (*myfile) << "# Command:";
+        m_file << " " << it->first << "=" << (it->second).getString();
+    m_file << std::endl;
+    m_file << "# Command:";
     for(int i=0; i<argc; i++)
-        (*myfile) << " " << std::string(argv[i]);
-    (*myfile) << std::endl;
+        m_file << " " << std::string(argv[i]);
+    m_file << std::endl;
     return;
 }
 
@@ -81,7 +81,7 @@ bool DataLogger::makeRecords(){
             }
             else{
                 int numRecords = 1;
-                while( m_timeStep*((float) m_i) <= m_prevTime && m_timeStep*((float) m_i) > curTime ){
+                while( m_timeStep*((float) m_i) <= m_prevTime && m_timeStep*((float) m_i) > curtime ){
                     if(numRecords > 1)
                         std::cout << "writing to the file for the " << numRecords << "th time after one reaction\n";
                     makeRecord(m_timeStep*((float) m_i));

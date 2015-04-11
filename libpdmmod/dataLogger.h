@@ -6,7 +6,7 @@
 
 #include "totalPopulation.h"
 
-/*
+/* // TODO - rewrite for the new API
  *  DATA
     Time        // total time of simulatios
     Steps       //how many time points we want to keep
@@ -41,9 +41,10 @@
 class DataLogger
 {
 public:
-    Logger(TotalPopulation* tp, float timeStep, float totalTime, std::string fileName); // will cause the program to fail if called with bad arguments
-    Logger(TotalPopulation* tp, int recordingPeriod, int totalReactions, std::string fileName); // will cause the program to fail if called with bad arguments
-    ~Logger();
+    DataLogger(){};
+    DataLogger(TotalPopulation* tp, float timeStep, float totalTime, std::string fileName); // will cause the program to fail if called with bad arguments
+    DataLogger(TotalPopulation* tp, int recordingPeriod, int totalReactions, std::string fileName); // will cause the program to fail if called with bad arguments
+    ~DataLogger();
     void makeHeader(int argc, char** argv);
     bool makeRecords();
     void makePostsimulationRecords();

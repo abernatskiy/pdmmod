@@ -81,7 +81,7 @@ bool DataLogger::makeRecords(){
             }
             else{
                 int numRecords = 1;
-                while( m_timeStep*((float) m_i) <= m_prevTime && m_timeStep*((float) m_i) > curtime ){
+                while( m_timeStep*((float) m_i) >= m_prevTime && m_timeStep*((float) m_i) < curtime ){
                     if(numRecords > 1)
                         std::cout << "writing to the file for the " << numRecords << "th time after one reaction\n";
                     makeRecord(m_timeStep*((float) m_i));
@@ -100,8 +100,8 @@ bool DataLogger::makeRecords(){
         if( m_i % m_recPeriod == 0 ){
             memorizePopulations();
             makeRecord(curtime);
-            m_i++;
         }
+        m_i++;
         return m_i <= m_numSteps;
     }
     std::cout << "ERROR: Undefined simulation type\n";
@@ -109,7 +109,7 @@ bool DataLogger::makeRecords(){
 }
 
 void DataLogger::makePostsimulationRecords(){
-    while(m_i <= m_numSteps){
+    while(m_type == 0 && m_i <= m_numSteps){
         makeRecord(m_timeStep*((float) m_i));
         m_i++;
     }

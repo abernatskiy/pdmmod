@@ -6,42 +6,65 @@
 
 #include "totalPopulation.h"
 
-/* // TODO - rewrite for the new API
- *  DATA
-    Time        // total time of simulatios
-    Steps       //how many time points we want to keep
-    currentTime //time which is being stored
-    currentPop  //population at currentTime calculate via calcPopAtTime
+/*
+ *  PUBLIC DATA
+    none
 
-    METHODS
-    storePopulations(tp)
-        //stores couple of (name, population)
-    storeTime(tp)
-        //stores time of population
-    float writeToFile(step, currentTime, currentPop)
-        //writes data into file
-        //AND returns next stored time
-
-    float
-
-    void writeHeaderToFile(totalPopulation, totalTime, period, filename, file)
-        // Writes a header of the output file. Format:
-        // line 0: # Model: <modelName>
-        // line 1: # <parameterName0>=<value0> <parameterName1>=<value1> ...
-        // line 2: # TotalTime=<T> RecordPeriod=<tau> Filename=<filename>
-        // where modelName is the name of the model as indicated in the Specie
-        // object associated with the first population in totalPopulation,
-        // parameters described by line 1 are the model parameters from parameters.ini, and
-        // parameters described by line 2 are command-line parameters: T is the total time
-        // of the simulation (0 if indefinite), tau is the simulation time between records,
-        // filename is the name of the original output file. All times are in seconds.
+    PUBLIC METHODS
+    DataLogger(TotalPopulation* tp, float timeStep, float totalTime, std::string fileName)
+        Constructor for use in simulateTime-type simulations. Opens the file under fileName.
+        Method makeRecords() (see below) records the state of the total population *tp at
+        the following times:
+            0.0, 1.0*timeStep, 2.0*timeStep, ..., n*timestep=totalTime.
+        WARNING: totalTime must be exactly divisible by timeStep in floats, otherwise the
+        constructor call will cause the program to exit with error. Examples:
+            totalTime   timeStep    Divisible in floats?
+            10          1           yes
+            10          0.1         yes
+            10          0.2         yes
+            10          0.5         yes
+            3           0.3         no
+            300         0.3         no
+        If timeStep is set to 0, it will record every reaction to occur before totalTime.
+        If simulation has to be stopped due to internal reasons (e.g. because there are no
+        more valid reactions), records for times after the stop can be requested using the
+        makePostsimulationRecords() function.
+    DataLogger(TotalPopulation* tp, int recordingPeriod, int totalReactions, std::string fileName)
+        Constructor for use in simulateReactions-type simulations. Opens the file under
+        fileName. Method makeRecords() (see below) records all every recordingPeriod-th
+        reaction with number less or equal to totalReactions.
+        WARNING: totalReactions must be exactly divisible by recordingPeriod, otherwise
+        the constructor call will cause the program to exit with error.
+        0th reaction is always recorded. makePostsimulationRecords() has no effect.
+    ~DataLogger()
+        Closes the data file.
+    void makeHeader(int argc, char** argv)
+        Writes a header of the output file. Format:
+        line 0: # Model: <modelName>
+        line 1: # Parameters: <parameterName0>=<value0> <parameterName1>=<value1> ...
+        line 2: # Command: <fullCommandLine>
+        where modelName is the name of the model as indicated in the Specie
+        object associated with the first population in totalPopulation,
+        parameters described by line 1 are the model parameters from parameters.ini, and
+        command at line 2 is the full command line which invoked simulation.
+    bool makeRecords()
+        An expert system which intellectually decides if it is the right time to make
+        a record in the data file. The exact behavior depends on which constructor and
+        with which parameters was used to make the object (see the constructors'
+        descriptions).
+        Returns true iff more steps of the simulation are required to make all necessary
+        records.
+    void makePostsimulationRecords()
+        If for some reason making more steps of the simulation is impossible (e.g.
+        because there are no more valid reactions), this function can be called to
+        append all the necessary records to the output file with the current state
+        of the total population. Exact behavior depends on which constructor was used.
  *
  */
 
 class DataLogger
 {
 public:
-    DataLogger(){};
     DataLogger(TotalPopulation* tp, float timeStep, float totalTime, std::string fileName); // will cause the program to fail if called with bad arguments
     DataLogger(TotalPopulation* tp, int recordingPeriod, int totalReactions, std::string fileName); // will cause the program to fail if called with bad arguments
     ~DataLogger();

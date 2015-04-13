@@ -75,8 +75,8 @@ def getSimTime(simulation):
     
     simulation.runSeveralParallelCluster(kernels=1, onNode=62)
     simulation.reorganizeOutput()
-    with open (simulation.outputDir+'runtimeStat.txt','r') as sf:
-        [time, timeStd] = [float(item) for item in readline.split(' ')]
+    with open(simulation.outputDir+'runtimeStat.txt','r') as sf:
+        [time, timeStd] = [float(item) for item in sf.readline().split(' ')]
     
     return time, timeStd
 

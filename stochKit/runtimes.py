@@ -11,6 +11,7 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
+import routes
 from balls import *
 
 '''DATA
@@ -220,7 +221,7 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=50
 filename = 'b.xml'
-command = '/data/research/06.origins_of_life/codes/stochKit/StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
 runs = 3
 collRate = 0.5
 

@@ -363,9 +363,9 @@ class Simulation(object):
         p =subprocess.Popen(('qsub',shell),
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
-        print(str(p))
-        out, err = p.communicate()
+        out, err = p.communicate() 
         self.log.info(out.decode())
+        self.log.warning(err.decode())
         output = out.decode().split(' ')
         print(output)
         jobsRun.append(int(output[2]))

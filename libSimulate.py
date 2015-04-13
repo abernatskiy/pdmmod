@@ -411,12 +411,15 @@ class Simulation(object):
             kernels = self.numOfRuns
         perKernel = int(math.ceil(self.numOfRuns/kernels))
         lastKernel = self.numOfRuns - perKernel*(kernels-1)
-        i=-1
+        
         for i in range(kernels-1):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
             self.log.info('kernel'+str(i))
             self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun)
+        if kernels == 1:
+            i = -1
+            trajLast = -1
         self.log.info('last kernel')
         self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun)
         self._wait(jobsRun)

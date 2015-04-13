@@ -7,4 +7,4 @@
 #$ -P kenprj
 
 cd /cavern/eliza/origins/pdmmod/stochKit/
-python runtimes.py
+/home/eliza/anaconda3/bin/python runtimes.py

@@ -5,7 +5,7 @@ from os import system as system
 #from statistics import stdev
 import numpy as np
 from math import sqrt as sqrt
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit

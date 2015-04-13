@@ -354,9 +354,9 @@ class Simulation(object):
         inFile.close()
         return pythonFile
     
-    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast,jobsRun):
+    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast,jobsRun,onNode):
         pythonFile = self._writePython(outputDir,kernelNum,trajFirst,trajLast)
-        shell = self._makeShell(outputDir,kernelNum,pythonFile)
+        shell = self._makeShell(outputDir,kernelNum,pythonFile,onNode)
         #system('cat '+pythonFile)
         #system('cat '+shell)
         p =subprocess.Popen(('qsub',shell),
@@ -416,12 +416,12 @@ class Simulation(object):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
             self.log.info('kernel'+str(i))
-            self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun)
+            self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun,onNode)
         if kernels == 1:
             i = -1
             trajLast = -1
         self.log.info('last kernel')
-        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun)
+        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode)
         self._wait(jobsRun)
         self.log.warning('all simulation finished running. calculationg averages and stds')
         return None

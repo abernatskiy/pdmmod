@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import subprocess
 from os import system as system
-from statistics import mean
-from statistics import stdev
+#from statistics import mean
+#from statistics import stdev
 from math import sqrt as sqrt
 import matplotlib.pyplot as plt
 #import scipy.optimize as optimization

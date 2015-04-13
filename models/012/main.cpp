@@ -2,7 +2,7 @@
 #include <fstream>
 #include <time.h>
 #include "totalPopulation.h"
-#include "output.h"
+#include "dataLogger.h"
 
 // Those modules are for loading parameters and data used by class Specie
 #include <map>
@@ -12,6 +12,7 @@
 std::map<std::string,Parameter> configDict;
 
 /* HP-model-specific headers and global variables */
+// In order to use these dictionaries, uncomment the four lines above and lines 104 and 105
 #include "nativeListLoader.h"
 #include "parametersLoader.h"
 std::map<std::string,std::string> catPatterns;
@@ -105,63 +106,32 @@ int main (int argc, char** argv){
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;
-    std::string prevPops = storePopulations(&tp);
-    float prevStep = 0.f;
-    std::ofstream myfile;
-    myfile.open(outputFilename);
-    writeHeaderToFile(&tp, argc, argv, &myfile);
-    writeToFile(prevPops, 0.0, &myfile);
+    DataLogger* dataLogger;
+    if(simType == 0)
+        dataLogger = new DataLogger(&tp, stepLen, totalTime, outputFilename);
+    else if(simType == 1)
+        dataLogger = new DataLogger(&tp, recordingPeriod, totalReactions, outputFilename);
+
+    dataLogger->makeHeader(argc, argv);
 
     int reacNum = 0;
     clock_t t1,t2;
-    int stp;
-
+    int stp = 0;
     t1=clock();
-    if (simType == 0){
-        while(true){
-            if (totalTime == 0.f)
-            {
-                //TODO
-            }
-            else{
-                stp = tp.stepSimulation();
-                reacNum = reacNum+1;
-                //std::cout << "after stepping:\n" << tp;
-                prevPops = writeOrNotTo(stepLen, &tp, prevStep, prevPops, &myfile);
-                prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
-                if (tp.m_t >= totalTime){
-                    myfile.close();
-                    break;
-                }
-                if (stp==1){
-                    break;
-                }
-            }
-        }
-    }
-    else if (simType == 1){
-        while(true){
-            stp = tp.stepSimulation();
-            reacNum = reacNum + 1;
-            if (reacNum % recordingPeriod == 0)
-                writeToFile(storePopulations(&tp), tp.m_t, &myfile);
 
-            if (stp == 1 || reacNum >= totalReactions){
-                myfile.close();
-                break;
-            }
-        }
+    while(dataLogger->makeRecords()){
+        stp = tp.stepSimulation();
+        reacNum++;
+        if(stp == 1)
+            break;
     }
+
     t2=clock();
-    std::cout << "status is " << stp << std::endl;
-    if (simType == 0 && tp.m_t < totalTime && stp == 1){
-        std::cout <<"simulations is over. prevStep is " << prevStep << std::endl;
-        for (float time=(prevStep+stepLen);time<=totalTime;time=time+stepLen){
-            writeToFile(prevPops,time,&myfile);
-        }
 
-        myfile.close();
-    }
+    std::cout << "status is " << stp << std::endl;
+    dataLogger->makePostsimulationRecords();
+
+    delete dataLogger;
 
     float diff = ((float)t2-(float)t1);
     float timePerReac = diff/CLOCKS_PER_SEC/reacNum;

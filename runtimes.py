@@ -120,6 +120,8 @@ def runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species):#TES
             modelNum,termCond,rewrite,numOfRuns,traj,log_level)
     system('touch '+s.path2Folder+'runTemp.txt' )
     for numSpec in species:
+        s = libSimulate.Simulation(
+            modelNum,termCond,rewrite,numOfRuns,traj,log_level)
         changeInitPop(numSpec,population)
         time, timeStd = getSimTime(s)
         

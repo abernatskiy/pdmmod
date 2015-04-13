@@ -313,7 +313,7 @@ class Simulation(object):
     def _makeShell(self,outputDir,kernelNum,pythonFile,onNode):
         shell = self.outputDir+'shell'+str(kernelNum)
         inFile = open(shell,'w')
-        infile.close()
+        inFile.close()
         inFile = open(shell,'a')
         inFile.write('#!/bin/bash\n')
         inFile.write('#$ -S /bin/bash\n')

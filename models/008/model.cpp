@@ -8,7 +8,7 @@
  * reactions are binary collisions, particles don't change when interact.
  */
 
-//std::map<std::string,Parameter> globParams;
+extern std::map<std::string,Parameter> configDict;
 
 Specie::Specie(std::string id){
     modelName = std::string("colliding_particles");
@@ -27,6 +27,8 @@ std::ostream& operator<<(std::ostream& os, const Specie& sp)
 //Defining reactions here
 
 std::list<Reaction> Specie::reactions(Specie specie){
+    //parameters
+    float COLL_RATE = configDict["collRate"].getFloat();
     //all the reactions two species can have
     std::list<Reaction> allReactions;
 

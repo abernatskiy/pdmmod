@@ -123,7 +123,7 @@ class Simulation(object):
             paramFile = self.path2Folder+'parameters.ini'
         if populFile == None:
             populFile = self.path2Folder+'populations.txt'
-        for trajNum in range(numOfRuns):
+        for trajNum in range(self.numOfRuns):
             command = self._formCommand(trajNum,paramFile,populFile)
             subprocess.call(command)
             self.log.info(str(command))
@@ -498,11 +498,11 @@ if __name__ == "__main__":
     traj = False
     #rewrite = True
     log_level = 'INFO'
-    #s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
     #s.runSeveralSeries()
     ##s.runSeveralParallelCluster(kernels=3, onNode=0)
     #s.reorganizeOutput()
-    ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
+    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
 
 
 

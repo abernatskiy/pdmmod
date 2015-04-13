@@ -411,6 +411,7 @@ class Simulation(object):
             kernels = self.numOfRuns
         perKernel = int(math.ceil(self.numOfRuns/kernels))
         lastKernel = self.numOfRuns - perKernel*(kernels-1)
+        i=-1
         for i in range(kernels-1):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)

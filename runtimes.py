@@ -10,6 +10,9 @@ from numpy import array
 from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
+import numpy as np
+
+import libSimulate
 
 '''DATA
 * numSpec -- int.
@@ -41,47 +44,57 @@ def changeInitPop(numSpec,population):
     
     return None
 
-def changeParameters(numSpec,collRate):
+def changeParameters(collRate):
     '''
     goes to parameters.ini and changes number of species and collision rate
     '''
     popFile = open("parameters.ini", mode='w', encoding='utf-8')
     popFile.write("[kinetic model]\n")
-    popFile.write("specNumber = "+str(numSpec)+"\n")
+    #popFile.write("specNumber = "+str(numSpec)+"\n")
     popFile.write("collRate = "+str(collRate)+"\n")
     popFile.close()
     
     
     return None
 
-def getSimTime(command):
+def getSimTime(simulation):
     '''
     runs the simulation and then retrieves its running time
     '''
-    retValue=subprocess.call(command)
+    def runtimesStats(simulation):
+        runtimes = []
+        files = [simulation.outputDir+'timePerReac'+str(i) 
+                 for i in range(simulation.numOfRuns)]
+        for f in files:
+            with open(f,'r') as cf:
+                runtimes.append(float(cf.read().rstrip('\n')))
+            cf.close()
+        mean = np.mean(runtimes)
+        std = np.std(runtimes)
+        return mean, std
     
-    timeFile = open("runtime.txt")
-    time = float(timeFile.readline().rstrip('\n'))
+    simulation.runSeveralParallelCluster(kernels=1, onNode=62)
+    time, timeStd = runtimesStats(simulation)
     
-    return time, retValue
+    return time, timeStd
 
-def getTimeStat(command,numSpec,population,runs):
-    '''runs the simulation several times with fixed parameters and then returns average time of running
-    '''
-    changeInitPop(numSpec,population)
-    times=[]
-    for i in range(runs):
-        time, retValue = getSimTime(command)
-        while retValue == 2:
-            print('rerun')
-            time, retValue = getSimTime(command)
+#def getTimeStat(command,numSpec,population,runs):
+    #'''runs the simulation several times with fixed parameters and then returns average time of running
+    #'''
+    #changeInitPop(numSpec,population)
+    #times=[]
+    #for i in range(runs):
+        #time, retValue = getSimTime(command)
+        #while retValue == 2:
+            #print('rerun')
+            #time, retValue = getSimTime(command)
             
-        times.append(time)
+        #times.append(time)
     
-    ave = mean(times)
-    stdDev = stdev(times)
-    print(ave, stdDev)
-    return ave, stdDev
+    #ave = mean(times)
+    #stdDev = stdev(times)
+    #print(ave, stdDev)
+    #return ave, stdDev
 
 def runSeveralChangePop(command,runs,numSpec,currPops):#TEST
     '''runs several simulations with different population of the fixed number of species
@@ -96,14 +109,22 @@ def runSeveralChangePop(command,runs,numSpec,currPops):#TEST
     
     return None
 
-def runSeveralChangeNumSpec(command,runs,population,species):#TEST
+def runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species):#TEST
     '''runs several simulations with different number of species but fixed population of every specie
     '''
-    system('rm runTemp.txt && touch runTemp.txt' )
+    
+    traj = True
+    log_level = 'INFO'
+    rewrite = True
+    s = libSimulate.Simulation(
+            modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+    system('touch '+s.path2Folder+'runTemp.txt' )
     for numSpec in species:
-        pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
+        changeInitPop(numSpec,population)
+        time, timeStd = getSimTime(s)
+        
         with open("runTemp.txt", "a") as myfile:
-            myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
+            myfile.write(str(numSpec)+' '+str(time)+' '+str(timeStd)+'\n')
         #numSpec=numSpec+steps[i]
 
     
@@ -263,12 +284,14 @@ def plotSeveral(filenames):#TODO
     return None
 
 ###Change Number of species###
-population=1
-command = './pdmmod', 'simulateReactions', '5000', '1000', 'x'
-runs = 3
-#species = [1650, 1750, 1850, 1950, 2050, 2150, 2250, 2350, 2400,2450]
+population=50
+modelNum = 8
+termCond = ('simulateReactions',5000, 1000)
+numOfRuns =3
+
 collRate = 0.5
 species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
-
+changeParameters(collRate)
+runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
 
 

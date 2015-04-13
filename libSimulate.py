@@ -359,12 +359,15 @@ class Simulation(object):
         shell = self._makeShell(outputDir,kernelNum,pythonFile,onNode)
         #system('cat '+pythonFile)
         #system('cat '+shell)
+        print(str(shell))
         p =subprocess.Popen(('qsub',shell),
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
+        print(str(p))
         out, err = p.communicate()
         self.log.info(out.decode())
         output = out.decode().split(' ')
+        print(output)
         jobsRun.append(int(output[2]))
             
         return None

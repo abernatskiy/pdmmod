@@ -312,6 +312,8 @@ class Simulation(object):
     
     def _makeShell(self,outputDir,kernelNum,pythonFile,onNode):
         shell = self.outputDir+'shell'+str(kernelNum)
+        inFile = open(shell,'w')
+        infile.close()
         inFile = open(shell,'a')
         inFile.write('#!/bin/bash\n')
         inFile.write('#$ -S /bin/bash\n')
@@ -372,7 +374,7 @@ class Simulation(object):
             
         return None
     
-    def _wait(self,jobsRun):
+    def _wait(self,jobsRun):#FIXME termination condition
         '''waits until all the simulations done running'''
         def checkJobsOnClust():
             p = subprocess.Popen('qstat', stdout=subprocess.PIPE, stderr=subprocess.PIPE)

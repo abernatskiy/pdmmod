@@ -348,7 +348,7 @@ class Simulation(object):
             inFile.write('subprocess.call('+str(command)+')'+'\n')
             inFile.write('subprocess.call(("mv","'+
                             self.path2Folder+'runtime.txt","'+
-                            self.outputDir+"timePerReac"+str(j)+'"))')
+                            self.outputDir+"timePerReac"+str(j)+'"))'+'\n')
             
             
         inFile.close()

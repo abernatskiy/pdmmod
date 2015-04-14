@@ -1,10 +1,11 @@
 #ifndef _SIMULATE_SINGLE_TRAJECTORY_H_
 #define _SIMULATE_SINGLE_TRAJECTORY_H_
 
+#include <fstream>//LISA
 #include <vector>
 #include <utility>
 #include "StandardDriverTypes.h"
-
+#include <time.h>//LISA
 using namespace STOCHKIT;
 
 template <class SSA_Solver_T>
@@ -12,9 +13,9 @@ template <class SSA_Solver_T>
 //NumberOfReactions is number of reaction channels in the model
 void simulateSingleTrajectory(std::vector<std::pair<double, StandardDriverTypes::populationType> >& output, SSA_Solver_T& solver, double simulationTime, unsigned maxSteps, std::size_t NumberOfReactions, bool printReactionCountDistribution=true) {	
 	unsigned reactionCounter=0;
-
+        clock_t t1,t2;//LISA
 	solver.initialize();
-	
+	maxSteps = 5000;//LISA
 	//record initial condition
 	//output is vector of pair, where pair is the current time and current population vector
 	//different from the output classes in the standard StochKit2 solvers
@@ -24,6 +25,7 @@ void simulateSingleTrajectory(std::vector<std::pair<double, StandardDriverTypes:
 	
 	std::vector<std::size_t> reactionCounts(NumberOfReactions);
 	
+	t1=clock();
 	while (solver.getCurrentTime()<simulationTime && reactionCounter<maxSteps) {
 		
 		int rxnIndex=solver.selectReaction();
@@ -31,16 +33,21 @@ void simulateSingleTrajectory(std::vector<std::pair<double, StandardDriverTypes:
 		reactionCounter++;
 		reactionCounts[rxnIndex]++;
 		//record output
-		output.push_back(std::make_pair(solver.getCurrentTime(),solver.getCurrentPopulation()));
+		//LISA//output.push_back(std::make_pair(solver.getCurrentTime(),solver.getCurrentPopulation()));
 		
 		if (reactionCounter==maxSteps) {
 			std::cout << "max-steps reached at simulation time "<<solver.getCurrentTime()<<", terminating.\n";
 		}
 		solver.setCurrentTime(solver.getCurrentTime()+solver.selectStepSize());
 	}
-	
+	t2=clock();//LISA
+        float diff = ((float)t2-(float)t1);//LISA
+        float timeTotal = diff/((float) CLOCKS_PER_SEC);//LISA
+        std::ofstream timeFile;//LISA
+	timeFile.open ("/data/research/06.origins_of_life/pdmmod/stochKit/runtime.txt");//LISA
+        timeFile << timeTotal/reactionCounter << std::endl;//LISA
 	if (reactionCounter!=maxSteps) {
-	  output.push_back(std::make_pair(simulationTime,solver.getCurrentPopulation()));
+	  //LISA//output.push_back(std::make_pair(simulationTime,solver.getCurrentPopulation()));
 	}
 	if (printReactionCountDistribution) {
 		std::cout << "fired "<<reactionCounter<<" reactions. Reaction count distribution:\n";

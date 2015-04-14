@@ -283,7 +283,7 @@ def plotSeveral(filenames):#TODO
     ax1.set_title('Current slope of the graph above')
     ax0.set_ylabel('runtime, microseconds')
     #plt.savefig('timeStats.pdf')
-    fig.suptitle(title)
+    #fig.suptitle(title)
     plt.show()
     return None
 
@@ -294,8 +294,14 @@ termCond = ('simulateReactions',5000, 1000)
 numOfRuns =3
 
 collRate = 0.5
-species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
-changeParameters(collRate)
-runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-
+species=[5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,
+         150,200,250,300,350,400,450,500,550,600,650,700,750,
+         800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
+         1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,
+         2300,2400,2500,2600,2700,2800,2900,3000,3250,3500,
+         3750,4000,4250,4500,4750,5000,5250,5500,5750,6000]
+#changeParameters(collRate)
+#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+filenames = ['collPartSpecTypes-c0.txt',]
+plotSeveral(filenames)
 

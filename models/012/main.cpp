@@ -134,11 +134,11 @@ int main (int argc, char** argv){
     delete dataLogger;
 
     float diff = ((float)t2-(float)t1);
-    float timePerReac = diff/CLOCKS_PER_SEC/reacNum;
+    float timePerReac = diff/(((float) CLOCKS_PER_SEC)*reacNum);
     std::cout << "Number of reactions is " << reacNum << std::endl;
     std::ofstream timeFile;
     timeFile.open ("runtime.txt");
-    timeFile << timePerReac << std:: endl;
+    timeFile << std::scientific << timePerReac << std::endl;
     timeFile.close();
     std::cout << "total time is " << tp.m_t << std::endl;
 

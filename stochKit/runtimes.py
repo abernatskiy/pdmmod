@@ -1,8 +1,7 @@
 #!/usr/bin/python
 import subprocess
+import sys
 from os import system as system
-#from statistics import mean
-#from statistics import stdev
 import numpy as np
 from math import sqrt as sqrt
 #import matplotlib.pyplot as plt
@@ -12,6 +11,7 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
+sys.path.append('../')
 import routes
 from balls import *
 
@@ -40,7 +40,6 @@ def getSimTime(command):
     '''
     runs the simulation and then retrieves its running time
     '''
-    print(subprocess.call('env'))
     retValue=subprocess.call(command)
     
     timeFile = open("runtime.txt")
@@ -223,7 +222,7 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=50
 filename = 'b.xml'
-command = '/cavern/eliza/origins/pdmmod/stochKit/StochKit2.0.11/custom_drivers/single_trajectory/bin/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
 
 runs = 3
 collRate = 0.5

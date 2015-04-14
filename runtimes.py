@@ -4,7 +4,7 @@ from os import system as system
 #from statistics import mean
 #from statistics import stdev
 from math import sqrt as sqrt
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit
@@ -300,8 +300,8 @@ species=[5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,
          1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,
          2300,2400,2500,2600,2700,2800,2900,3000,3250,3500,
          3750,4000,4250,4500,4750,5000,5250,5500,5750,6000]
-#changeParameters(collRate)
-#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames = ['collPartSpecTypes-c0.txt',]
-plotSeveral(filenames)
+changeParameters(collRate)
+runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+#filenames = ['collPartSpecTypes-c0.txt',]
+#plotSeveral(filenames)
 

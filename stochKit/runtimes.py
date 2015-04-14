@@ -40,6 +40,7 @@ def getSimTime(command):
     '''
     runs the simulation and then retrieves its running time
     '''
+    print(subprocess.call('env'))
     retValue=subprocess.call(command)
     
     timeFile = open("runtime.txt")
@@ -222,7 +223,8 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=50
 filename = 'b.xml'
-command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+command = '/cavern/eliza/origins/pdmmod/stochKit/StochKit2.0.11/custom_drivers/single_trajectory/bin/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+
 runs = 3
 collRate = 0.5
 

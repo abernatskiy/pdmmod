@@ -73,7 +73,7 @@ def getSimTime(simulation):
         std = np.std(runtimes)
         return mean, std
     
-    simulation.runSeveralParallelCluster(kernels=1, onNode=62)
+    simulation.runSeveralParallelCluster(kernels=1, onNode=60)
     simulation.reorganizeOutput()
     with open(simulation.outputDir+'runtimeStat.txt','r') as sf:
         [time, timeStd] = [float(item) for item in sf.readline().split(' ')]

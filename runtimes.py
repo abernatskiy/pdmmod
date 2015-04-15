@@ -4,8 +4,8 @@ from os import system as system
 #from statistics import mean
 #from statistics import stdev
 from math import sqrt as sqrt
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+#import matplotlib.pyplot as plt
+#import matplotlib.cm as cm
 #import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit
@@ -45,7 +45,7 @@ def changeInitPop(numSpec,population):
     
     return None
 
-def changeParameters(collRate):
+def changeParameters(collRate,numSpec):
     '''
     goes to parameters.ini and changes number of species and collision rate
     '''
@@ -75,10 +75,7 @@ def getSimTime(simulation):
         return mean, std
     
     simulation.runSeveralParallelCluster(kernels=1, onNode=60)
-<<<<<<< HEAD
-=======
     #simulation.runSeveralSeries()
->>>>>>> 172c7c823f721d18d0241a4a01f7ef73b2967574
     simulation.reorganizeOutput()
     with open(simulation.outputDir+'runtimeStat.txt','r') as sf:
         [time, timeStd] = [float(item) for item in sf.readline().split(' ')]
@@ -309,21 +306,21 @@ def plotSeveral(filenames):#TODO
     return None
 
 ###Change Number of species###
-population=50
-modelNum = 8
+population=1
+modelNum = 6
 termCond = ('simulateReactions',5000, 1000)
 numOfRuns =3
 
 collRate = 0.5
-#species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600]#,
-         #650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
-         #1400,1450,1500,1600,1650,1700,1750,1800,1850,1900,1950,2000,
-         #2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,
-         #3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
-         #4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
+species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600, 
+         650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
+         1400,1450,1500,1600,1650,1700,1750,1800,1850,1900,1950,2000,
+         2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,
+         3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
+         4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
-#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
+runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+#filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
 #filenames = ['collPartSpecTypes-stochkit-c0.txt','collPartSpecTypes-stochkit-pc0.txt','collPartSpecTypes3.txt']
-plotSeveral(filenames)
+#plotSeveral(filenames)
 

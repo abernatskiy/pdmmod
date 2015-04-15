@@ -4,9 +4,9 @@ from os import system as system
 #from statistics import mean
 #from statistics import stdev
 from math import sqrt as sqrt
-#import matplotlib.pyplot as plt
-#import matplotlib.cm as cm
-#import scipy.optimize as optimization
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit
 from numpy import poly1d
@@ -239,15 +239,19 @@ def analyzeFile(filename):
         ratios.append((runtimes[i][0],m,e))
     
     x=[r[0] for r in runtimes] #number of specs
-    y=[r[1]*10**6 for r in runtimes] #time per reaction
-    y_err=[r[2]*10**6 for r in runtimes] #std of time per reaction
+    y=[r[1]*10**3 for r in runtimes] #time per reaction
+    y_err=[r[2]*10**3 for r in runtimes] #std of time per reaction
     
     #z = polyfit(x, y, 1)
     #print(z)
     #f = poly1d(z)
     _x = (np.array(x))[:,np.newaxis]
-    k, _, _, _ = np.linalg.lstsq(_x, y)
+    k = np.linalg.lstsq(_x, y)[0]
     z = (k, 0.0)
+    ### if we want to fit intercept too
+    #_x = np.vstack([np.array(x),np.ones(len(x))]).T
+    #k, b = np.linalg.lstsq(_x, y)[0]
+    #z = (k, b)
     def f(x):
         return k*x
     
@@ -299,7 +303,7 @@ def plotSeveral(filenames):#TODO
     ax1.legend(loc=4)
     ax0.set_title('Simulation run time vs number species types in the simulation')
     ax1.set_title('Current slope of the graph above')
-    ax0.set_ylabel('runtime, microseconds')
+    ax0.set_ylabel('runtime, miliseconds')
     #plt.savefig('timeStats.pdf')
     #fig.suptitle(title)
     plt.show()
@@ -319,8 +323,10 @@ species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
          3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
          4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
-runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
 #filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
-#filenames = ['collPartSpecTypes-stochkit-c0.txt','collPartSpecTypes-stochkit-pc0.txt','collPartSpecTypes3.txt']
-#plotSeveral(filenames)
+filenames = ['collPartSpecTypes-c2.txt',
+                'collPartSpecTypesDel-c0.txt',
+                'collPartSpecTypes-stochkit-c0.txt']
+plotSeveral(filenames)
 

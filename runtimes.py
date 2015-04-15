@@ -4,7 +4,8 @@ from os import system as system
 #from statistics import mean
 #from statistics import stdev
 from math import sqrt as sqrt
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 #import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit
@@ -50,7 +51,7 @@ def changeParameters(collRate):
     '''
     popFile = open("parameters.ini", mode='w', encoding='utf-8')
     popFile.write("[kinetic model]\n")
-    #popFile.write("specNumber = "+str(numSpec)+"\n")
+    popFile.write("specNumber = "+str(numSpec)+"\n")
     popFile.write("collRate = "+str(collRate)+"\n")
     popFile.close()
     
@@ -73,7 +74,8 @@ def getSimTime(simulation):
         std = np.std(runtimes)
         return mean, std
     
-    simulation.runSeveralParallelCluster(kernels=1, onNode=62)
+    simulation.runSeveralParallelCluster(kernels=1, onNode=60)
+    #simulation.runSeveralSeries()
     simulation.reorganizeOutput()
     with open(simulation.outputDir+'runtimeStat.txt','r') as sf:
         [time, timeStd] = [float(item) for item in sf.readline().split(' ')]
@@ -122,6 +124,7 @@ def runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species):#TES
             modelNum,termCond,rewrite,numOfRuns,traj,log_level)
     system('touch '+s.path2Folder+'runTemp.txt' )
     for numSpec in species:
+        changeParameters(collRate,numSpec)
         s = libSimulate.Simulation(
             modelNum,termCond,rewrite,numOfRuns,traj,log_level)
         changeInitPop(numSpec,population)
@@ -235,18 +238,24 @@ def analyzeFile(filename):
         e=sqrt((runtimes[i][2])**2+(runtimes[i-1][2])**2)/(runtimes[i][0]-runtimes[i-1][0])
         ratios.append((runtimes[i][0],m,e))
     
-    x=[r[0] for r in runtimes]
-    y=[r[1]*10**6 for r in runtimes]
-    y_err=[r[2]*10**6 for r in runtimes]
+    x=[r[0] for r in runtimes] #number of specs
+    y=[r[1]*10**6 for r in runtimes] #time per reaction
+    y_err=[r[2]*10**6 for r in runtimes] #std of time per reaction
     
-    z = polyfit(x, y, 1)
-    f = poly1d(z)
+    #z = polyfit(x, y, 1)
+    #print(z)
+    #f = poly1d(z)
+    _x = (np.array(x))[:,np.newaxis]
+    k, _, _, _ = np.linalg.lstsq(_x, y)
+    z = (k, 0.0)
+    def f(x):
+        return k*x
     
     z2 = polyfit(x, y, 2)
     f2 = poly1d(z2)
     
     x_new = linspace(x[0], x[-1], 50)
-    y_new = f(x_new)
+    y_new = [f(x) for x in x_new]
     y_new2= f2(x_new)
     
     '''ratios fitting'''
@@ -263,18 +272,27 @@ def plotSeveral(filenames):#TODO
     '''filenames = [string]
     '''
     fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
+    labCols = dict(
+        zip(filenames,cm.rainbow(np.linspace(0, 1, len(filenames))))
+        )
     for filename in filenames:
         data, lines, slope, ratios, fits = analyzeFile(filename)
-
-        ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o')
-        ax0.plot(lines[0],lines[1],label='y = '+'%.2e' %fits[0][0]+' x +'+'%.2e' %fits[0][1])
-        #ax0.plot(lines[0],lines[2],label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2])
+        col = labCols[filename]
+        ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',color = col)
+        if filename.find('stochkit')== -1:
+            ax0.plot(lines[0],lines[1],
+                     label='y = '+'%.2e' %fits[0][0]+' x',
+                     color = col)
+        else:
+            ax0.plot(lines[0],lines[2],
+                     label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2],
+                     color = col)
         #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
         for i in range(len(data[1])):
             element=data[1][i]
         
             rat=ratios[i-1]
-            ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o')
+            ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o',color = col)
         
     
     ax0.legend(loc=4)
@@ -291,17 +309,18 @@ def plotSeveral(filenames):#TODO
 population=50
 modelNum = 8
 termCond = ('simulateReactions',5000, 1000)
-numOfRuns =5
+numOfRuns =3
 
 collRate = 0.5
-species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
-         650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
-         1400,1450,1500,1600,1650,1700,1750,1800,1850,1900,1950,2000,
-         2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,
-         3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
-         4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
-changeParameters(collRate)
-runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-#filenames = ['collPartSpecTypes-c1.txt']
-#plotSeveral(filenames)
+#species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600]#,
+         #650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
+         #1400,1450,1500,1600,1650,1700,1750,1800,1850,1900,1950,2000,
+         #2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,
+         #3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
+         #4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
+#
+#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
+#filenames = ['collPartSpecTypes-stochkit-c0.txt','collPartSpecTypes-stochkit-pc0.txt','collPartSpecTypes3.txt']
+plotSeveral(filenames)
 

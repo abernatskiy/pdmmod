@@ -222,12 +222,14 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=50
 filename = 'b.xml'
-command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/bin/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
 
 runs = 3
 collRate = 0.5
 
-species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,1400,1450,1500]
+species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200]#,
+         #250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,
+         #1000,1100,1150,1200,1250,1300,1350,1400,1450,1500]
 #,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
 
 numOfPoints = len(species)

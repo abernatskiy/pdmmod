@@ -1,8 +1,8 @@
 # List of objects specific to this model - append your objects here!
-modelObjects    = model.o nativeListLoader.o main.o
+modelObjects    = model.o main.o
 
 # Path to the libpdmmod directory
-libPdmmodDir    = libpdmmod
+libPdmmodDir    = ../../libpdmmod
 CFLAGS          = -std=c++11 -g -ggdb -Wall -I"." -I"${libPdmmodDir}" -O2
 
 # Loading list of library objects and prepending the libpdmmod directory to each entry

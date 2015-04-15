@@ -50,10 +50,10 @@ void simulateSingleTrajectory(std::vector<std::pair<double, StandardDriverTypes:
 	  //LISA//output.push_back(std::make_pair(simulationTime,solver.getCurrentPopulation()));
 	}
 	if (printReactionCountDistribution) {
-		std::cout << "fired "<<reactionCounter<<" reactions. Reaction count distribution:\n";
-		for (std::size_t i=0; i!=reactionCounts.size(); ++i) {
-			std::cout << "\treaction index "<<i<<": "<<reactionCounts[i]<<"\n";
-		}
+		std::cout << "fired "<<reactionCounter<<" reactions. \n";
+// 		for (std::size_t i=0; i!=reactionCounts.size(); ++i) {
+// 			std::cout << "\treaction index "<<i<<": "<<reactionCounts[i]<<"\n";
+//		}
 	}
 	
 }

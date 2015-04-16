@@ -570,7 +570,7 @@ class SimulationsSet(object):
 #TESTING
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',100,1)
+    termCond = ('simulateTime',50,0.5)
     numOfRuns = 3
     traj = False
     #rewrite = True

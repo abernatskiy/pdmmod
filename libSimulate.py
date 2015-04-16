@@ -579,7 +579,8 @@ if __name__ == "__main__":
     ##s.runSeveralParallelCluster(kernels=3, onNode=0)
     #s.reorganizeOutput()
     ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
-    ss.runSimsOnCluster(3)
+    #ss.runSimsOnCluster(3)
+    ss.runSimsOnPC()
 
 
 

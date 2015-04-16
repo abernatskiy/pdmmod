@@ -13,10 +13,10 @@ import itertools
 
 from log_utils import init_log
 import routes
-try:
-    from parameters import correspond
-except:
-    correspond = {}
+#try:
+from parameters import correspond
+#except:
+#    correspond = {}
 
 def castType(typeName,string):
     if typeName == 'int':
@@ -509,6 +509,7 @@ class SimulationsSet(object):
         
         self.correspond = correspond
         if self.correspond == {}:
+            print(subprocess.call('ls'))
             raise ValueError('I need to have a parameters.py file'+
                              'to read set of parameters')
         
@@ -569,7 +570,7 @@ class SimulationsSet(object):
 #TESTING
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',3,1)
+    termCond = ('simulateTime',100,1)
     numOfRuns = 3
     traj = False
     #rewrite = True

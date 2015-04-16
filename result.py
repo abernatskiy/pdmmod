@@ -168,10 +168,11 @@ class Result(object):
             self.makeStats()
         if jointData == None:
             try:
+                jointData = self.jointData
                 type(self.jointData)
             except:
                 self.jointData=self.makeDictOfLengths(maxLength)
-                jointData = self.jointData
+        
             
         mL=max(lengths)
         print("maximum length of a polymer is "+str(mL))

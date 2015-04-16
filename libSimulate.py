@@ -466,7 +466,7 @@ class Simulation(object):
             i = -1
             trajLast = -1
         self.log.info('last kernel')
-        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode)
+        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode,paramFile,populFile)
         self._wait(jobsRun)
         self.log.warning('all simulation finished running. calculationg averages and stds')
         return None
@@ -570,7 +570,7 @@ class SimulationsSet(object):
 if __name__ == "__main__":
     modelNum = 12
     termCond = ('simulateTime',3,1)
-    numOfRuns = 1
+    numOfRuns = 3
     traj = False
     #rewrite = True
     log_level = 'INFO'
@@ -579,7 +579,7 @@ if __name__ == "__main__":
     ##s.runSeveralParallelCluster(kernels=3, onNode=0)
     #s.reorganizeOutput()
     ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
-    ss.runSimsOnPC()
+    ss.runSimsOnCluster(3)
 
 
 

@@ -245,15 +245,15 @@ def analyzeFile(filename):
     #z = polyfit(x, y, 1)
     #print(z)
     #f = poly1d(z)
-    _x = (np.array(x))[:,np.newaxis]
-    k = np.linalg.lstsq(_x, y)[0]
-    z = (k, 0.0)
+    #_x = (np.array(x))[:,np.newaxis]
+    #k = np.linalg.lstsq(_x, y)[0]
+    #z = (k, 0.0)
     ### if we want to fit intercept too
-    #_x = np.vstack([np.array(x),np.ones(len(x))]).T
-    #k, b = np.linalg.lstsq(_x, y)[0]
-    #z = (k, b)
+    _x = np.vstack([np.array(x),np.ones(len(x))]).T
+    k, b = np.linalg.lstsq(_x, y)[0]
+    z = (k, b)
     def f(x):
-        return k*x
+        return k*x+b
     
     z2 = polyfit(x, y, 2)
     f2 = poly1d(z2)
@@ -282,12 +282,13 @@ def plotSeveral(filenames):#TODO
     for filename in filenames:
         data, lines, slope, ratios, fits = analyzeFile(filename)
         col = labCols[filename]
-        ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',color = col)
         if filename.find('stochkit')== -1:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D',color = col)
             ax0.plot(lines[0],lines[1],
-                     label='y = '+'%.2e' %fits[0][0]+' x',
+                     label='y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1],
                      color = col)
         else:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',color = col)
             ax0.plot(lines[0],lines[2],
                      label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2],
                      color = col)
@@ -324,9 +325,9 @@ species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
          4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
 #runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-#filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
-filenames = ['collPartSpecTypes-c2.txt',
-                'collPartSpecTypesDel-c0.txt',
-                'collPartSpecTypes-stochkit-c0.txt']
+filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
+#filenames = ['collPartSpecTypes-c2.txt',
+                #'collPartSpecTypesDel-c0.txt',
+                #'collPartSpecTypes-stochkit-c0.txt']
 plotSeveral(filenames)
 

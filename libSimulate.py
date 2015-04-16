@@ -26,6 +26,32 @@ def castType(typeName,string):
     elif typeName == 'bool':
         return bool(string)
 
+def readSet(correspond):#TEST
+    '''
+    reads file with parameters and generates dict:
+    {param name:[list of values],
+        param name:[list of values]
+        etc}
+    '''
+    parameters = {} #init dict of parameters
+    #read which parameter correspond to which position in the
+    #file with parameters' values
+    for i in correspond.keys():
+        parameters[correspond[i][0]]=[]
+    pf = open('paramSet.txt','r')
+    count = 0
+    for line in pf:
+        if line[0]=='#':
+            continue
+        else:
+            raw = line.rstrip('\n').split(' ')
+            for i in range(len(raw)):
+                parameters[correspond[i][0]].append(
+                    castType(correspond[i][1],raw[i]))
+            count+=1
+    return parameters, count
+        
+
 class Simulation(object):
     def __init__(self,modelNum,termCond,rewrite,
                  numOfRuns=1,traj=False,log_level='WARNING'):
@@ -46,7 +72,7 @@ class Simulation(object):
         self.traj = traj
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
         self.log_level = log_level
-        self.outputDir = self.makeOutputFolder(rewrite)
+        self.outputDir, self.currRun = self.makeOutputFolder(rewrite)
         
     def __str__(self):
         str1 = ('Simulation of the model '+str(self.modelNum)+
@@ -102,7 +128,7 @@ class Simulation(object):
         outputDir = path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/'
         self.outputDir = outputDir
         self.log = init_log(self.log_level,log_path=outputDir+'sim.log')
-        return outputDir
+        return outputDir, currentRun
     
     def _formCommand(self,trajNum,paramFile,populFile):
         command = (self.path2Folder+'pdmmod',
@@ -125,6 +151,7 @@ class Simulation(object):
             populFile = self.path2Folder+'populations.txt'
         for trajNum in range(self.numOfRuns):
             command = self._formCommand(trajNum,paramFile,populFile)
+            print(command)
             subprocess.call(command)
             self.log.info(str(command))
             subprocess.call(("mv",
@@ -332,7 +359,8 @@ class Simulation(object):
         
         return shell
     
-    def _writePython(self,outputDir,kernelNum,trajFirst,trajLast):
+    def _writePython(self,outputDir,kernelNum,trajFirst,trajLast,
+                     paramFile,populFile):
         pythonFile = self.outputDir+'run'+str(kernelNum)+'.py'
         #system('echo "" > '+str(pythonFile))
         inFile = open(pythonFile,'a')
@@ -342,11 +370,12 @@ class Simulation(object):
         #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
         
         for j in range(trajFirst,trajLast+1):
-            command = (self.path2Folder+'pdmmod',
-                        str(self.howTerm), 
-                        str(self.whenTerm), 
-                        str(self.records),
-                        self.outputDir+'traj'+str(j))
+            command = self._formCommand(j,paramFile,populFile)
+            #command = (self.path2Folder+'pdmmod',
+                        #str(self.howTerm), 
+                        #str(self.whenTerm), 
+                        #str(self.records),
+                        #self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
             inFile.write('subprocess.call(("mv","'+
                             self.path2Folder+'runtime.txt","'+
@@ -356,8 +385,12 @@ class Simulation(object):
         inFile.close()
         return pythonFile
     
-    def _addToQueue(self,outputDir,kernelNum,trajFirst,trajLast,jobsRun,onNode):
-        pythonFile = self._writePython(outputDir,kernelNum,trajFirst,trajLast)
+    def _addToQueue(self,outputDir,kernelNum,
+                    trajFirst,trajLast,
+                    jobsRun,onNode,
+                    paramFile,populFile):
+        pythonFile = self._writePython(
+            outputDir,kernelNum,trajFirst,trajLast,paramFile,populFile)
         shell = self._makeShell(outputDir,kernelNum,pythonFile,onNode)
         #system('cat '+pythonFile)
         #system('cat '+shell)
@@ -410,7 +443,12 @@ class Simulation(object):
             
         return None
     
-    def runSeveralParallelCluster(self,kernels=None,onNode=0):
+    def runSeveralParallelCluster(self,kernels=None,onNode=0,
+                                  paramFile=None,populFile=None):
+        if paramFile == None:
+            paramFile = self.path2Folder+'parameters.ini'
+        if populFile == None:
+            populFile = self.path2Folder+'populations.txt'
         jobsRun = []
         if kernels == None:
             kernels = self.numOfRuns
@@ -421,7 +459,9 @@ class Simulation(object):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
             self.log.info('kernel'+str(i))
-            self._addToQueue(self.outputDir,i,trajFirst,trajLast,jobsRun,onNode)
+            self._addToQueue(
+                self.outputDir,i,trajFirst,trajLast,jobsRun,onNode,
+                paramFile,populFile)
         if kernels == 1:
             i = -1
             trajLast = -1
@@ -438,6 +478,19 @@ class Simulation(object):
         
         return None
     
+    def writeParamIni(self,paramDict,whichRun):
+        paramFileName =self.outputDir+'parameters.ini'
+        paramFile = open(paramFileName,'w')
+        paramFile.close()
+        paramFile = open(self.outputDir+'parameters.ini','a')
+        paramFile.write('[kinetic model]\n')
+        print(paramDict)
+        lines = [key+' = '+str(paramDict[key][whichRun]) for key in paramDict.keys()]
+        for line in lines:
+            paramFile.write(line+'\n')
+        paramFile.close()
+        
+        return paramFileName
 
 class SimulationsSet(object):
     '''reads parameters from file paramSpace.txt, forms parmeters.ini
@@ -459,41 +512,55 @@ class SimulationsSet(object):
             raise ValueError('I need to have a parameters.py file'+
                              'to read set of parameters')
         
-    def readSet(self):#TODO
-        parameters = {}
-        for i in correspond.keys():
-            parameters[correspond[i][0]]=[]
-        pf = open('paramSet.txt','r')
-        for line in pf:
-            raw = line.rstrip('\n').split(' ')
-            for i in range(len(raw)):
-                parameters[correspond[i][0]] = \
-                    castType(correspond[i][1],raw[i])
-        
-    
-    
-    
-        
-    
     
     def initParams(self,simulation):
         return None
     
     
-    def runSimsOnPC(self):
-        #read file with parameters 
-        #for line in the file:
-            #form simulation
-            #run simulation
-            #put it into database
+    
+    def runSimsOnPC(self):#TEST
+        database = open(self.path2Folder+'database','a')
+        paramDict, runs = readSet(self.correspond)
+        for i in range(runs):
+            s = Simulation(self.modelNum,
+                           self.termCond,
+                           rewrite=False,
+                           numOfRuns=self.numOfRuns,
+                           traj=self.traj,
+                           log_level=self.log_level)
+            paramFile = s.writeParamIni(paramDict,i)
+            s.runSeveralSeries(paramFile,populFile=None)
+            s.reorganizeOutput()
+            database.write(str(s.currRun)+',,')
+            line = ''
+            for key in paramDict.keys():
+                line += str(paramDict[key][i])+' '
+            line = line.rstrip(' ')+'\n'
+            database.write(line)
+        database.close()
         return None
     
-    def runSimsOnCluster(self):
-        #read file with parameters
-        #for line in the file:
-            #form simulation
-            #submit simulation
-            #put it into database
+    def runSimsOnCluster(self,kernels=None,onNode=0):#TEST
+        database = open(self.path2Folder+'database','a')
+        paramDict, runs = readSet(self.correspond)
+        for i in range(runs):
+            s = Simulation(self.modelNum,
+                           self.termCond,
+                           rewrite=False,
+                           numOfRuns=self.numOfRuns,
+                           traj=self.traj,
+                           log_level=self.log_level)
+            paramFile = s.writeParamIni(paramDict,i)
+            s.runSeveralParallelCluster(kernels,onNode,
+                                  paramFile,populFile=None)
+            s.reorganizeOutput()
+            database.write(str(s.currRun)+',,')
+            line = ''
+            for key in paramDict.keys():
+                line += str(paramDict[key][i])+' '
+            line = line.rstrip(' ')+'\n'
+            database.write(line)
+        database.close()
         return None
     
         
@@ -502,17 +569,17 @@ class SimulationsSet(object):
 #TESTING
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',30,3)
-    numOfRuns = 3
+    termCond = ('simulateTime',3,1)
+    numOfRuns = 1
     traj = False
     #rewrite = True
     log_level = 'INFO'
-    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+    #s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
     #s.runSeveralSeries()
     ##s.runSeveralParallelCluster(kernels=3, onNode=0)
     #s.reorganizeOutput()
-    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
-
+    ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
+    ss.runSimsOnPC()
 
 
 

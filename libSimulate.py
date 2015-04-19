@@ -573,15 +573,15 @@ if __name__ == "__main__":
     termCond = ('simulateTime',50,0.5)
     numOfRuns = 3
     traj = False
-    #rewrite = True
+    rewrite = False
     log_level = 'INFO'
-    #s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
-    #s.runSeveralSeries()
+    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+    s.runSeveralSeries()
     ##s.runSeveralParallelCluster(kernels=3, onNode=0)
-    #s.reorganizeOutput()
-    ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
+    s.reorganizeOutput()
+    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
     #ss.runSimsOnCluster(3)
-    ss.runSimsOnPC()
+    #ss.runSimsOnPC()
 
 
 

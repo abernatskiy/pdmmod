@@ -12,7 +12,10 @@ def readNativeList(maxLength):
     converts nativeList<maxLength>.txt to a dictionary from hp-string 
     to a tuple of their native energies and catalytic patterns
     '''
-    dataFile = open(routes.routePDM+'nativeList'+str(maxLength)+'.txt', "rt")
+    try:
+        dataFile = open(routes.routePDM+'nativeList'+str(maxLength)+'.txt', "rt")
+    except:
+        dataFile = open(routes.routePDM+'nativeList.txt', "rt")
     count = 0
     natData ={}
     for line in dataFile:

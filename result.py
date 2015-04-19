@@ -11,6 +11,7 @@ from collections import OrderedDict
 from os import system as system
 import numpy as np
 import math
+import glob
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
@@ -91,7 +92,7 @@ class Result(object):
         line = header.readline()
         self.whenTerm = int(line.rstrip('\n').replace('whenTerm ',''))
         line = header.readline()
-        self.records = int(line.rstrip('\n').replace('records ',''))
+        self.records = float(line.rstrip('\n').replace('records ',''))
         line = header.readline()
         line = header.readline()
         self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ',''))
@@ -134,6 +135,41 @@ class Result(object):
         return countAll, countFold, countCat, countAuto, lengths
         
     
+    def _kin2str(self):
+        title = 'Model #'+str(self.modelNum)+'.'+str(self.simNum)+':\n'
+        for parameter in self.parameters:
+            title+=str(self.parameters[parameter])+', '
+        return title
+    
+    def _writeGraphFilename(self):
+        '''Results -> String (filename)
+        '''
+        def ifNameExists(name):
+            sR=glob.glob(self.outputDir+'figures/'+name)
+            if sR==[]:
+                return False
+            else:
+                return True
+        s='000'
+        while ifNameExists(s+'.png'):
+            i=int(s)
+            i+=1
+            if len(str(i))==1:#LAME
+                s='00'+str(i)
+            elif len(str(i))==2:
+                s='0'+str(i)
+            elif len(str(i))>2:
+                s=str(i)
+        #if not ifNameExists(s)
+        name=s+'.png'
+            #if ifNameExists(name):
+            #    raise('plot has been overwritten')
+            
+            
+        path=self.outputDir+'figures/'+name
+        
+        return path
+    
     def _plotTotalPop(self,fig,countAll):
         fig.plot(self.times,countAll)
         fig.set_yscale('log')
@@ -162,7 +198,7 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def plotHPstats(self,jointData=None,show=True):
+    def plotHPstats(self,jointData=None,saveFig=False):
         maxLength = int(self.parameters['maxLength'])
         countAll, countFold, countCat, countAuto, lengths = \
             self.makeStats()
@@ -186,15 +222,18 @@ class Result(object):
                   zip(lenPops,list(lengths))]
         
 
-        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
+        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(18,14))
         self._plotTotalPop(ax0,countAll)
         self._plotTypes(ax1,countFold,countCat,countAuto)
         self._plotLenDistr(ax2,mL,list(lengths),lengthsDistr)
         
         title = 'Statistics of a HP-wordl simulation run'
         fig.suptitle(title + ' for '+self.name)
-        if show:
+        if not saveFig:
             plt.show()
+        else:
+            plt.suptitle(self._kin2str(), fontsize=20)
+            plt.savefig(self._writeGraphFilename())
         
         return None
     

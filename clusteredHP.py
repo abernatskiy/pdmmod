@@ -32,13 +32,8 @@ class ClusteredResults(result.Result):
             
         return clustDict
     
-<<<<<<< HEAD
-    def plotClustLenDots(self,minLength=None,maxLength=None,saveFig=False):
-=======
-    
     
     def plot2DClustLen(self,minLength=None,maxLength=None,saveFig=False):
->>>>>>> 1bbce2d7d7ca9174dde4417a205c1df9913ffbf8
         '''plots sequences as dots of various shape
         lists outstanders.
         '''

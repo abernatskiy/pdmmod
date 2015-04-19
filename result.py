@@ -5,8 +5,6 @@
 
 #specPop -- {name: [populations during time steps]}
 import matplotlib.pyplot as plt
-from statistics import mean
-from statistics import variance
 from collections import OrderedDict
 from os import system as system
 import numpy as np
@@ -205,9 +203,10 @@ class Result(object):
         if jointData == None:
             try:
                 jointData = self.jointData
-                type(self.jointData)
+                self.jointData.keys()
             except:
                 self.jointData=self.makeDictOfLengths(maxLength)
+                jointData=self.jointData
         
             
         mL=max(lengths)
@@ -250,7 +249,7 @@ class Result(object):
         steady={}
         for seq in self.means.keys():
             points=self.means[seq][border:]
-            steady[seq]=mean(points)
+            steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
             sorted(steady.items(), key=lambda t: t[1],reverse=True)
@@ -263,7 +262,7 @@ class Result(object):
         steady={}
         for seq in self.stds.keys():
             points=self.stds[seq][border:]
-            steady[seq]=mean(points)
+            steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
             sorted(steady.items(), key=lambda t: t[1],reverse=True)

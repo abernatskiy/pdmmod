@@ -1,57 +1,80 @@
+#include <algorithm>
 #include <fstream>
-#include "totalPopulation.h"
-#include "output.h"
 #include <time.h>
+#include "totalPopulation.h"
+#include "dataLogger.h"
 
 // Those modules are for loading parameters and data used by class Specie
 #include <map>
-
-
-
+#include "parametersLoader.h"
 
 /* General-purpose global dictionary of parameters */
 std::map<std::string,Parameter> configDict;
 
+/* HP-model-specific headers and global variables */
+// In order to use these dictionaries, uncomment the four lines above and lines 104 and 105
+//#include "nativeListLoader.h"
+//#include "parametersLoader.h"
+//std::map<std::string,std::string> catPatterns;
+//std::map<std::string,int> wellDepths;
+
 void printUsage(){
-//    std::cout << "wrong number of arguments" << std::endl;
-//    std::cout << "the first argument: time the simulation runs, second: how often you want to record data" << std::endl;
-//    std::cout << "the last argument is the filename where you want to store results" << std::endl;
-//    std::cout << "Total Time = 0: if you want to run simulation until it breaks down/you get tired" << std::endl;
-//    std::cout << "Step = 0: record every step" << std::endl;
     std::cout << "Usage:" << std::endl;
-    std::cout << "  pdmmod simulateTime <totalTime> <timeBetweenRecords> <outputFileName>" << std::endl;
-    std::cout << "  pdmmod simulateReactions <numberOfReactions> <recordingPeriod> <outputFileName>" << std::endl;
+    std::cout << "  pdmmod simulateTime <totalTime> <timeBetweenRecords> <outputFileName> [-c <parametersFileName>] [-i <initialPopulationFileName>]" << std::endl;
+    std::cout << "  pdmmod simulateReactions <numberOfReactions> <recordingPeriod> <outputFileName> [-c <parametersFileName>] [-i <initialPopulationFileName>]" << std::endl;
     std::cout << "totalTime=0 causes the program to run the simulation until it runs out of possible reactions or indefinitely" << std::endl;
     std::cout << "timeBetweenRecords=0 causes the program to record the population after every reaction" << std::endl;
     std::cout << "numberOfReactions must be a multiple of recordingPeriod" << std::endl;
+    std::cout << "parametersFileName is a path to the configuration .ini file. Defaults to parameters.ini" << std::endl;
+    std::cout << "initialPopulationFileName is a path to the file holding initial configurations. Defaults to populations.txt" << std::endl;
+}
+
+bool cmdOptionExists(char** begin, char** end, const std::string& option){
+    return std::find(begin, end, option) != end;
+}
+
+char* getCmdOption(char** begin, char** end, const std::string & option){
+    char** itr = std::find(begin, end, option);
+    if (itr != end && ++itr != end)
+        return *itr;
+    return NULL;
 }
 
 int main (int argc, char** argv){
 
+    /* Parsing command line options */
 
-    /* Loading parameters */
-    readConfig(&configDict, "parameters.ini");
-    showConfig(&configDict);
+    // treating nonpositinal arguments first
+    int positionalArgc = argc;
+    std::string configFileName("parameters.ini");
+    if (getCmdOption(argv, argv+argc, "-c") != NULL){
+        char* cConfigFileName = getCmdOption(argv, argv+argc, "-c");
+        configFileName = std::string(cConfigFileName);
+        positionalArgc -= 2;
+    }
+    std::string initialPopulationFileName("populations.txt");
+    if (getCmdOption(argv, argv+argc, "-i") != NULL){
+        char* cInitialPopulationsFileName = getCmdOption(argv, argv+argc, "-i");
+        initialPopulationFileName = std::string(cInitialPopulationsFileName);
+        positionalArgc -= 2;
+    }
 
-    int reacNum = 0;
-    clock_t t1,t2;
-    int stp;
-
+    // then treating positional arguments
     int simType = -1;
     float totalTime = 0.0;
     float stepLen = 0.0;
     int totalReactions = 0;
     int recordingPeriod = 0;
-    std::string filename;
-    if (argc == 5 && std::string(argv[1]).compare("simulateTime") == 0){
+    std::string outputFilename;
+    if (positionalArgc == 5 && std::string(argv[1]).compare("simulateTime") == 0){
         simType = 0;
         //total time of simulation
         totalTime = std::atof(argv[2]);
         //how often to record
         stepLen = std::atof(argv[3]);
-        filename = std::string(argv[4]);
+        outputFilename = std::string(argv[4]);
     }
-    else if (argc == 5 && std::string(argv[1]).compare("simulateReactions") == 0){
+    else if (positionalArgc == 5 && std::string(argv[1]).compare("simulateReactions") == 0){
         simType = 1;
         //total number of reactions
         totalReactions = std::atoi(argv[2]);
@@ -61,7 +84,7 @@ int main (int argc, char** argv){
             printUsage();
             return 1;
         }
-        filename = std::string(argv[4]);
+        outputFilename = std::string(argv[4]);
     }
     else {
         std::cout << "Unrecognized arguments" << std::endl;
@@ -69,71 +92,53 @@ int main (int argc, char** argv){
         return 1;
     }
 
-    //reading initial conditions frmo file
+    /* Loading parameters */
+    readConfig(&configDict, configFileName);
+    showConfig(&configDict);
+
+    /* Reading initial conditions from file */
     std::cout << " before beginning" << std::endl;
-    TotalPopulation tp("populations.txt");
+    TotalPopulation tp(initialPopulationFileName);
 
-    //std::cout << "before stepping:\n"<< tp;
+    /* Loading HP-model-specific data */
+//    catPatterns = readCatPatterns("nativeList.txt");
+//    wellDepths = readWellDepths("nativeList.txt");
+
+    /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;
-    std::string prevPops = storePopulations(&tp);
-    float prevStep = 0.f;
-    std::ofstream myfile;
-    myfile.open (filename);
-    writeHeaderToFile(&tp, argc, argv, &myfile);
-    writeToFile(prevPops, 0.0, &myfile);
+    DataLogger* dataLogger;
+    if(simType == 0)
+        dataLogger = new DataLogger(&tp, stepLen, totalTime, outputFilename);
+    else if(simType == 1)
+        dataLogger = new DataLogger(&tp, recordingPeriod, totalReactions, outputFilename);
+
+    dataLogger->makeHeader(argc, argv);
+
+    int reacNum = 0;
+    clock_t t1,t2;
+    int stp = 0;
     t1=clock();
-    if (simType == 0){
-        while(true){
-            if (totalTime == 0.f)
-            {
-                //TODO
-            }
-            else{
-                stp = tp.stepSimulation();
-                reacNum = reacNum+1;
-                //std::cout << "after stepping:\n" << tp;
-                prevPops = writeOrNotTo(stepLen, &tp, prevStep, prevPops, &myfile);
-                prevStep = getPrevStep(stepLen, prevStep, tp.m_t);
-                if (tp.m_t >= totalTime){
-                    myfile.close();
-                    break;
-                }
-                if (stp==1){
-                    break;
-                }
-            }
-        }
-    }
-    else if (simType == 1){
-        while(true){
-            stp = tp.stepSimulation();
-            reacNum = reacNum + 1;
-            if (reacNum % recordingPeriod == 0)
-                writeToFile(storePopulations(&tp), tp.m_t, &myfile);
 
-            if (stp == 1 || reacNum >= totalReactions){
-                myfile.close();
-                break;
-            }
-        }
+    while(dataLogger->makeRecords()){
+        stp = tp.stepSimulation();
+        reacNum++;
+        if(stp == 1)
+            break;
     }
+
     t2=clock();
-    std::cout << "status is " << stp << std::endl;
-    if (simType == 0 && tp.m_t < totalTime && stp == 1){
-        std::cout <<"simulations is over. prevStep is " << prevStep << std::endl;
-        for (float time=(prevStep+stepLen);time<=totalTime;time=time+stepLen){
-            writeToFile(prevPops,time,&myfile);
-        }
 
-        myfile.close();
-    }
+    std::cout << "status is " << stp << std::endl;
+    dataLogger->makePostsimulationRecords();
+
+    delete dataLogger;
 
     float diff = ((float)t2-(float)t1);
-    float timePerReac = diff/CLOCKS_PER_SEC/reacNum;
+    float timePerReac = diff/(((float) CLOCKS_PER_SEC)*reacNum);
     std::cout << "Number of reactions is " << reacNum << std::endl;
     std::ofstream timeFile;
     timeFile.open ("runtime.txt");
-    timeFile << timePerReac << std:: endl;
+    timeFile << std::scientific << timePerReac << std::endl;
     timeFile.close();
     std::cout << "total time is " << tp.m_t << std::endl;
 

@@ -11,6 +11,7 @@ from collections import OrderedDict
 from os import system as system
 import numpy as np
 import math
+import glob
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
@@ -91,7 +92,7 @@ class Result(object):
         line = header.readline()
         self.whenTerm = int(line.rstrip('\n').replace('whenTerm ',''))
         line = header.readline()
-        self.records = int(line.rstrip('\n').replace('records ',''))
+        self.records = float(line.rstrip('\n').replace('records ',''))
         line = header.readline()
         line = header.readline()
         self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ',''))
@@ -99,7 +100,7 @@ class Result(object):
         return parameters
 
     def makeStats(self): 
-        '''return countAll, countFold, countCat, countAuto, popStats, length
+        '''return countAll, countFold, countCat, countAuto, length
         means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
         natData=hpClasses.readNativeList(int(self.parameters['maxLength']))
@@ -108,7 +109,7 @@ class Result(object):
         countFold = [(0)]*(len(self.times)) 
         countCat = [(0)]*(len(self.times)) 
         countAuto = [(0)]*(len(self.times)) 
-        popStats={}#lengths distribution in the last moment of simulation
+        #popStats={}#lengths distribution in the last moment of simulation
         for key in self.means.keys():
             if key.find('f')==-1:
                 polLen=len(key)
@@ -128,10 +129,46 @@ class Result(object):
                             if autocat:
                                 countAuto[i]+=self.means[key][i]
             #here we store lengths distribution in the last moment of simulation  
-            addToDictNum(popStats,polLen,self.means[key][-1])
+            #addToDictNum(popStats,polLen,self.means[key][-1])
             
-        return countAll, countFold, countCat, countAuto, popStats, lengths
+            
+        return countAll, countFold, countCat, countAuto, lengths
         
+    
+    def _kin2str(self):
+        title = 'Model #'+str(self.modelNum)+'.'+str(self.simNum)+':\n'
+        for parameter in self.parameters:
+            title+=str(self.parameters[parameter])+', '
+        return title
+    
+    def _writeGraphFilename(self):
+        '''Results -> String (filename)
+        '''
+        def ifNameExists(name):
+            sR=glob.glob(self.outputDir+'figures/'+name)
+            if sR==[]:
+                return False
+            else:
+                return True
+        s='000'
+        while ifNameExists(s+'.png'):
+            i=int(s)
+            i+=1
+            if len(str(i))==1:#LAME
+                s='00'+str(i)
+            elif len(str(i))==2:
+                s='0'+str(i)
+            elif len(str(i))>2:
+                s=str(i)
+        #if not ifNameExists(s)
+        name=s+'.png'
+            #if ifNameExists(name):
+            #    raise('plot has been overwritten')
+            
+            
+        path=self.outputDir+'figures/'+name
+        
+        return path
     
     def _plotTotalPop(self,fig,countAll):
         fig.plot(self.times,countAll)
@@ -151,8 +188,8 @@ class Result(object):
         fig.set_title("count of molecules of various types at each moment")
         return None
     
-    def _plotLenDistr(self,fig,mL,seqNames,lengthsDistr):
-        fig.plot(seqNames,lengthsDistr,label=\
+    def _plotLenDistr(self,fig,mL,lengths,lengthsDistr):
+        fig.plot(lengths,lengthsDistr,label=\
             str(mL)+'/'+str(len(self.means.keys())))
         fig.grid(True)
         fig.set_yscale('log')
@@ -161,29 +198,52 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def printHPstats(self,show=True):
-        countAll, countFold, countCat, countAuto, popStats, lengths = \
+    def plotHPstats(self,jointData=None,saveFig=False):
+        maxLength = int(self.parameters['maxLength'])
+        countAll, countFold, countCat, countAuto, lengths = \
             self.makeStats()
-            
+        if jointData == None:
+            try:
+                jointData = self.jointData
+                type(self.jointData)
+            except:
+                self.jointData=self.makeDictOfLengths(maxLength)
+        
             
         mL=max(lengths)
         print("maximum length of a polymer is "+str(mL))
-        seqNames = list(popStats.copy().keys())
+        #lengths = list(jointData.copy().keys())
+        lenPops = [
+            sum([jointData[length][name][0] 
+                 for name in jointData[length].keys()]) 
+            for length in jointData.keys()
+            ]
         lengthsDistr=[ps/2**li for (ps,li) in 
-                  zip(list(popStats.copy().values()),
-                      seqNames)]
+                  zip(lenPops,list(lengths))]
+        
 
-        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3)
+        fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(18,14))
         self._plotTotalPop(ax0,countAll)
         self._plotTypes(ax1,countFold,countCat,countAuto)
-        self._plotLenDistr(ax2,mL,seqNames,lengthsDistr)
+        self._plotLenDistr(ax2,mL,list(lengths),lengthsDistr)
         
         title = 'Statistics of a HP-wordl simulation run'
         fig.suptitle(title + ' for '+self.name)
-        if show:
+        if not saveFig:
             plt.show()
+        else:
+            plt.suptitle(self._kin2str(), fontsize=20)
+            plt.savefig(self._writeGraphFilename())
         
         return None
+    
+    def plotLenEvolution(self,show=True):
+        '''
+        '''
+        
+        
+        return None
+        
     
     def getSteadyMean(self,nonSteadyPercent):
         border=int(nonSteadyPercent*len(self.times))
@@ -243,7 +303,10 @@ class Result(object):
         if self.numOfRuns == 1:
             raise ValueError('I cannot cluster data from 1 simulation:'+
                 ' standard deviation isn\'t defined')
-        self.jointData=self.makeDictOfLengths(maxLength)
+        try:
+            type(self.jointData)
+        except:
+            self.jointData=self.makeDictOfLengths(maxLength)
         jointLabels={}
         _labels={}
         labels={}
@@ -339,9 +402,9 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 2
+    simNum = 3
     r = Result(modelNum,simNum)
-    r.printHPstats()
+    r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)
     #jointLabels, epsilons = r.clustLengths(14,25)
     

@@ -12,7 +12,7 @@
  */
 
 
-const float COLL_RATE = 0.0001;
+//const float COLL_RATE = 0.5;
 
 
 

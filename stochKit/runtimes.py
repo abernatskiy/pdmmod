@@ -1,16 +1,18 @@
 #!/usr/bin/python
 import subprocess
+import sys
 from os import system as system
-from statistics import mean
-from statistics import stdev
+import numpy as np
 from math import sqrt as sqrt
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #import scipy.optimize as optimization
 from numpy import array
 from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 
+sys.path.append('../')
+import routes
 from balls import *
 
 '''DATA
@@ -58,8 +60,8 @@ def getTimeStat(command,numSpec,population,collRate,runs):
             
         times.append(time)
     
-    ave = mean(times)
-    stdDev = stdev(times)
+    ave = np.mean(times)
+    stdDev = np.std(times)
     print(ave, stdDev)
     return ave, stdDev
 
@@ -220,21 +222,25 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=50
 filename = 'b.xml'
-command = '/data/research/06.origins_of_life/codes/stochKit/StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+command = routes.routeStochKit+'StochKit2.0.11/custom_drivers/single_trajectory/single_trajectory_debug', 'simulateReactions', '-m', filename, '-t', '2000'
+
 runs = 3
 collRate = 0.5
 
-species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000]#,1100,1150,1200,1250,1300,1350,1400,1450,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
+species=[2,3,4,5,10,12,14,16,18,20,30,40,50,60,70,80,90,100,150,200]#,
+         #250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,
+         #1000,1100,1150,1200,1250,1300,1350,1400,1450,1500]
+#,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000]
 
 numOfPoints = len(species)
 title = ''
 
-#runSeveralChangeNumSpec(command,runs,population,collRate,species)
+runSeveralChangeNumSpec(command,runs,population,collRate,species)
 #runtimes, ratios = analyzeRuntime(command,runs,numOfPoints,'runTemp.txt')
 #plotRuntimes(runtimes,ratios,title)
 filenames = ['runTemp.txt','pdmmodBalls.txt']
 
-plotSeveral(filenames)
+#plotSeveral(filenames)
 
 
 

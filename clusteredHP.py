@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import subprocess
 
 import result
 import hpClasses
@@ -31,7 +32,13 @@ class ClusteredResults(result.Result):
             
         return clustDict
     
+<<<<<<< HEAD
     def plotClustLenDots(self,minLength=None,maxLength=None,saveFig=False):
+=======
+    
+    
+    def plot2DClustLen(self,minLength=None,maxLength=None,saveFig=False):
+>>>>>>> 1bbce2d7d7ca9174dde4417a205c1df9913ffbf8
         '''plots sequences as dots of various shape
         lists outstanders.
         '''
@@ -90,9 +97,8 @@ class ClusteredResults(result.Result):
         if not saveFig:
             plt.show()
         else:
-            #plt.set_size__inches(12,16)
-            plt.suptitle(self.kin2str(), fontsize=20)
-            plt.savefig(self.writeGraphFilename())
+            plt.suptitle(self._kin2str(), fontsize=20)
+            plt.savefig(self._writeGraphFilename())
         return None
     
     
@@ -311,11 +317,16 @@ class SeqInClust(object):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 1
+    simNum = 9
     minL = 4
-    maxL = 25
-    cr = ClusteredResults(modelNum,simNum,minL,maxL)
-    cr.plotClustLen(20,25,False)
+    maxL = 21
+    cr = ClusteredResults(modelNum,simNum,minL,21)
+    subprocess.call(('mkdir',cr.outputDir+'figures/'))
+    cr.plotHPstats(saveFig=True)
+    cr.plot2DClustLen(4,9,True)
+    cr.plot2DClustLen(10,15,True)
+    cr.plot2DClustLen(16,21,True)
+    #cr.plot2DClustLen(22,25,True)
     
     
 

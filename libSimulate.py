@@ -6,15 +6,54 @@ from os import walk as walk
 import numpy as np
 import logging
 #import cProfile
-
+import math
+import time
 import subprocess
 import itertools
 
 from log_utils import init_log
 import routes
+#try:
+from parameters import correspond
+#except:
+#    correspond = {}
+
+def castType(typeName,string):
+    if typeName == 'int':
+        return int(string)
+    elif typeName == 'float':
+        return float(string)
+    elif typeName == 'bool':
+        return bool(string)
+
+def readSet(correspond):#TEST
+    '''
+    reads file with parameters and generates dict:
+    {param name:[list of values],
+        param name:[list of values]
+        etc}
+    '''
+    parameters = {} #init dict of parameters
+    #read which parameter correspond to which position in the
+    #file with parameters' values
+    for i in correspond.keys():
+        parameters[correspond[i][0]]=[]
+    pf = open('paramSet.txt','r')
+    count = 0
+    for line in pf:
+        if line[0]=='#':
+            continue
+        else:
+            raw = line.rstrip('\n').split(' ')
+            for i in range(len(raw)):
+                parameters[correspond[i][0]].append(
+                    castType(correspond[i][1],raw[i]))
+            count+=1
+    return parameters, count
+        
 
 class Simulation(object):
-    def __init__(self,modelNum,termCond,
+    def __init__(self,modelNum,termCond,rewrite,
                  numOfRuns=1,traj=False,log_level='WARNING'):
         '''
             modelNum: int
@@ -33,6 +72,7 @@ class Simulation(object):
         self.traj = traj
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
         self.log_level = log_level
+        self.outputDir, self.currRun = self.makeOutputFolder(rewrite)
         
     def __str__(self):
         str1 = ('Simulation of the model '+str(self.modelNum)+
@@ -88,21 +128,35 @@ class Simulation(object):
         outputDir = path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/'
         self.outputDir = outputDir
         self.log = init_log(self.log_level,log_path=outputDir+'sim.log')
-        return outputDir
+        return outputDir, currentRun
     
-    def runSeveralSeries(self,rewrite):
+    def _formCommand(self,trajNum,paramFile,populFile):
+        command = (self.path2Folder+'pdmmod',
+                    str(self.howTerm), 
+                    str(self.whenTerm), 
+                    str(self.records),
+                    self.outputDir+'traj'+str(trajNum),
+                    '-c',paramFile,
+                    '-i',populFile)
+        return command
+        
+    
+    def runSeveralSeries(self,paramFile=None,populFile=None):
         '''runs several simulations sequentially, 
         stores average, st.deviation and optionally trajectories
         '''
-        self.outputDir = self.makeOutputFolder(rewrite)
-        for i in range(numOfRuns):
-            command = (self.path2Folder+'pdmmod',
-                        str(self.howTerm), 
-                        str(self.whenTerm), 
-                        str(self.records),
-                        self.outputDir+'traj'+str(i))
+        if paramFile == None:
+            paramFile = self.path2Folder+'parameters.ini'
+        if populFile == None:
+            populFile = self.path2Folder+'populations.txt'
+        for trajNum in range(self.numOfRuns):
+            command = self._formCommand(trajNum,paramFile,populFile)
+            print(command)
             subprocess.call(command)
             self.log.info(str(command))
+            subprocess.call(("mv",
+                             self.path2Folder+"runtime.txt",
+                             self.outputDir+"timePerReac"+str(trajNum)))
             
         return None
     
@@ -247,17 +301,175 @@ class Simulation(object):
         fTimes.close()
         return None
     
+    def _writeRuntimesStats(self):
+        runtimes = []
+        files = [self.outputDir+'timePerReac'+str(i) 
+                 for i in range(self.numOfRuns)]
+        for f in files:
+            with open(f,'r') as cf:
+                runtimes.append(float(cf.read().rstrip('\n')))
+            cf.close()
+        mean = np.mean(runtimes)
+        std = np.std(runtimes)
+        with open(self.outputDir+'runtimeStat.txt','w') as wf:
+            wf.write(str(mean)+' '+str(std))
+        wf.close()
+        
+        return None
+    
+    def _delRuntimes(self):
+        files = [self.outputDir+'timePerReac'+str(i) 
+                 for i in range(self.numOfRuns)]
+        for f in files:
+            system('rm '+f)
+        return None
+        
+    
     def reorganizeOutput(self,outputDir=None):
         if outputDir == None:
             outputDir = self.outputDir
         self._makeHeader(outputDir)
         self._writeEvolutions(outputDir)
         self._writeTimes(outputDir)
+        self._writeRuntimesStats()
         if not self.traj:
             self._deleteTraj(outputDir)
+            self._delRuntimes()
         return None
     
+    def _makeShell(self,outputDir,kernelNum,pythonFile,onNode):
+        shell = self.outputDir+'shell'+str(kernelNum)
+        inFile = open(shell,'w')
+        inFile.close()
+        inFile = open(shell,'a')
+        inFile.write('#!/bin/bash\n')
+        inFile.write('#$ -S /bin/bash\n')
+        inFile.write('#$ -N simpdm'+str(kernelNum)+'\n')
+        inFile.write('#$ -cwd\n')
+        if onNode == 0:
+            inFile.write('#$ -q cpu_long\n')
+        else:
+            inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')
+        inFile.write('#$ -P kenprj\n')
+        inFile.write('\n')
+        inFile.write('cd '+self.path2Folder+'\n')
+        inFile.write(routes.path2python+' '+str(pythonFile)+'\n')
+        inFile.close()
+        
+        
+        return shell
     
+    def _writePython(self,outputDir,kernelNum,trajFirst,trajLast,
+                     paramFile,populFile):
+        pythonFile = self.outputDir+'run'+str(kernelNum)+'.py'
+        #system('echo "" > '+str(pythonFile))
+        inFile = open(pythonFile,'a')
+        inFile.write('#!'+routes.path2python+'\n')
+        inFile.write('import subprocess\n')
+        inFile.write('subprocess.call("pwd",)'+'\n')
+        #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
+        
+        for j in range(trajFirst,trajLast+1):
+            command = self._formCommand(j,paramFile,populFile)
+            #command = (self.path2Folder+'pdmmod',
+                        #str(self.howTerm), 
+                        #str(self.whenTerm), 
+                        #str(self.records),
+                        #self.outputDir+'traj'+str(j))
+            inFile.write('subprocess.call('+str(command)+')'+'\n')
+            inFile.write('subprocess.call(("mv","'+
+                            self.path2Folder+'runtime.txt","'+
+                            self.outputDir+"timePerReac"+str(j)+'"))'+'\n')
+            
+            
+        inFile.close()
+        return pythonFile
+    
+    def _addToQueue(self,outputDir,kernelNum,
+                    trajFirst,trajLast,
+                    jobsRun,onNode,
+                    paramFile,populFile):
+        pythonFile = self._writePython(
+            outputDir,kernelNum,trajFirst,trajLast,paramFile,populFile)
+        shell = self._makeShell(outputDir,kernelNum,pythonFile,onNode)
+        #system('cat '+pythonFile)
+        #system('cat '+shell)
+        print(str(shell))
+        p =subprocess.Popen(('qsub',shell),
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.PIPE)
+        out, err = p.communicate() 
+        self.log.info(out.decode())
+        self.log.warning(err.decode())
+        output = out.decode().split(' ')
+        print(output)
+        jobsRun.append(int(output[2]))
+            
+        return None
+    
+    def _wait(self,jobsRun):#FIXME termination condition
+        '''waits until all the simulations done running'''
+        def checkJobsOnClust():
+            p = subprocess.Popen('qstat', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = p.communicate()
+
+            lines = (out.decode().split('\n'))[2:]
+            jobsOnClust = []
+            for line in lines:
+                items =line.split(' ')
+                try:
+                    jobsOnClust.append(int(items[1]))
+                except:
+                    continue
+            return jobsOnClust
+        
+        def ifJobsDone(jobsOnClust,jobsRun):
+            jobsDoneList = []
+            for job in jobsRun:
+                if job in jobsOnClust:
+                    return False
+                else:
+                    jobsDoneList.append(job)
+            if set(jobsRun)==set(jobsDoneList):
+                return True
+            
+            
+        
+        jobsDone = False
+        while not jobsDone:
+            time.sleep(10)
+            jobsOnClust = checkJobsOnClust()
+            jobsDone = ifJobsDone(jobsOnClust,jobsRun)
+            
+        return None
+    
+    def runSeveralParallelCluster(self,kernels=None,onNode=0,
+                                  paramFile=None,populFile=None):
+        if paramFile == None:
+            paramFile = self.path2Folder+'parameters.ini'
+        if populFile == None:
+            populFile = self.path2Folder+'populations.txt'
+        jobsRun = []
+        if kernels == None:
+            kernels = self.numOfRuns
+        perKernel = int(math.ceil(self.numOfRuns/kernels))
+        lastKernel = self.numOfRuns - perKernel*(kernels-1)
+        
+        for i in range(kernels-1):
+            trajFirst = i*perKernel
+            trajLast = int((i+1)*perKernel - 1)
+            self.log.info('kernel'+str(i))
+            self._addToQueue(
+                self.outputDir,i,trajFirst,trajLast,jobsRun,onNode,
+                paramFile,populFile)
+        if kernels == 1:
+            i = -1
+            trajLast = -1
+        self.log.info('last kernel')
+        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode,paramFile,populFile)
+        self._wait(jobsRun)
+        self.log.warning('all simulation finished running. calculationg averages and stds')
+        return None
         
     
     def runSeveralParallelPC():#TODO
@@ -265,18 +477,111 @@ class Simulation(object):
         '''
         
         return None
+    
+    def writeParamIni(self,paramDict,whichRun):
+        paramFileName =self.outputDir+'parameters.ini'
+        paramFile = open(paramFileName,'w')
+        paramFile.close()
+        paramFile = open(self.outputDir+'parameters.ini','a')
+        paramFile.write('[kinetic model]\n')
+        print(paramDict)
+        lines = [key+' = '+str(paramDict[key][whichRun]) for key in paramDict.keys()]
+        for line in lines:
+            paramFile.write(line+'\n')
+        paramFile.close()
+        
+        return paramFileName
 
+class SimulationsSet(object):
+    '''reads parameters from file paramSpace.txt, forms parmeters.ini
+    creates Simulation with given parameters
+    ??
+    '''
+    def __init__(self,modelNum,termCond,
+                 numOfRuns=1,traj=False,log_level='WARNING'):
+        self.modelNum = modelNum
+        self.termCond = termCond
+        self.numOfRuns = numOfRuns
+        self.traj = traj
+        self.log_level = log_level
+        self.path2Folder = \
+            routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
+        
+        self.correspond = correspond
+        if self.correspond == {}:
+            print(subprocess.call('ls'))
+            raise ValueError('I need to have a parameters.py file'+
+                             'to read set of parameters')
+        
+    
+    def initParams(self,simulation):
+        return None
+    
+    
+    
+    def runSimsOnPC(self):#TEST
+        database = open(self.path2Folder+'database','a')
+        paramDict, runs = readSet(self.correspond)
+        for i in range(runs):
+            s = Simulation(self.modelNum,
+                           self.termCond,
+                           rewrite=False,
+                           numOfRuns=self.numOfRuns,
+                           traj=self.traj,
+                           log_level=self.log_level)
+            paramFile = s.writeParamIni(paramDict,i)
+            s.runSeveralSeries(paramFile,populFile=None)
+            s.reorganizeOutput()
+            database.write(str(s.currRun)+',,')
+            line = ''
+            for key in paramDict.keys():
+                line += str(paramDict[key][i])+' '
+            line = line.rstrip(' ')+'\n'
+            database.write(line)
+        database.close()
+        return None
+    
+    def runSimsOnCluster(self,kernels=None,onNode=0):#TEST
+        database = open(self.path2Folder+'database','a')
+        paramDict, runs = readSet(self.correspond)
+        for i in range(runs):
+            s = Simulation(self.modelNum,
+                           self.termCond,
+                           rewrite=False,
+                           numOfRuns=self.numOfRuns,
+                           traj=self.traj,
+                           log_level=self.log_level)
+            paramFile = s.writeParamIni(paramDict,i)
+            s.runSeveralParallelCluster(kernels,onNode,
+                                  paramFile,populFile=None)
+            s.reorganizeOutput()
+            database.write(str(s.currRun)+',,')
+            line = ''
+            for key in paramDict.keys():
+                line += str(paramDict[key][i])+' '
+            line = line.rstrip(' ')+'\n'
+            database.write(line)
+        database.close()
+        return None
+    
+        
+        
+
+#TESTING
 if __name__ == "__main__":
     modelNum = 12
-    termCond = ('simulateTime',100,1)
+    termCond = ('simulateTime',50,0.5)
     numOfRuns = 3
-    traj = True
+    traj = False
     rewrite = False
     log_level = 'INFO'
-    s = Simulation(modelNum,termCond,numOfRuns,traj,log_level)
-    s.runSeveralSeries(rewrite)
+    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+    s.runSeveralSeries()
+    ##s.runSeveralParallelCluster(kernels=3, onNode=0)
     s.reorganizeOutput()
-
+    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
+    #ss.runSimsOnCluster(3)
+    #ss.runSimsOnPC()
 
 
 

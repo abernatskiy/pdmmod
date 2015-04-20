@@ -310,18 +310,7 @@ class SeqInClust(object):
             
         return mark, markersize, col
 
-if __name__ == "__main__":
-    modelNum = 12
-    simNum = 9
-    minL = 4
-    maxL = 21
-    cr = ClusteredResults(modelNum,simNum,minL,21)
-    subprocess.call(('mkdir',cr.outputDir+'figures/'))
-    cr.plotHPstats(saveFig=True)
-    cr.plot2DClustLen(4,9,True)
-    cr.plot2DClustLen(10,15,True)
-    cr.plot2DClustLen(16,21,True)
-    #cr.plot2DClustLen(22,25,True)
+
     
     
 

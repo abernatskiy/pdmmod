@@ -169,7 +169,7 @@ class Result(object):
         return path
     
     def _plotTotalPop(self,fig,countAll):
-        fig.plot(self.times,countAll)
+        fig.plot(self.times,countAll,linewidth=4)
         fig.set_yscale('log')
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
@@ -177,9 +177,9 @@ class Result(object):
         return None
     
     def _plotTypes(self,fig,countFold,countCat,countAuto):
-        fig.plot(self.times,countFold,label='folded')
-        fig.plot(self.times,countCat,label='catalysts')
-        fig.plot(self.times,countAuto,label='autocats')
+        fig.plot(self.times,countFold,linewidth=4,label='folded')
+        fig.plot(self.times,countCat,linewidth=4,label='catalysts')
+        fig.plot(self.times,countAuto,linewidth=4,label='autocats')
         fig.legend()
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
@@ -187,7 +187,7 @@ class Result(object):
         return None
     
     def _plotLenDistr(self,fig,mL,lengths,lengthsDistr):
-        fig.plot(lengths,lengthsDistr,label=\
+        fig.plot(lengths,lengthsDistr,linewidth=4,label=\
             str(mL)+'/'+str(len(self.means.keys())))
         fig.grid(True)
         fig.set_yscale('log')
@@ -401,7 +401,7 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 3
+    simNum = 0
     r = Result(modelNum,simNum)
     r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)

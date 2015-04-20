@@ -13,10 +13,7 @@ import itertools
 
 from log_utils import init_log
 import routes
-#try:
-from parameters import correspond
-#except:
-#    correspond = {}
+
 
 def castType(typeName,string):
     if typeName == 'int':
@@ -497,7 +494,7 @@ class SimulationsSet(object):
     creates Simulation with given parameters
     ??
     '''
-    def __init__(self,modelNum,termCond,
+    def __init__(self,modelNum,termCond,correspond,
                  numOfRuns=1,traj=False,log_level='WARNING'):
         self.modelNum = modelNum
         self.termCond = termCond
@@ -567,21 +564,7 @@ class SimulationsSet(object):
         
         
 
-#TESTING
-if __name__ == "__main__":
-    modelNum = 12
-    termCond = ('simulateTime',50,0.5)
-    numOfRuns = 3
-    traj = False
-    rewrite = False
-    log_level = 'INFO'
-    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
-    s.runSeveralSeries()
-    ##s.runSeveralParallelCluster(kernels=3, onNode=0)
-    s.reorganizeOutput()
-    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
-    #ss.runSimsOnCluster(3)
-    #ss.runSimsOnPC()
+
 
 
 

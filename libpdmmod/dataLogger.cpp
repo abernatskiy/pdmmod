@@ -64,13 +64,13 @@ void DataLogger::makeHeader(int argc, char** argv){
 
 bool DataLogger::makeRecords(){
     float curtime = m_tp->m_t;
-    if(m_type == 0){
+    if(m_type == 0){ // simulateTime
         if(m_totalTime == 0.0){
             std::cout << "Total simulation time is 0 - output not implemented" << std::endl;
             return false;
         }
         else{
-            if(m_timeStep == 0.0){
+            if(m_timeStep == 0.0){ // Timestep is 0 - we're recording state at every reaction
                 if(curtime > m_totalTime)
                     return false;
                 else{
@@ -79,7 +79,7 @@ bool DataLogger::makeRecords(){
                     return curtime < m_totalTime;
                 }
             }
-            else{
+            else{ // We're making time-periodic records
                 int numRecords = 1;
                 while( m_timeStep*((float) m_i) >= m_prevTime && m_timeStep*((float) m_i) < curtime ){
                     if(numRecords > 1)
@@ -96,7 +96,7 @@ bool DataLogger::makeRecords(){
             }
         }
     }
-    else if(m_type == 1){
+    else if(m_type == 1){ // simulateReactions
         if( m_i % m_recPeriod == 0 ){
             memorizePopulations();
             makeRecord(curtime);

@@ -6,7 +6,7 @@ import clusteredHP
 
 
 modelNum = 12
-for i in range(4,5):
+for i in range(9,10):
     simNum = i
     minL = 4
     maxL = 25

@@ -15,7 +15,7 @@ numOfRuns = 3
 traj = False
 rewrite = False
 log_level = 'INFO'
-#s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
+#s = Simulation(modelNum,termCond,rewrite,None,numOfRuns,traj,log_level)
 #s.runSeveralSeries()
 ##s.runSeveralParallelCluster(kernels=3, onNode=0)
 #s.reorganizeOutput()

@@ -286,11 +286,13 @@ def plotSeveral(filenames):#TODO
             ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D',color = col)
             ax0.plot(lines[0],lines[1],
                      label='y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1],
+                     linewidth=2,
                      color = col)
         else:
             ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',color = col)
             ax0.plot(lines[0],lines[2],
                      label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2],
+                     linewidth=2,
                      color = col)
         #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
         for i in range(len(data[1])):
@@ -325,9 +327,7 @@ species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
          4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
 #runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
-#filenames = ['collPartSpecTypes-c2.txt',
-                #'collPartSpecTypesDel-c0.txt',
-                #'collPartSpecTypes-stochkit-c0.txt']
+#filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
+filenames = ['collPartSpecTypesDel-c0.txt']
 plotSeveral(filenames)
 

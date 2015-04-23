@@ -1,4 +1,19 @@
 #!/usr/bin/python
+import os
+import random
+import sys
+sys.path.append('../')
+
+import libSimulate
+
+def countWeight(points):
+    weight = 0
+    for (seq, pop) in points.items():
+        if not seq[0] =='f':
+            weight+=len(seq)*pop
+        else:
+            weight+=(len(seq)-1)*pop
+    return weight
 
 class Vesicle(object):
     '''class representing a vesicle containing some sequences
@@ -8,83 +23,62 @@ class Vesicle(object):
         its daughter is generation 1, ect
      * sequences - Dict. - {sequnce name: sequnce population}#TODO SeqInClust??
      * modelNum - Int. - model, which governs chemistry in the vesicle
+     * path - String. - containing folder.
     '''
-    #__slots__ = ['population','generation','matureWeight']
-    def __init__(self,sequences, generation,matureWeight,modelNum,path):
-        self.sequences=sequences
+    def __init__(self,generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path):
+        self.idInGen = idInGen
+        self.sequencesAtBirth = sequences
+        self.motherIdInGen = motherIdInGen
         self.generation=generation
         self.matureWeight=matureWeight
         self.modelNum = modelNum
         self.path = path
+        self.outPath=os.path.join(self.path,str("%04d" %self.generation))
+        self.initFile = self._getInitPopFile()
         
     def __str__(self):
         str1='Vesicle '+str(self.generation)+' of mature weight '+\
-            str(self.matureWeight)+\
-                ' with '+str(len(self.sequences.keys()))+' sequeneces'
+            str(self.matureWeight)
         return str1
     
     def __repr__(self):
         str1='Vesicle '+str(self.generation)
         return str1
 
-    def storeCell(self,dictOfCells):#TODO
-        '''adds a cell into a dictionary, which contains all possible cells
-        '''
-        if self.population in dictOfCells:
-            dictOfCells[self.population]+=1
-        else:
-            dictOfCells[self.population]=1
+
+    def _getInitPopFile(self):#TEST
+        populFile = os.path.join(
+            self.path,str("%04d" %self.generation),'initPop'+str("%05d" %self.idInGen))
+        return populFile
     
-        return dictOfCells
-    
-    
-    def storeInitPop(self):#TODO
-        f=open(routes.routeCellsTmp+"%03d" % self.origTraj+'_'+str(self.generation)+'.txt',"wb")
-        str1=''
-        for item in self.population:
-            str1+=str(item)+' '
-        str1=str1.rstrip(' ')
-        f.write(bytes(str1, 'UTF-8'))
-        f.close()
-        return routes.routeCellsTmp+"%03d" % self.origTraj+'_'+str(self.generation)+'.txt'
-    
-    def writePython(self,maxLength,kinetics,simParams,typeOfSim,procNumber):#TODO
-        pyFile=routes.routeCells+'tmp/'+"%03d" % self.origTraj+'_'+str(self.generation)+'.py'
-        pathToXml=routes.routeCells+'simulations/'+"%03d" % self.origTraj+'_'+str(self.generation)+'.xml'
-        pyF=open(pyFile,'w')
-        pyF.write('#! /usr/bin/python2\n')
-        pyF.write('\n')
-        pyF.write('import sys\n')
-        pyF.write('import pickle\n')
-        pyF.write('sys.path.append(\'../\')\n')
-        pyF.write('sys.path.append(\'../../\')\n')
-        pyF.write('import routes\n')
-        pyF.write('sys.path.append'+'('+'routes.routeHP'+')\n')
-        pyF.write('import '+str(typeOfSim)+'\n')
-        #pyF.write('dreload('+str(typeOfSim)+')\n')
-        pyF.write('from nativeChain import *\n')
-        pyF.write('maxLength='+str(maxLength)+'\n')
-        pyF.write('kinetics='+str(kinetics)+'\n')
-        pyF.write('simParams='+str(simParams)+'\n')
-        pyF.write('directOrTau=\'direct\''+'\n')
-        pyF.write('procNumber='+str(procNumber)+'\n')
-        pyF.write('keepTraj=False'+'\n')
-        pyF.write('nativeList=pickle.load(open(\"'+routes.route+'nativeList\"+str(maxLength)+\".p\",\"rb\"))')
-        pyF.write('\n')
-        pyF.write('model='+str(typeOfSim)+'.Mod'+str(typeOfSim)[0].upper()+str(typeOfSim)[1:]+\
-            '(maxLength,kinetics,nativeList,True)\n')
-        pyF.write('sim='+str(typeOfSim)+'.Sim'+str(typeOfSim)[0].upper()+str(typeOfSim)[1:]+\
-            '(model,simParams,directOrTau,procNumber)\n')
-        pyF.write('ipFile=open(routes.routeCellsTmp+\''+"%03d" % self.origTraj+'_'+str(self.generation)+'.txt\',\"r\")\n')
-        pyF.write('initPopList=(ipFile.readline().rstrip(\' \')).split(\' \')\n')
-        pyF.write('for i in range(len(initPopList)):\n')
-        pyF.write('    initPopList[i]=int(initPopList[i])\n')
-        pyF.write('sim.writeFile(\"'+pathToXml+'\",initPopList)\n')
-        pyF.close()
-                
-                
-        return pyFile, pathToXml
-    
+    def _findMature(self):
+        def line2Data(raw):
+            points = {}
+            for item in raw[1:len(raw)-1]:
+                #get a couple specie -- its population
+                point=item.split(' ')
+                points[point[0]]=int(point[1])
+            return points
+        
+        simRes = open(os.path.join(self.outPath,'traj0'),'r')
+        growth = open(os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen)),'a')
+        for line in simRes:
+            if line[0]=="#":
+                continue
+            else:
+                growth.write(line)
+                raw = (line.rstrip('\n')).split(',')
+                points = line2Data(raw)
+                weight = countWeight(points)
+                #print(weight)
+                if weight>=self.matureWeight:
+                    timeMature = float(raw[0])
+                    break
+        simRes.close()
+        growth.close()
+        return timeMature,points
+        
+        
 
     def growCell(self,termTime,timeStep):#TODO
         '''
@@ -98,14 +92,46 @@ class Vesicle(object):
                 self.modelNum,
                 termCond=('simulateTime',termTime,timeStep),
                 rewrite=False,
-                specialPath=self.path,
+                specialPath = self.outPath,
                 numOfRuns=1,
                 traj=True,
-                log_level='INFO')
-        populationFile = self.makeInitPopFile()
-        sDef.runSeveralSeries(paramFile=None,populFile=populationFile)
+                log_level='WARNING')
+        sDef.runSeveralSeries(paramFile=None,populFile=self.initFile)
+        timeMature, sequencesAtSplit = self._findMature()#TEST
+        return sequencesAtSplit
         
-        return None
+        
+    def splitCell(self,sequencesAtSplit):
+        daughter1=Vesicle(
+            self.generation+1,
+            {},
+            self.idInGen*2,
+            idInGen,
+            self.matureWeight,
+            self.modelNum,
+            path)
+        daughter2=Vesicle(
+            self.generation+1,
+            {},
+            self.idInGen*2+1,
+            idInGen,
+            self.matureWeight,
+            self.modelNum,
+            path)
+        megaList = []
+        for (seq, pop) in sequencesAtSplit.items():
+            megaList+=[seq]*pop
+        random.shuffle(megaList)
+        list1=megaList[:int(len(megaList)/2)]
+        list2=megaList[int(len(megaList)/2):]
+        for item in list1:
+            daughter1.sequencesAtBirth[item]=list1.count(item)
+        for item in list2:
+            daughter2.sequencesAtBirth[item]=list2.count(item)
+        print('d1 weight: '+str(countWeight(daughter1.sequencesAtBirth)))
+        print('d2 weight: '+str(countWeight(daughter2.sequencesAtBirth)))
+        
+        return daughter1, daughter2
     
     def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):#TEST
         '''
@@ -115,7 +141,24 @@ class Vesicle(object):
         while currGeneration < numOfGenerations:
             nextGen = []
             for vesicle in vesicles:
-                daughter1, daughter2 = self.growCell(termTime,timeStep)
+                self.sequencesAtSplit = self.growCell(termTime,timeStep)#TEST
+                daughter1, daughter2 = self.splitCell(self.sequencesAtSplit)
+                return daughter1, daughter2
+                try:
+                    os.makedirs(daughter1.outPath)
+                except FileExistsError:
+                    print('dir exists')
+                #os.makedirs(daughter2.outPath)
+                init1 = open(daughter1._getInitPopFile(),'a')
+                init2 = open(daughter2._getInitPopFile(),'a')
+                for (seq, pop) in daughter1.sequencesAtBirth.items():
+                    init1.write(seq+' '+str(pop)+'\n')
+                init1.close()
+                for (seq, pop) in daughter2.sequencesAtBirth.items():
+                    init2.write(seq+' '+str(pop)+'\n')
+                init2.close()
+                
+                
                 nextGen.append(daughter1)
                 if keepAll:
                     nextGen.append(daughter2)
@@ -125,12 +168,15 @@ class Vesicle(object):
         return vesicles
     
 if __name__ == "__main__":     
-    sequences = {'a': 1}
+    idInGen =0
+    sequences={'H':50,'P':50}
+    motherIdInGen = 0
     generation = 0
-    matureWeight = 10
+    matureWeight = 150
     modelNum = 12
     path = './'
-    v = Vesicle(sequences, generation,matureWeight,modelNum,path)
-    print(v)
-    
+    v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
+    d1, d2 = v.growAndSplit(5,0.5,2,True)
+    #sequencesAtSplit = v.growCell(7,0.5)
+    #d1, d2 = v.splitCell(sequencesAtSplit) 
     

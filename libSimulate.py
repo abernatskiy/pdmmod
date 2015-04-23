@@ -96,7 +96,7 @@ class Simulation(object):
             raise ValueError("Unknown termination condition, check if typo")
     
     def makeOutputFolder(self,rewrite,specialPath):#seems to be working OK
-        if not specialPath == None:
+        if specialPath == None:
             path = str(routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/')
             if rewrite:
                 system('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
@@ -133,6 +133,7 @@ class Simulation(object):
             outputDir=specialPath
             if not os.path.exists(outputDir):
                 os.makedirs(outputDir)
+            self.log = init_log(self.log_level,log_path=os.path.join(outputDir,'sim.log'))
         return outputDir
     
     def _formCommand(self,trajNum,paramFile,populFile):
@@ -140,7 +141,7 @@ class Simulation(object):
                     str(self.howTerm), 
                     str(self.whenTerm), 
                     str(self.records),
-                    self.outputDir+'traj'+str(trajNum),
+                    os.path.join(self.outputDir,'traj'+str(trajNum)),
                     '-c',paramFile,
                     '-i',populFile)
         return command

@@ -2,22 +2,52 @@
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
 <model id="model01" name="model">
     <listOfCompartments>
-        <compartment id="compartment_0000001" name="default" size="1" units="volume"/>
+        <compartment id="compartment_1" name="default" size="1" units="volume"/>
     </listOfCompartments>
     <listOfSpecies>
-        <species compartment="compartment_0000001" id="species_0000001" initialAmount="1000" name="A"/>
+        <species compartment="compartment_1" id="species_01" constant="true" initialAmount="10" name="A"/>
+        <species compartment="compartment_1" id="species_02" initialAmount="5" name="B"/>
+        <species compartment="compartment_1" id="species_03" initialAmount="5" name="C"/>
+        <species compartment="compartment_1" id="species_04" initialAmount="5" name="D"/>
     </listOfSpecies>
+    <listOfParameters>
+        <parameter id="kd" name="kd" units="rate" value="0.05"/>
+    </listOfParameters>
     <listOfReactions>
-        <reaction id="reaction_0000001" name="Dimerization" reversible="false">
+        <reaction id="reaction_01" name="Decay" reversible="false">
             <listOfReactants>
-                <speciesReference name="A" species="species_0000001" stoichiometry="1"/>
+                <speciesReference name="A" species="species_01" stoichiometry="1"/>
+                <speciesReference name="B" species="species_02" stoichiometry="1"/>
             </listOfReactants>
+            <listOfProducts>
+                <speciesReference name="A" species="species_01" stoichiometry="1"/>
+                <speciesReference name="B" species="species_02" stoichiometry="1"/>
+            </listOfProducts>
             <kineticLaw>
                 <math xmlns="http://www.w3.org/1998/Math/MathML">
                     <apply>
                         <times/>
+                        <ci>kd</ci>
                         <cn type="real">1.0</cn>
-                        <cn type="real">0.2</cn>
+                    </apply>
+                </math>
+            </kineticLaw>
+        </reaction>
+        <reaction id="reaction_02" name="Decay" reversible="false">
+            <listOfReactants>
+                <speciesReference name="B" species="species_02" stoichiometry="1"/>
+                <speciesReference name="D" species="species_04" stoichiometry="1"/>
+            </listOfReactants>
+            <listOfProducts>
+                <speciesReference name="B" species="species_02" stoichiometry="1"/>
+                <speciesReference name="D" species="species_04" stoichiometry="1"/>
+            </listOfProducts>
+            <kineticLaw>
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <apply>
+                        <times/>
+                        <ci>kd</ci>
+                        <cn type="real">2.0</cn>
                     </apply>
                 </math>
             </kineticLaw>

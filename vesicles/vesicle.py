@@ -61,6 +61,8 @@ class Vesicle(object):
             return points
         
         simRes = open(os.path.join(self.outPath,'traj0'),'r')
+        growth = open(os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen)),'w')
+        growth.close()
         growth = open(os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen)),'a')
         for line in simRes:
             if line[0]=="#":
@@ -141,22 +143,29 @@ class Vesicle(object):
         while currGeneration < numOfGenerations:
             nextGen = []
             for vesicle in vesicles:
-                self.sequencesAtSplit = self.growCell(termTime,timeStep)#TEST
-                daughter1, daughter2 = self.splitCell(self.sequencesAtSplit)
-                return daughter1, daughter2
+                vesicle.sequencesAtSplit = vesicle.growCell(termTime,timeStep)#TEST
+                daughter1, daughter2 = vesicle.splitCell(vesicle.sequencesAtSplit)
+                #return daughter1, daughter2
                 try:
                     os.makedirs(daughter1.outPath)
                 except FileExistsError:
                     print('dir exists')
                 #os.makedirs(daughter2.outPath)
-                init1 = open(daughter1._getInitPopFile(),'a')
-                init2 = open(daughter2._getInitPopFile(),'a')
+                init1 = open(daughter1.initFile,'w')
+                init1.close()
+                init1 = open(daughter1.initFile,'a')
                 for (seq, pop) in daughter1.sequencesAtBirth.items():
                     init1.write(seq+' '+str(pop)+'\n')
                 init1.close()
-                for (seq, pop) in daughter2.sequencesAtBirth.items():
-                    init2.write(seq+' '+str(pop)+'\n')
-                init2.close()
+                
+                if keepAll:
+                    init2 = open(daughter2.initFile,'w')
+                    init2.close()
+                    init2 = open(daughter2.initFile,'a')
+                
+                    for (seq, pop) in daughter2.sequencesAtBirth.items():
+                        init2.write(seq+' '+str(pop)+'\n')
+                    init2.close()
                 
                 
                 nextGen.append(daughter1)
@@ -164,19 +173,21 @@ class Vesicle(object):
                     nextGen.append(daughter2)
             vesicles = nextGen
             currGeneration+=1
+            
         
         return vesicles
     
 if __name__ == "__main__":     
     idInGen =0
-    sequences={'H':50,'P':50}
+    sequences={'H':20,'P':20}
     motherIdInGen = 0
     generation = 0
-    matureWeight = 150
+    matureWeight = 300
     modelNum = 12
     path = './'
+    termTime = 5
+    timeStep = 0.5
+    numOfGenerations = 3
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
-    d1, d2 = v.growAndSplit(5,0.5,2,True)
-    #sequencesAtSplit = v.growCell(7,0.5)
-    #d1, d2 = v.splitCell(sequencesAtSplit) 
+    vs = v.growAndSplit(termTime,timeStep,numOfGenerations,True)
     

@@ -119,7 +119,7 @@ class ClusteredResults(result.Result):
         else:
             plt.title('Fraction of mass in the top '+str(topN)+' sequences'+'\n'+self._kin2str(), fontsize=20)
             plt.savefig(self._writeGraphFilename())
-        return None
+        return x, y
     
     
         

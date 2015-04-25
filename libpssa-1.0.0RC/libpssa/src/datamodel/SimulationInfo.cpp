@@ -163,8 +163,8 @@ namespace pssalib
 			if(dTimeStart > 0.0)
 				dTimeCheckpoint = dTimeStart - dTimeStep;
 #ifdef __linux__
-//			clock_gettime(CLOCK_MONOTONIC, &trialStart);
-			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &trialStart);
+//			clock_gettime(CLOCK_MONOTONIC, &trialStart); //TOXA
+			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &trialStart); //TOXA
 #elif defined(__MACH__)
 			trialStart = mach_absolute_time();
 #elif defined(_WIN32)
@@ -177,8 +177,8 @@ namespace pssalib
 		{
 #ifdef __linux__
 			// get hi res time
-//			clock_gettime(CLOCK_MONOTONIC, &trialEnd);
-			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &trialEnd);
+//			clock_gettime(CLOCK_MONOTONIC, &trialEnd); //TOXA
+			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &trialEnd); //TOXA
 #elif defined(__MACH__)
 			// Get absolute time
 			trialEnd = mach_absolute_time();

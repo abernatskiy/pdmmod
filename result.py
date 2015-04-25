@@ -5,8 +5,6 @@
 
 #specPop -- {name: [populations during time steps]}
 import matplotlib.pyplot as plt
-from statistics import mean
-from statistics import variance
 from collections import OrderedDict
 from os import system as system
 import numpy as np
@@ -171,7 +169,7 @@ class Result(object):
         return path
     
     def _plotTotalPop(self,fig,countAll):
-        fig.plot(self.times,countAll)
+        fig.plot(self.times,countAll,linewidth=4)
         fig.set_yscale('log')
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
@@ -179,9 +177,9 @@ class Result(object):
         return None
     
     def _plotTypes(self,fig,countFold,countCat,countAuto):
-        fig.plot(self.times,countFold,label='folded')
-        fig.plot(self.times,countCat,label='catalysts')
-        fig.plot(self.times,countAuto,label='autocats')
+        fig.plot(self.times,countFold,linewidth=4,label='folded')
+        fig.plot(self.times,countCat,linewidth=4,label='catalysts')
+        fig.plot(self.times,countAuto,linewidth=4,label='autocats')
         fig.legend()
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
@@ -189,7 +187,7 @@ class Result(object):
         return None
     
     def _plotLenDistr(self,fig,mL,lengths,lengthsDistr):
-        fig.plot(lengths,lengthsDistr,label=\
+        fig.plot(lengths,lengthsDistr,linewidth=4,label=\
             str(mL)+'/'+str(len(self.means.keys())))
         fig.grid(True)
         fig.set_yscale('log')
@@ -198,16 +196,17 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def plotHPstats(self,jointData=None,saveFig=False):
+    def plotHPstats(self,jointData=None,saveFig=False,nonSteadyPercent=0.9):
         maxLength = int(self.parameters['maxLength'])
         countAll, countFold, countCat, countAuto, lengths = \
             self.makeStats()
         if jointData == None:
             try:
                 jointData = self.jointData
-                type(self.jointData)
+                self.jointData.keys()
             except:
-                self.jointData=self.makeDictOfLengths(maxLength)
+                self.jointData=self.makeDictOfLengths(maxLength,nonSteadyPercent)
+                jointData=self.jointData
         
             
         mL=max(lengths)
@@ -250,7 +249,7 @@ class Result(object):
         steady={}
         for seq in self.means.keys():
             points=self.means[seq][border:]
-            steady[seq]=mean(points)
+            steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
             sorted(steady.items(), key=lambda t: t[1],reverse=True)
@@ -263,7 +262,7 @@ class Result(object):
         steady={}
         for seq in self.stds.keys():
             points=self.stds[seq][border:]
-            steady[seq]=mean(points)
+            steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
             sorted(steady.items(), key=lambda t: t[1],reverse=True)
@@ -271,7 +270,7 @@ class Result(object):
         
         return steadySorted
     
-    def makeDictOfLengths(self,maxLength,nonSteadyPercent=0.9):
+    def makeDictOfLengths(self,maxLength,nonSteadyPercent):
         '''returns dictionary of ordereder dictionaries
         {length: OrderedDict{seq: float}}
         '''
@@ -287,7 +286,8 @@ class Result(object):
                 sLen=len(seq)
             else:
                 sLen=len(seq)-1
-            steadyLen[sLen][seq]=(steadyMean[seq],steadyStd[seq])
+            if not (steadyMean[seq],steadyStd[seq])==(0.0,0.0):
+                steadyLen[sLen][seq]=(steadyMean[seq],steadyStd[seq])
         
         for length in steadyLen.keys():
             tmp = OrderedDict(
@@ -298,7 +298,7 @@ class Result(object):
         return steadyLen
     
     def clustLengths(self,minLength,maxLength,
-                     nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):#TEST
+                     nonSteadyPercent,samp=None,epsilonModifyer={0:0}):#TEST
         ''' returns dict jointLabels'''
         if self.numOfRuns == 1:
             raise ValueError('I cannot cluster data from 1 simulation:'+
@@ -306,7 +306,7 @@ class Result(object):
         try:
             type(self.jointData)
         except:
-            self.jointData=self.makeDictOfLengths(maxLength)
+            self.jointData=self.makeDictOfLengths(maxLength,nonSteadyPercent)
         jointLabels={}
         _labels={}
         labels={}
@@ -401,8 +401,8 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 
 if __name__ == "__main__":
-    modelNum = 12
-    simNum = 3
+    modelNum = 13
+    simNum = 0
     r = Result(modelNum,simNum)
     r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)

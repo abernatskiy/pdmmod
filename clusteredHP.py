@@ -15,7 +15,7 @@ class ClusteredResults(result.Result):
         self.maxLength=maxLength
         self.natData = hpClasses.readNativeList(self.maxLength)
         self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
-                     nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0})
+                     nonSteadyPercent,samp,epsilonModifyer)
                     #labels for each length
         self.clustDict=self.makeClustDict()
     
@@ -96,6 +96,31 @@ class ClusteredResults(result.Result):
             plt.savefig(self._writeGraphFilename())
         return None
     
+    def bioMassDistr(self,minLen,topN,saveFig):
+        plt.clf()
+        lenMass ={}
+        topMass={}
+        n=topN
+        for length in self.jointData:
+            if length >= minLen:
+                lenMass[length]=sum([item[0] for item in self.jointData[length].values()])
+                topMass[length]=sum(sorted([item[0] for item in self.jointData[length].values()])[-n:])
+        y=[]
+        x=[]
+        for i in topMass.keys():
+            x.append(i)
+            y.append(topMass[i]/lenMass[i])
+        fig = plt.figure(figsize=(18,14))
+        plt.plot(x,y,linewidth=4)
+        plt.xlabel('length')
+        plt.ylabel('fraction of mass')
+        if not saveFig:
+            plt.show()
+        else:
+            plt.title('Fraction of mass in the top '+str(topN)+' sequences'+'\n'+self._kin2str(), fontsize=20)
+            plt.savefig(self._writeGraphFilename())
+        return None
+    
     
         
 class Clusters(object):
@@ -151,6 +176,19 @@ class Clusters(object):
         else:
             absMax=self.maxClustered
         return absMax
+    
+    def statsOfClust(self,median=False):
+        if not median:
+            med = (self.maxClustered+self.minClustered)/2.0
+            return self.minClustered, med, self.maxClustered
+        else:#FIXME
+            raise NotImplementedError
+    
+    def statsOfOuts(self):
+        pops=[seq.meanPop for seq in self.outstanders]
+        med = np.median(pops)
+        return min(pops), med, max(pops)
+        
     
     #def genSurfaceOfOutst(self,nativeList):#!!!interesting!!!
         #'''Clusters, List -> Dict
@@ -310,18 +348,7 @@ class SeqInClust(object):
             
         return mark, markersize, col
 
-if __name__ == "__main__":
-    modelNum = 12
-    simNum = 9
-    minL = 4
-    maxL = 21
-    cr = ClusteredResults(modelNum,simNum,minL,21)
-    subprocess.call(('mkdir',cr.outputDir+'figures/'))
-    cr.plotHPstats(saveFig=True)
-    cr.plot2DClustLen(4,9,True)
-    cr.plot2DClustLen(10,15,True)
-    cr.plot2DClustLen(16,21,True)
-    #cr.plot2DClustLen(22,25,True)
+
     
     
 

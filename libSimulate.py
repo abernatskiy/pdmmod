@@ -3,6 +3,7 @@
 '''
 from os import system as system
 from os import walk as walk
+import os
 import numpy as np
 import logging
 #import cProfile
@@ -13,10 +14,7 @@ import itertools
 
 from log_utils import init_log
 import routes
-#try:
-from parameters import correspond
-#except:
-#    correspond = {}
+
 
 def castType(typeName,string):
     if typeName == 'int':
@@ -53,7 +51,7 @@ def readSet(correspond):#TEST
         
 
 class Simulation(object):
-    def __init__(self,modelNum,termCond,rewrite,
+    def __init__(self,modelNum,termCond,rewrite,specialPath=None,
                  numOfRuns=1,traj=False,log_level='WARNING'):
         '''
             modelNum: int
@@ -72,7 +70,7 @@ class Simulation(object):
         self.traj = traj
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
         self.log_level = log_level
-        self.outputDir, self.currRun = self.makeOutputFolder(rewrite)
+        self.outputDir = self.makeOutputFolder(rewrite,specialPath)
         
     def __str__(self):
         str1 = ('Simulation of the model '+str(self.modelNum)+
@@ -97,45 +95,53 @@ class Simulation(object):
         else:
             raise ValueError("Unknown termination condition, check if typo")
     
-    def makeOutputFolder(self,rewrite):#seems to be working OK
-        path = str(routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/')
-        if rewrite:
-            system('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
-            system('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
-            #print('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
-            #print('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
-            currentRun = 0
-        else:
-            dirs=(next(walk(path))[1])
-            print(dirs)
-            nums = []
-            for directory in dirs:
-                if '_output' in directory:
-                    tmp = directory.replace(str("%03d" %self.modelNum)+'_output','')
-                    if tmp == '':
-                        nums.append(0)
-                    else:
-                        nums.append(int(tmp))
-            if nums ==[]:
+    def makeOutputFolder(self,rewrite,specialPath):#seems to be working OK
+        if specialPath == None:
+            path = str(routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/')
+            if rewrite:
+                system('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
+                system('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
+                #print('rm -r '+path+str("%03d" %self.modelNum)+'_output*')
+                #print('mkdir '+path+str("%03d" %self.modelNum)+'_output0/')
                 currentRun = 0
             else:
-                currentRun = max(nums)+1
-            system('mkdir '+path+str("%03d" %self.modelNum)+
-                   '_output'+str(currentRun)+'/')
-            #print('mkdir '+path+str("%03d" %self.modelNum)+
-            #      '_output'+str(currentRun)+'/')
-        
-        outputDir = path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/'
-        self.outputDir = outputDir
-        self.log = init_log(self.log_level,log_path=outputDir+'sim.log')
-        return outputDir, currentRun
+                dirs=(next(walk(path))[1])
+                print(dirs)
+                nums = []
+                for directory in dirs:
+                    if '_output' in directory:
+                        tmp = directory.replace(str("%03d" %self.modelNum)+'_output','')
+                        if tmp == '':
+                            nums.append(0)
+                        else:
+                            nums.append(int(tmp))
+                if nums ==[]:
+                    currentRun = 0
+                else:
+                    currentRun = max(nums)+1
+                #os.makedirs(...)FIXME cross platform
+                system('mkdir '+path+str("%03d" %self.modelNum)+
+                    '_output'+str(currentRun)+'/')
+                #print('mkdir '+path+str("%03d" %self.modelNum)+
+                #      '_output'+str(currentRun)+'/')
+            
+            #FIXME cross platform
+            outputDir = path+str("%03d" %self.modelNum)+'_output'+str(currentRun)+'/'
+            self.outputDir = outputDir
+            self.log = init_log(self.log_level,log_path=outputDir+'sim.log')
+        else:
+            outputDir=specialPath
+            if not os.path.exists(outputDir):
+                os.makedirs(outputDir)
+            self.log = init_log(self.log_level,log_path=os.path.join(outputDir,'sim.log'))
+        return outputDir
     
     def _formCommand(self,trajNum,paramFile,populFile):
         command = (self.path2Folder+'pdmmod',
                     str(self.howTerm), 
                     str(self.whenTerm), 
                     str(self.records),
-                    self.outputDir+'traj'+str(trajNum),
+                    os.path.join(self.outputDir,'traj'+str(trajNum)),
                     '-c',paramFile,
                     '-i',populFile)
         return command
@@ -497,7 +503,7 @@ class SimulationsSet(object):
     creates Simulation with given parameters
     ??
     '''
-    def __init__(self,modelNum,termCond,
+    def __init__(self,modelNum,termCond,correspond,
                  numOfRuns=1,traj=False,log_level='WARNING'):
         self.modelNum = modelNum
         self.termCond = termCond
@@ -520,7 +526,7 @@ class SimulationsSet(object):
     
     
     def runSimsOnPC(self):#TEST
-        database = open(self.path2Folder+'database','a')
+        #database = open(self.path2Folder+'database','a')
         paramDict, runs = readSet(self.correspond)
         for i in range(runs):
             s = Simulation(self.modelNum,
@@ -532,17 +538,17 @@ class SimulationsSet(object):
             paramFile = s.writeParamIni(paramDict,i)
             s.runSeveralSeries(paramFile,populFile=None)
             s.reorganizeOutput()
-            database.write(str(s.currRun)+',,')
+            #database.write(str(s.currRun)+',,')
             line = ''
             for key in paramDict.keys():
                 line += str(paramDict[key][i])+' '
             line = line.rstrip(' ')+'\n'
-            database.write(line)
-        database.close()
+            #database.write(line)
+        #database.close()
         return None
     
     def runSimsOnCluster(self,kernels=None,onNode=0):#TEST
-        database = open(self.path2Folder+'database','a')
+        #database = open(self.path2Folder+'database','a')
         paramDict, runs = readSet(self.correspond)
         for i in range(runs):
             s = Simulation(self.modelNum,
@@ -555,33 +561,19 @@ class SimulationsSet(object):
             s.runSeveralParallelCluster(kernels,onNode,
                                   paramFile,populFile=None)
             s.reorganizeOutput()
-            database.write(str(s.currRun)+',,')
+            #database.write(str(s.currRun)+',,')
             line = ''
             for key in paramDict.keys():
                 line += str(paramDict[key][i])+' '
             line = line.rstrip(' ')+'\n'
-            database.write(line)
-        database.close()
+            #database.write(line)
+        #database.close()
         return None
     
         
         
 
-#TESTING
-if __name__ == "__main__":
-    modelNum = 12
-    termCond = ('simulateTime',50,0.5)
-    numOfRuns = 3
-    traj = False
-    rewrite = False
-    log_level = 'INFO'
-    s = Simulation(modelNum,termCond,rewrite,numOfRuns,traj,log_level)
-    s.runSeveralSeries()
-    ##s.runSeveralParallelCluster(kernels=3, onNode=0)
-    s.reorganizeOutput()
-    #ss = SimulationsSet(modelNum,termCond,numOfRuns,traj,log_level)
-    #ss.runSimsOnCluster(3)
-    #ss.runSimsOnPC()
+
 
 
 

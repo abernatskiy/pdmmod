@@ -10,8 +10,8 @@ except:
 
 #TESTING
 modelNum = 13
-termCond = ('simulateTime',30,0.5)
-numOfRuns = 3
+termCond = ('simulateTime',100,0.5)
+numOfRuns = 5
 traj = False
 rewrite = False
 log_level = 'INFO'

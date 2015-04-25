@@ -1,19 +1,24 @@
 #!/usr/bin/python
 import subprocess
-
+import matplotlib.pyplot as plt
 import clusteredHP
 
 
 
 modelNum = 12
-for i in range(9,10):
-    simNum = i
-    minL = 4
-    maxL = 25
-    cr = clusteredHP.ClusteredResults(modelNum,simNum,minL,25)
-    subprocess.call(('mkdir',cr.outputDir+'figures/'))
-    cr.plotHPstats(saveFig=True)
-    cr.plot2DClustLen(4,9,True)
-    cr.plot2DClustLen(10,15,True)
-    cr.plot2DClustLen(16,21,True)
-    cr.plot2DClustLen(22,25,True)
+#for i in range(9,10):
+simnum = 12
+minl = 4
+maxl = 25
+cr = clusteredHP.ClusteredResults(modelNum,simnum,minl,maxl,nonSteadyPercent=0.5)
+subprocess.call(('mkdir',cr.outputDir+'figures/'))
+cr.plotHPstats(saveFig=True)
+cr.plot2DClustLen(4,9,True)
+cr.plot2DClustLen(10,15,True)
+cr.plot2DClustLen(16,21,True)
+cr.plot2DClustLen(22,25,True)
+cr.bioMassDistr(6,10,True)
+cr.bioMassDistr(6,5,True)
+#plt.show()
+
+

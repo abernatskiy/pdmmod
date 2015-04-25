@@ -198,7 +198,7 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def plotHPstats(self,jointData=None,saveFig=False):
+    def plotHPstats(self,jointData=None,saveFig=False,nonSteadyPercent=0.9):
         maxLength = int(self.parameters['maxLength'])
         countAll, countFold, countCat, countAuto, lengths = \
             self.makeStats()
@@ -207,7 +207,7 @@ class Result(object):
                 jointData = self.jointData
                 self.jointData.keys()
             except:
-                self.jointData=self.makeDictOfLengths(maxLength)
+                self.jointData=self.makeDictOfLengths(maxLength,nonSteadyPercent)
                 jointData=self.jointData
         
             
@@ -272,7 +272,7 @@ class Result(object):
         
         return steadySorted
     
-    def makeDictOfLengths(self,maxLength,nonSteadyPercent=0.9):
+    def makeDictOfLengths(self,maxLength,nonSteadyPercent):
         '''returns dictionary of ordereder dictionaries
         {length: OrderedDict{seq: float}}
         '''
@@ -288,7 +288,8 @@ class Result(object):
                 sLen=len(seq)
             else:
                 sLen=len(seq)-1
-            steadyLen[sLen][seq]=(steadyMean[seq],steadyStd[seq])
+            if not (steadyMean[seq],steadyStd[seq])==(0.0,0.0):
+                steadyLen[sLen][seq]=(steadyMean[seq],steadyStd[seq])
         
         for length in steadyLen.keys():
             tmp = OrderedDict(
@@ -299,7 +300,7 @@ class Result(object):
         return steadyLen
     
     def clustLengths(self,minLength,maxLength,
-                     nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):#TEST
+                     nonSteadyPercent,samp=None,epsilonModifyer={0:0}):#TEST
         ''' returns dict jointLabels'''
         if self.numOfRuns == 1:
             raise ValueError('I cannot cluster data from 1 simulation:'+
@@ -307,7 +308,7 @@ class Result(object):
         try:
             type(self.jointData)
         except:
-            self.jointData=self.makeDictOfLengths(maxLength)
+            self.jointData=self.makeDictOfLengths(maxLength,nonSteadyPercent)
         jointLabels={}
         _labels={}
         labels={}
@@ -402,7 +403,7 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 
 if __name__ == "__main__":
-    modelNum = 12
+    modelNum = 13
     simNum = 0
     r = Result(modelNum,simNum)
     r.plotHPstats()

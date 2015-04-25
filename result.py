@@ -4,6 +4,8 @@
 # time,specName specPopulation,specName specPopulation .....
 
 #specPop -- {name: [populations during time steps]}
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from os import system as system

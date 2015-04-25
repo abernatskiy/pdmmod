@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import subprocess
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import clusteredHP
 

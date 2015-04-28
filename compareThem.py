@@ -5,12 +5,40 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import clusteredHP
+import numpy as np
 
+#cr2 = clusteredHP.ClusteredResults(modelNum=12,simNum=10,minLength=4,maxLength=25,nonSteadyPercent=0.5)
+#cr0 = clusteredHP.ClusteredResults(modelNum=12,simNum=12,minLength=4,maxLength=25,nonSteadyPercent=0.5)
+cr2 = pickle.load(open('compareTmp/cr2.p','rb'))
+cr0 = pickle.load(open('compareTmp/cr0.p','rb'))
 
-cr2 = clusteredHP.ClusteredResults(modelNum=12,simNum=10,minLength=4,maxLength=25,nonSteadyPercent=0.5)
-cr0 = clusteredHP.ClusteredResults(modelNum=12,simNum=12,minLength=4,maxLength=25,nonSteadyPercent=0.5)
-pickle.dump(cr2,open('compareTmp/cr2.p','wb'))
-pickle.dump(cr0,open('compareTmp/cr0.p','wb'))
+def getBase(cr2):
+    bases={}
+    for (length, clust) in cr2.clustDict.items():
+        bases[length]=(
+                clust.minClustered,
+                np.mean([seq.meanPop for seq in clust.clusters[0].sequences]),
+                clust.maxClustered)
+    return bases
+
+def getNumGood(cr0,bases,nTimes):#BUG
+    numGood = {}
+    for (length, clust) in cr0.clustDict.items():
+        numGood[length]=0
+        #for clustNum in clust.clusters.keys():
+        #    pops=sorted([seq.meanPop for seq in clust.clusters[clustNum].sequences])
+        #    numGood[length] += len(list(filter(lambda x: x > nTimes*bases[length][2], pops)))
+        pops=sorted([seq.meanPop for seq in clust.outstanders])
+        numGood[length] += len(list(filter(lambda x: x > nTimes*bases[length][2], pops)))
+    return numGood
+
+def doClustMatch(cr0,bases):
+    match = {}
+    for (length, clust) in cr0.clustDict.items():
+        if not length == 4:
+            match[length]=(clust.maxClustered>=bases[length][2])
+    return match
+
 
 #subprocess.call(('mkdir',cr.outputDir+'figures/'))
 #cr.plotHPstats(saveFig=True)

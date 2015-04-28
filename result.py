@@ -12,6 +12,7 @@ from os import system as system
 import numpy as np
 import math
 import glob
+import os
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
@@ -141,17 +142,21 @@ class Result(object):
             title+=str(self.parameters[parameter])+', '
         return title
     
-    def _writeGraphFilename(self):
+    def _writeGraphFilename(self,specDir=None):
         '''Results -> String (filename)
+        
         '''
-        def ifNameExists(name):
-            sR=glob.glob(self.outputDir+'figures/'+name)
+        def ifNameExists(name,specDir):
+            sR=glob.glob(os.path.join(specDir,name))
             if sR==[]:
                 return False
             else:
                 return True
+            
+        if specDir==None:
+            specDir = self.outputDir+'figures/'
         s='000'
-        while ifNameExists(s+'.png'):
+        while ifNameExists(s+'.png',specDir):
             i=int(s)
             i+=1
             if len(str(i))==1:#LAME
@@ -166,7 +171,7 @@ class Result(object):
             #    raise('plot has been overwritten')
             
             
-        path=self.outputDir+'figures/'+name
+        path=os.path.join(specDir,name)
         
         return path
     

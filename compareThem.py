@@ -39,6 +39,15 @@ def doClustMatch(cr0,bases):
             match[length]=(clust.maxClustered>=bases[length][2])
     return match
 
+<<<<<<< HEAD
+=======
+#cr2 = clusteredHP.ClusteredResults(modelNum=12,simNum=10,minLength=4,maxLength=25,nonSteadyPercent=0.5)
+#cr0 = clusteredHP.ClusteredResults(modelNum=12,simNum=12,minLength=4,maxLength=25,nonSteadyPercent=0.5)
+#pickle.dump(cr2,open('compareTmp/cr2.p','wb'))
+#pickle.dump(cr0,open('compareTmp/cr0.p','wb'))
+cr2=pickle.load( open( "compareTmp/cr2.p", "rb" ) )
+cr0=pickle.load( open( "compareTmp/cr0.p", "rb" ) )
+>>>>>>> ca3c8de2354e823911875f5b63edbb893e31bc6e
 
 #subprocess.call(('mkdir',cr.outputDir+'figures/'))
 #cr.plotHPstats(saveFig=True)

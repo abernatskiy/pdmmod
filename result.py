@@ -63,6 +63,7 @@ class Result(object):
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
             evolutions[raw[0]]=[float(item) for item in raw[1:]]
+            
         
         return evolutions
     

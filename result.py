@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from os import system as system
 import numpy as np
+import scipy
 import math
 import glob
 import os
@@ -62,7 +63,7 @@ class Result(object):
                  '_output'+str(self.simNum)+'/means.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=[float(item) for item in raw[1:]]
+            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
             
         
         return evolutions

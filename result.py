@@ -74,7 +74,7 @@ class Result(object):
                  '_output'+str(self.simNum)+'/standDivs.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=[float(item) for item in raw[1:]]
+            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
         
         return evolutions
     
@@ -113,7 +113,9 @@ class Result(object):
         countCat = [(0)]*(len(self.times)) 
         countAuto = [(0)]*(len(self.times)) 
         #popStats={}#lengths distribution in the last moment of simulation
+        #FIXME modify for sparse
         for key in self.means.keys():
+            means=self.means[key].A[0]
             if key.find('f')==-1:
                 polLen=len(key)
                 lengths.add(len(key))
@@ -121,16 +123,16 @@ class Result(object):
                 lengths.add(len(key)-1)
                 polLen=len(key)-1
             for i in range(len(self.times)):
-                    countAll[i]+=self.means[key][i] 
+                    countAll[i]+=means[i] 
                     #adds population of current sequence at time i to 
                     #total population of all the sequences seen before 
                     fold, cat , autocat = hpClasses.getHPClassOfSeq(key,natData)
                     if fold:#TEST
-                        countFold[i]+=self.means[key][i]
+                        countFold[i]+=means[i]
                         if cat:
-                            countCat[i]+=self.means[key][i]
+                            countCat[i]+=means[i]
                             if autocat:
-                                countAuto[i]+=self.means[key][i]
+                                countAuto[i]+=means[i]
             #here we store lengths distribution in the last moment of simulation  
             #addToDictNum(popStats,polLen,self.means[key][-1])
             
@@ -257,7 +259,8 @@ class Result(object):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.means.keys():
-            points=self.means[seq][border:]
+            means=self.means[seq].A[0]
+            points=means[border:]
             steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
@@ -270,7 +273,8 @@ class Result(object):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.stds.keys():
-            points=self.stds[seq][border:]
+            stds=self.stds[seq].A[0]
+            points=stds[border:]
             steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(

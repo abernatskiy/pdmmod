@@ -129,7 +129,8 @@ class ClusteredResults(result.Result):
         border1=self.times.index(float(lastTime))
         steady={}
         for seq in self.means.keys():
-            points=self.means[seq][border0:(border1+1)]
+            means=self.means[seq].A[0]
+            points=means[border0:(border1+1)]
             steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(

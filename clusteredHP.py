@@ -167,37 +167,50 @@ class ClusteredResults(result.Result):
         
         return steadyLen
     
-    def bioMassSlides(self,minLen,maxLength,topN,startTime,stopTime,recTime):
+    def bioMassSlides(self,minLen,maxLength,topN,startTime,stopTime,recTime,dirname):
         firstTime=startTime
+        try:
+            os.makedirs(os.path.join(self.outputDir,'figures',dirname))
+        except:
+            print('directory likely exists already')
         while not firstTime==(stopTime-recTime+self.times[1]):
             steadyLen = self.makeCustomSteady(
                 maxLength,firstTime,firstTime+recTime)
         
             plt.clf()
+            fig = plt.figure(figsize=(16,12))
             lenMass ={}
             topMass={}
+            top5={}
             n=topN
+            name2numDict = self.enumerateAll(num2name=False,name2num=True)
             for length in steadyLen:
                 if length >= minLen:
                     lenMass[length]=sum([item for item in steadyLen[length].values()])
                     topMass[length]=sum(
-                        sorted([item for item in steadyLen[length].values()])[-n:]
-                        )
+                        [item for item in steadyLen[length].values()][0:4])
+                    count=0.0
+                    for name in [item for item in steadyLen[length].keys()][0:4]:
+                        plt.text(length,count,str(name2numDict[name]))
+                        count+=0.1
+                    
             y=[]
             x=[]
             for i in topMass.keys():
                 x.append(i)
                 y.append(topMass[i]/lenMass[i])
-            fig = plt.figure(figsize=(16,12))
+            
             plt.plot(x,y,linewidth=4)
+            
             plt.xlabel('length')
             plt.ylabel('fraction of mass')
             plt.ylim((0.0, 1.0))
             plt.title('Fraction of mass in the top '+
                       str(topN)+' sequences, at time '+str(firstTime)+'\n'+self._kin2str(), fontsize=20)
+            
             plt.savefig(
                 self._writeGraphFilename(
-                    os.path.join(self.outputDir,'figures','movie'))
+                    os.path.join(self.outputDir,'figures',dirname))
                 )
             firstTime+=self.times[1]
         

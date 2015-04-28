@@ -367,7 +367,34 @@ class Result(object):
             
         return labels, epsilons
     
-
+    def enumerateAll(self,num2name=False,name2num=False):
+        i=0
+        if name2num and num2name:
+            num2nameDict={}
+            name2numDict={}
+            for key in self.means.keys():
+                num2nameDict[i]=key
+                name2numDict[key]=i
+                i+=1
+            return name2numDict, num2nameDict
+        elif name2num and (not num2name):
+            name2numDict={}
+            for key in self.means.keys():
+                name2numDict[key]=i
+                i+=1
+            return name2numDict
+        elif num2name and (not name2num):
+            num2nameDict={}
+            for key in self.means.keys():
+                num2nameDict[i]=key
+                i+=1
+            return num2nameDict
+        else:
+            raise('what to do?')
+            
+            
+            
+        
 
 
 def median(mylist):

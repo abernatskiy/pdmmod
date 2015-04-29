@@ -4,12 +4,16 @@
 # time,specName specPopulation,specName specPopulation .....
 
 #specPop -- {name: [populations during time steps]}
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from os import system as system
 import numpy as np
+import scipy
 import math
 import glob
+import os
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
@@ -59,7 +63,8 @@ class Result(object):
                  '_output'+str(self.simNum)+'/means.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=[float(item) for item in raw[1:]]
+            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            
         
         return evolutions
     
@@ -69,7 +74,7 @@ class Result(object):
                  '_output'+str(self.simNum)+'/standDivs.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=[float(item) for item in raw[1:]]
+            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
         
         return evolutions
     
@@ -108,7 +113,9 @@ class Result(object):
         countCat = [(0)]*(len(self.times)) 
         countAuto = [(0)]*(len(self.times)) 
         #popStats={}#lengths distribution in the last moment of simulation
+        #FIXME modify for sparse
         for key in self.means.keys():
+            means=self.means[key].A[0]
             if key.find('f')==-1:
                 polLen=len(key)
                 lengths.add(len(key))
@@ -116,16 +123,16 @@ class Result(object):
                 lengths.add(len(key)-1)
                 polLen=len(key)-1
             for i in range(len(self.times)):
-                    countAll[i]+=self.means[key][i] 
+                    countAll[i]+=means[i] 
                     #adds population of current sequence at time i to 
                     #total population of all the sequences seen before 
                     fold, cat , autocat = hpClasses.getHPClassOfSeq(key,natData)
                     if fold:#TEST
-                        countFold[i]+=self.means[key][i]
+                        countFold[i]+=means[i]
                         if cat:
-                            countCat[i]+=self.means[key][i]
+                            countCat[i]+=means[i]
                             if autocat:
-                                countAuto[i]+=self.means[key][i]
+                                countAuto[i]+=means[i]
             #here we store lengths distribution in the last moment of simulation  
             #addToDictNum(popStats,polLen,self.means[key][-1])
             
@@ -139,17 +146,21 @@ class Result(object):
             title+=str(self.parameters[parameter])+', '
         return title
     
-    def _writeGraphFilename(self):
+    def _writeGraphFilename(self,specDir=None):
         '''Results -> String (filename)
+        
         '''
-        def ifNameExists(name):
-            sR=glob.glob(self.outputDir+'figures/'+name)
+        def ifNameExists(name,specDir):
+            sR=glob.glob(os.path.join(specDir,name))
             if sR==[]:
                 return False
             else:
                 return True
+            
+        if specDir==None:
+            specDir = self.outputDir+'figures/'
         s='000'
-        while ifNameExists(s+'.png'):
+        while ifNameExists(s+'.png',specDir):
             i=int(s)
             i+=1
             if len(str(i))==1:#LAME
@@ -164,7 +175,7 @@ class Result(object):
             #    raise('plot has been overwritten')
             
             
-        path=self.outputDir+'figures/'+name
+        path=os.path.join(specDir,name)
         
         return path
     
@@ -248,7 +259,8 @@ class Result(object):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.means.keys():
-            points=self.means[seq][border:]
+            means=self.means[seq].A[0]
+            points=means[border:]
             steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
@@ -261,7 +273,8 @@ class Result(object):
         border=int(nonSteadyPercent*len(self.times))
         steady={}
         for seq in self.stds.keys():
-            points=self.stds[seq][border:]
+            stds=self.stds[seq].A[0]
+            points=stds[border:]
             steady[seq]=np.mean(points)
         
         steadySorted = OrderedDict(
@@ -354,7 +367,34 @@ class Result(object):
             
         return labels, epsilons
     
-
+    def enumerateAll(self,num2name=False,name2num=False):
+        i=0
+        if name2num and num2name:
+            num2nameDict={}
+            name2numDict={}
+            for key in self.means.keys():
+                num2nameDict[i]=key
+                name2numDict[key]=i
+                i+=1
+            return name2numDict, num2nameDict
+        elif name2num and (not num2name):
+            name2numDict={}
+            for key in self.means.keys():
+                name2numDict[key]=i
+                i+=1
+            return name2numDict
+        elif num2name and (not name2num):
+            num2nameDict={}
+            for key in self.means.keys():
+                num2nameDict[i]=key
+                i+=1
+            return num2nameDict
+        else:
+            raise('what to do?')
+            
+            
+            
+        
 
 
 def median(mylist):
@@ -402,7 +442,7 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 13
-    simNum = 0
+    simNum = 2
     r = Result(modelNum,simNum)
     r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)

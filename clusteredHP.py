@@ -3,9 +3,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 import subprocess
-
+import os
 import result
 import hpClasses
+
+from collections import OrderedDict
 
 class ClusteredResults(result.Result):
     def __init__(self,modelNum,simNum,minLength,maxLength,
@@ -117,11 +119,104 @@ class ClusteredResults(result.Result):
         if not saveFig:
             plt.show()
         else:
-            plt.title('Fraction of mass in the top '+str(topN)+' sequences'+'\n'+self._kin2str(), fontsize=20)
+            plt.title('Fraction of mass in the top '+
+                      str(topN)+' sequences'+'\n'+self._kin2str(), fontsize=20)
             plt.savefig(self._writeGraphFilename())
+        return x, y
+    
+    def getCustomMean(self,firstTime,lastTime):
+        border0=self.times.index(float(firstTime))
+        border1=self.times.index(float(lastTime))
+        steady={}
+        for seq in self.means.keys():
+            means=self.means[seq].A[0]
+            points=means[border0:(border1+1)]
+            steady[seq]=np.mean(points)
+        
+        steadySorted = OrderedDict(
+            sorted(steady.items(), key=lambda t: t[1],reverse=True)
+            )
+        
+        return steadySorted
+    
+    def makeCustomSteady(self,maxLength,firstTime,lastTime):
+        '''returns dictionary of ordereder dictionaries
+        {length: OrderedDict{seq: float}}
+        '''
+        
+        steadyMean = self.getCustomMean(firstTime,lastTime)   #sortedDict
+        #steadyStd = self.getSteadyStd(nonSteadyPercent)     #sortedDict
+        steadyLen={}
+        for i in range(1,maxLength+1):      #initialyze dicts
+            steadyLen[i]={}
+        
+        #get sorted dictionary for every key of steadyLen
+        for seq in steadyMean:
+            if seq.find('f')==-1:
+                sLen=len(seq)
+            else:
+                sLen=len(seq)-1
+            if not (steadyMean[seq])==0.0:
+                steadyLen[sLen][seq]=steadyMean[seq]
+        
+        for length in steadyLen.keys():
+            tmp = OrderedDict(
+                sorted(steadyLen[length].items(), key=lambda t: t[1],reverse=True)
+                )
+            steadyLen[length]=tmp
+        
+        return steadyLen
+    
+    def bioMassSlides(self,minLen,maxLength,topN,startTime,stopTime,recTime,dirname):
+        firstTime=startTime
+        try:
+            os.makedirs(os.path.join(self.outputDir,'figures',dirname))
+        except:
+            print('directory likely exists already')
+        while not firstTime==(stopTime-recTime+self.times[1]):
+            steadyLen = self.makeCustomSteady(
+                maxLength,firstTime,firstTime+recTime)
+        
+            plt.clf()
+            fig = plt.figure(figsize=(16,12))
+            lenMass ={}
+            topMass={}
+            top5={}
+            n=topN
+            name2numDict = self.enumerateAll(num2name=False,name2num=True)
+            for length in steadyLen:
+                if length >= minLen:
+                    lenMass[length]=sum([item for item in steadyLen[length].values()])
+                    topMass[length]=sum(
+                        [item for item in steadyLen[length].values()][0:4])
+                    count=0.0
+                    for name in [item for item in steadyLen[length].keys()][0:4]:
+                        plt.text(length,count,str(name2numDict[name]))
+                        count+=0.1
+                    
+            y=[]
+            x=[]
+            for i in topMass.keys():
+                x.append(i)
+                y.append(topMass[i]/lenMass[i])
+            
+            plt.plot(x,y,linewidth=4)
+            
+            plt.xlabel('length')
+            plt.ylabel('fraction of mass')
+            plt.ylim((0.0, 1.0))
+            plt.title('Fraction of mass in the top '+
+                      str(topN)+' sequences, at time '+str(firstTime)+'\n'+self._kin2str(), fontsize=20)
+            
+            plt.savefig(
+                self._writeGraphFilename(
+                    os.path.join(self.outputDir,'figures',dirname))
+                )
+            firstTime+=self.times[1]
+        
         return None
-    
-    
+        
+        
         
 class Clusters(object):
     '''class Clusters(length,clustResults)

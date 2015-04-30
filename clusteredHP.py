@@ -13,6 +13,7 @@ class ClusteredResults(result.Result):
     def __init__(self,modelNum,simNum,minLength,maxLength,
                      nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):
         result.Result.__init__(self,modelNum,simNum)
+        print('this is simulation '+str(self.modelNum)+'.'+str(self.simNum))
         self.minLength=minLength
         self.maxLength=maxLength
         self.natData = hpClasses.readNativeList(self.maxLength)
@@ -28,6 +29,7 @@ class ClusteredResults(result.Result):
         return self.clustDict[length].theClusters[label]
     
     def makeClustDict(self):
+        print('making clustDict')
         clustDict={}
         for length in range(self.minLength,self.maxLength+1):
             clustDict[length]=Clusters(length,self)
@@ -131,7 +133,7 @@ class ClusteredResults(result.Result):
         for seq in self.means.keys():
             means=self.means[seq].A[0]
             points=means[border0:(border1+1)]
-            steady[seq]=np.mean(points)
+            steady[seq]=np.mean(points)#mean/median question
         
         steadySorted = OrderedDict(
             sorted(steady.items(), key=lambda t: t[1],reverse=True)

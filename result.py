@@ -185,7 +185,7 @@ class Result(object):
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
         fig.set_title("Total count of molecules at each moment")
-        return None
+        return None#times, countAll
     
     def _plotTypes(self,fig,countFold,countCat,countAuto):
         fig.plot(self.times,countFold,linewidth=4,label='folded')
@@ -195,7 +195,7 @@ class Result(object):
         fig.set_ylabel('molecules count')
         fig.set_xlabel('time')
         fig.set_title("count of molecules of various types at each moment")
-        return None
+        return None#(times,countFold), (times,countCat), (times,countAuto)
     
     def _plotLenDistr(self,fig,mL,lengths,lengthsDistr):
         fig.plot(lengths,lengthsDistr,linewidth=4,label=\
@@ -245,7 +245,7 @@ class Result(object):
             plt.suptitle(self._kin2str(), fontsize=20)
             plt.savefig(self._writeGraphFilename())
         
-        return None
+        return (times, countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
     
     def plotLenEvolution(self,show=True):
         '''

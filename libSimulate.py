@@ -219,7 +219,7 @@ class Simulation(object):
         return None
     
     def _line2Data(self,raw,points,fileCount):
-        for item in raw[1:len(raw)-1]:
+        for item in raw[1:len(raw)]:#TEST
             #get a couple specie -- its population
             point=item.split(' ')
             if point[0] not in points:
@@ -255,7 +255,7 @@ class Simulation(object):
                 elif line[0]=="#":
                     continue
                 else:
-                    raw = (line.rstrip('\n')).split(',')
+                    raw = (line.rstrip(',\n')).split(',')#TEST
                     if fileCount == 0:
                         count+=1
                         self.times.append(float(raw[0]))

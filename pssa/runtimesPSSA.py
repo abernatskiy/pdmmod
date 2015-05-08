@@ -54,7 +54,7 @@ def runSeveralBallsVarNSpec(command,runs,population,collRate,species):#TEST
     system('rm runTemp.txt && touch runTemp.txt' )
     for numSpec in species:
         system('rm -r out/PDM')
-        filewriter('b.sbml','balls',numSpec,pop,collRate)
+        filewriter('b.sbml','balls',numSpec,population,collRate)
         pair=getSimTime(command,runs)
         with open("runTemp.txt", "a") as myfile:
             myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
@@ -68,7 +68,9 @@ population = 50
 collRate = 0.5
 command = '../libpssa-1.0.0RC/pssa_cli/pssa'
 
-species = [5,10]
+species = [2600,2700,2800,2900,3000,3100,3200,
+         3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
+         4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000] 
 
 runSeveralBallsVarNSpec(command,runs,population,collRate,species)
 

@@ -407,6 +407,7 @@ class Result(object):
                 raw = line.split(',')
                 data = raw[1:]
                 time = float(raw[0])
+                print(time)
         initFile = open( os.path.join(self.path2Folder,
                     initFileName),'a')
         for point in data:
@@ -459,8 +460,9 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 if __name__ == "__main__":
     modelNum = 12
-    simNum = 10
+    simNum = 22
     r = Result(modelNum,simNum)
+    r.getInitPopFromTraj(0,50.0,'populations50.txt')
     #r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)
     #jointLabels, epsilons = r.clustLengths(14,25)

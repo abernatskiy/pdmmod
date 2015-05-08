@@ -12,7 +12,7 @@ from numpy import polyfit
 from numpy import poly1d
 from numpy import linspace
 import numpy as np
-
+from matplotlib.legend_handler import HandlerLine2D
 import libSimulate
 
 '''DATA
@@ -171,7 +171,7 @@ def analyzeRuntime(command,runs,numOfPoints,filename):
         e=sqrt((runtimes[i][2])**2+(runtimes[i-1][2])**2)/(runtimes[i][0]-runtimes[i-1][0])
         ratios.append((runtimes[i][0],m,e))
     
-    print(ratios)
+    #print(ratios)
     
     return runtimes, ratios
     
@@ -269,7 +269,7 @@ def analyzeFile(filename):
     fr = poly1d(zr)
     xr_new = linspace(xr[0], xr[-1], 50)
     yr_new = fr(xr_new)
-    print(ratios)    
+    #print(ratios)    
     return (x,y,y_err),(x_new, y_new, y_new2), (xr_new, yr_new), ratios,(z,z2,zr)
 
 def plotSeveral(filenames):#TODO
@@ -282,19 +282,42 @@ def plotSeveral(filenames):#TODO
     for filename in filenames:
         data, lines, slope, ratios, fits = analyzeFile(filename)
         col = labCols[filename]
-        if filename.find('stochkit')== -1:
-            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D',color = col)
+        if not filename.find('pssa')== -1:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='v',
+                         color = col,
+                         markersize=12)
+            ax0.plot([],[],marker='v',
+                        markersize=12,
+                        color = col,label='PDM')
             ax0.plot(lines[0],lines[1],
-                     label='y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1],
-                     linewidth=2,
+                     linewidth=3,
                      color = col)
-        else:
-            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',color = col)
+            print('PDM: y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1])
+        elif not filename.find('stochkit')== -1:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',
+                         color = col,markersize=12)
+            ax0.plot([],[],marker='o',
+                        markersize=12,
+                        color = col,label='SSA')
             ax0.plot(lines[0],lines[2],
-                     label='y = '+'%.2e' %fits[1][0]+' x^2 +'+'%.2e' %fits[1][1]+' x '+'%.2e' %fits[1][2],
-                     linewidth=2,
+                     linewidth=3,
+                     color = col)
+            print('SSA: y = '+
+                    '%.2e' %fits[1][0]+' x^2 +'+
+                    '%.2e' %fits[1][1]+' x '+
+                    '%.2e' %fits[1][2],)
+        else:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D', 
+                        color = col,markersize=12)
+            ax0.plot([],[],marker='D',
+                        markersize=12,
+                        color = col,label='PDMmod')
+            ax0.plot(lines[0],lines[1],
+                     linewidth=3,
                      color = col)
         #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
+            print('PDMmod: y ='+'%.2e' %fits[0][0]+
+                        ' x'+'%.2e' %fits[0][1])
         for i in range(len(data[1])):
             element=data[1][i]
         
@@ -302,11 +325,15 @@ def plotSeveral(filenames):#TODO
             ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o',color = col)
         
     
-    ax0.legend(loc=4)
-    ax1.legend(loc=4)
-    ax0.set_title('Simulation run time vs number species types in the simulation')
-    ax1.set_title('Current slope of the graph above')
-    ax0.set_ylabel('runtime, miliseconds')
+    ax0.legend(loc=4,fontsize=20)
+    ax1.legend(loc=4,fontsize=20)
+    ax0.set_title('Simulation run time vs number species types in the simulation',
+                  fontsize = 20)
+    ax1.set_title('Current slope of the graph above',
+                  fontsize = 20)
+    ax0.set_ylabel('t, ms',
+                   fontsize =16)
+    ax0.set_xlabel('N',fontsize=16)
     #plt.savefig('timeStats.pdf')
     #fig.suptitle(title)
     plt.show()
@@ -327,7 +354,12 @@ species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
          4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
 #runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-stochkit-c0.txt']
+filenames0 = [
+    'collPartSpecTypes-c2.txt',
+    'collPartSpecTypes-stochkit-c0.txt',
+    'collPartSpecTypes-pssa-c0.txt'
+    ]
+
 #filenames = ['collPartSpecTypesDel-c0.txt']
-plotSeveral(filenames)
+plotSeveral(filenames0)
 

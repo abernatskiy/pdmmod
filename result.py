@@ -394,8 +394,26 @@ class Result(object):
             
             
             
-        
+    def getInitPopFromTraj(self,trajNum,atTime,initFileName):
+        trajFile = open(os.path.join(self.path2Folder,
+                    (str("%03d" %self.modelNum)+'_output'+str(self.simNum)),
+                    'traj'+str(trajNum)),'r')
+        time=0
+        while not time == atTime:
+            line = (trajFile.readline()).rstrip('\n')
+            if line[0]=='#':
+                continue
+            else:
+                raw = line.split(',')
+                data = raw[1:]
+                time = float(raw[0])
+        initFile = open( os.path.join(self.path2Folder,
+                    initFileName),'a')
+        for point in data:
+            initFile.write(point+'\n')
+        return None    
 
+#######EXTRA FUNCTIOS######
 
 def median(mylist):
     sorts = sorted(mylist)
@@ -439,12 +457,11 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 
 
-
 if __name__ == "__main__":
-    modelNum = 13
-    simNum = 2
+    modelNum = 12
+    simNum = 10
     r = Result(modelNum,simNum)
-    r.plotHPstats()
+    #r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)
     #jointLabels, epsilons = r.clustLengths(14,25)
     

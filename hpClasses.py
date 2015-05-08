@@ -48,6 +48,22 @@ def getHPClassOfSeq(seq,natData):
             
     return fold, cat, autocat
 
+def getUserFriendData(seq,natData):
+    (let1, let2, let3) = ('','','')
+    fold, cat, autocat = getHPClassOfSeq(seq,natData)
+    if not seq.find('f')==-1:
+        seqLen=len(seq)-1
+    else:
+        seqLen=len(seq)
+    if fold:
+        let1='F'
+    if cat:
+        let2='C'
+    if autocat:
+        let3='A'
+    return 'len '+str(seqLen)+' '+let1+let2+let3
+    
+
 #TESTING
 if __name__ == "__main__":
     maxLength = 25

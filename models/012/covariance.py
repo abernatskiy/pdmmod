@@ -5,12 +5,12 @@ import numpy as np
 import scipy.sparse as sps
 import os
 import matplotlib
-matplotlib.use('Agg')
-
+#matplotlib.use('Agg')
+from pylab import pcolor, show, colorbar, xticks, yticks
 sys.path.append('../../')
 import dictUtils
 
-path='012_output10/'
+path='012_output22/'
 
 def traj2matrix(trajname,startTime,finishTime,timeStep):
     trajFile = open(os.path.join(path,trajname),'r')
@@ -31,7 +31,7 @@ def traj2matrix(trajname,startTime,finishTime,timeStep):
         elif line[0]=="#":
             continue
         else:
-            #print('data at line '+str(lineCount))
+            print('data at line '+str(lineCount))
             raw = (line.rstrip(',\n')).split(',')
             timePoint=float(raw[0])
             if not timePoint<startTime:
@@ -66,7 +66,9 @@ def sparseCovMat(matrix):
     emu=matrix-mu
     norm = emu.shape[1]-1.
     C=np.dot(emu,emu.T.conjugate())/norm
-    return C
+    d = np.diag(C)
+    coeffs = C / np.sqrt(np.outer(d, d))
+    return coeffs
 
 def meansOverLen(seq2num,evolutions):
     def getSeqLen(seq):
@@ -91,19 +93,27 @@ def getTop(means,topN):
 
 def getTopEvolutions(top,evolutions):
     shape=(1,evolutions.shape[1])
-    topEvo=sps.coo_matrix((1,evolutions.shape[1]),dtype='int8')
+    topEvo=None
     for (seqLen, seqList) in top.items():
-        for item in seqList:
-            topEvo = sps.vstack([
-                topEvo,
-                evolutions.getrow(item[0])
-                ])
+        if seqLen>=6:
+            for item in seqList:
+                if not topEvo==None:
+                    topEvo = sps.vstack([
+                        topEvo,
+                        evolutions.getrow(item[0])
+                        ])
+                else:
+                    topEvo=evolutions.getrow(item[0])
     return topEvo
             
     
 trajname='traj0'
-numOfTimePoints=201
-seq2num,evo = traj2matrix(trajname,50,100,0.5)
-#C=sparseCovMat(topEvo)
-
+seq2num,evolutions = traj2matrix(trajname,0,50,0.5)
+means = meansOverLen(seq2num,evolutions)
+top = getTop(means,15)
+topEvo = getTopEvolutions(top,evolutions)
+C = np.array(sparseCovMat(topEvo))
+pcolor(C)
+colorbar()
+show()
 

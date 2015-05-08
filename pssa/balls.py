@@ -86,10 +86,10 @@ def reactionsWriter(f,numSpec,collRate):#TODO
 
 
 
-filename = 'b.sbml'
-numSpec = 3
-pop = 4
-collRate =0.5
-modelName = 'balls'
+#filename = 'b.sbml'
+#numSpec = 3
+#pop = 4
+#collRate =0.5
+#modelName = 'balls'
 
-filewriter(filename,modelName,numSpec,pop,collRate)
+#filewriter(filename,modelName,numSpec,pop,collRate)

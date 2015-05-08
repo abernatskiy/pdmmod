@@ -337,7 +337,10 @@ class Simulation(object):
         self._makeHeader(outputDir)
         self._writeEvolutions(outputDir)
         self._writeTimes(outputDir)
-        self._writeRuntimesStats()
+        try:
+            self._writeRuntimesStats()
+        except:
+            self.log.warning('runtimes weren\'t saved. something went wrong. Perhabs you were running jobs in parallel.')
         if not self.traj:
             self._deleteTraj(outputDir)
             self._delRuntimes()

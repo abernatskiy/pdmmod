@@ -74,8 +74,7 @@ def getSimTime(simulation):
         std = np.std(runtimes)
         return mean, std
     
-    simulation.runSeveralParallelCluster(kernels=1, onNode=60)
-    #simulation.runSeveralSeries()
+    simulation.runSeveralSeries()
     simulation.reorganizeOutput()
     with open(simulation.outputDir+'runtimeStat.txt','r') as sf:
         [time, timeStd] = [float(item) for item in sf.readline().split(' ')]
@@ -343,23 +342,22 @@ def plotSeveral(filenames):#TODO
 population=1
 modelNum = 6
 termCond = ('simulateReactions',5000, 1000)
-numOfRuns =3
+numOfRuns =10
 
 collRate = 0.5
-species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600, 
-         650,700,750,800,850,900,950,1000,1100,1150,1200,1250,1300,1350,
-         1400,1450,1500,1600,1650,1700,1750,1800,1850,1900,1950,2000,
-         2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,
-         3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
-         4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
+species=[10,50,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,
+         1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,
+         2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,
+         4000,4100,4200,4300,4400,4500,4600,4700,4800,4900,5000,5100,5200,
+         5300,5400,5500,5600,5700,5800,5900,6000,6250,6500,6750,7000]
 #
-#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames = [
-    'collPartSpecTypes-c2.txt',
-    'collPartSpecTypes-stochkit-c0.txt',
-    'collPartSpecTypes-pssa-c0.txt'
-    ]
+runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+#filenames = [
+    #'collPartSpecTypes-c2.txt',
+    #'collPartSpecTypes-stochkit-c0.txt',
+    #'collPartSpecTypes-pssa-c0.txt'
+    #]
 
-#filenames = ['collPartSpecTypesDel-c0.txt']
-plotSeveral(filenames)
+##filenames = ['collPartSpecTypesDel-c0.txt']
+#plotSeveral(filenames)
 

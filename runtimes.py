@@ -341,7 +341,7 @@ def plotSeveral(filenames):#TODO
 ###Change Number of species###
 population=1
 modelNum = 6
-termCond = ('simulateReactions',5000, 1000)
+termCond = ('simulateReactions',5000, 2500)
 numOfRuns =10
 
 collRate = 0.5

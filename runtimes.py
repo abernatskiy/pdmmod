@@ -351,13 +351,13 @@ species=[10,50,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,
          4000,4100,4200,4300,4400,4500,4600,4700,4800,4900,5000,5100,5200,
          5300,5400,5500,5600,5700,5800,5900,6000,6250,6500,6750,7000]
 #
-runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-#filenames = [
-    #'collPartSpecTypes-c2.txt',
-    #'collPartSpecTypes-stochkit-c0.txt',
-    #'collPartSpecTypes-pssa-c0.txt'
-    #]
+#runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
+filenames = [
+    'balls-pdmmod-c3-10rep.txt',
+    'collPartSpecTypes-stochkit-c0.txt',
+    'balls-pssa-c1-10rep.txt'
+    ]
 
-##filenames = ['collPartSpecTypesDel-c0.txt']
-#plotSeveral(filenames)
+#filenames = ['collPartSpecTypesDel-c0.txt']
+plotSeveral(filenames)
 

@@ -339,8 +339,8 @@ def plotSeveral(filenames):#TODO
     return None
 
 ###Change Number of species###
-population=1
-modelNum = 6
+population=50
+modelNum = 8
 termCond = ('simulateReactions',5000, 2500)
 numOfRuns =10
 

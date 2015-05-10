@@ -120,8 +120,10 @@ int main (int argc, char** argv){
     t1=clock();
 
     while(dataLogger->makeRecords()){
+        //std::cout << tp << std::endl;
         stp = tp.stepSimulation();
         reacNum++;
+        //std::cout << tp << std::endl;
         if(stp == 1)
             break;
     }

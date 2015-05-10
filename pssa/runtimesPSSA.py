@@ -33,10 +33,11 @@ def getSimTime(command,numOfRuns):
     '''
     runs the simulation and then retrieves its running time
     '''
-    retValue=subprocess.call(command)
-    timeFile = open("out/PDM/"+str(numOfRuns)+"/PSSA_probability_timing.txt")
+    
     times = []
     for i in range(numOfRuns):
+        retValue=subprocess.call(command)
+        timeFile = open("out/PDM/1/PSSA_probability_timing.txt")
         raw = (timeFile.readline().rstrip('\n')).split(' ')
         data = []
         for item in raw:
@@ -61,16 +62,17 @@ def runSeveralBallsVarNSpec(command,runs,population,collRate,species):#TEST
     
     return None
 
+if __name__ == "__main__":
+    runs = 10
+    population = 50
+    collRate = 0.5
+    command = '../libpssa-1.0.0RC/pssa_cli/pssa'
 
-runs = 5
-population = 50
-collRate = 0.5
-command = '../libpssa-1.0.0RC/pssa_cli/pssa'
+    species = [10,50,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,
+         1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,
+         2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,
+         4000,4100,4200,4300,4400,4500] 
 
-species = [2600,2700,2800,2900,3000,3100,3200,
-         3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,
-         4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000] 
-
-runSeveralBallsVarNSpec(command,runs,population,collRate,species)
+    runSeveralBallsVarNSpec(command,runs,population,collRate,species)
 
 

@@ -17,11 +17,29 @@ sys.path.append('../../')
 import dictUtils
 import hpClasses
 
-path='012_output22/'
 
-def traj2matrix(trajname,startTime,finishTime,timeStep):
+
+def traj2matrix(path,trajname,startTime,finishTime,timeStep=0,numOfPoints=None):
     trajFile = open(os.path.join(path,trajname),'r')
-    numOfTimePoints=int((finishTime - startTime)/timeStep)+1
+    def file_len(fname):
+        comment = 0
+        with open(fname) as f:
+            for i, l in enumerate(f):
+                if l[0]=='#':
+                    comment+=1
+                pass
+                if i==10000:
+                    print(l[0:10])
+        return i + 1-comment
+    trajFile = open(os.path.join(path,trajname),'r')
+    if not timeStep==0:
+            numOfTimePoints = int((finishTime - startTime)/timeStep)+1
+    else:
+        if numOfPoints==None:
+            numOfTimePoints = file_len(os.path.join(path,trajname))
+        else:
+            numOfTimePoints=numOfPoints
+            print(numOfTimePoints)
     shape = (1,numOfTimePoints)
     evolutions = sps.coo_matrix(shape,dtype='int8')
     seq2num={'H':0}
@@ -63,6 +81,8 @@ def traj2matrix(trajname,startTime,finishTime,timeStep):
                     
                     
                 lineCount+=1
+                if lineCount%100==0:
+                    print(lineCount)
                 if lineCount>=numOfTimePoints:
                     breakCondition=True
                     
@@ -213,10 +233,11 @@ def plotSlice(D,firstNum,lastNum,natData,maps):
     fig.show()
 
 if __name__ == "__main__":
+    path='012_output26/'
     maxLength = 25
     natData = hpClasses.readNativeList(25)
     trajname='traj0'
-    seq2num,evolutions =  traj2matrix(trajname,50,550,0.5)
+    seq2num,evolutions =  traj2matrix(path,trajname,0,2.20202,0,10000)
     num2seq = dict(zip(seq2num.values(),seq2num.keys()))
     means =  meansOverLen(seq2num,evolutions)
     topN = 15
@@ -228,7 +249,7 @@ if __name__ == "__main__":
     maps = mapSeqsAndIndexes(D,seq2num,reorderedNames)
     firstNum=170
     lastNum=196
-    #plotSlice(D,firstNum,lastNum,'',maps)
+    plotSlice(D,firstNum,lastNum,'',maps)
     
     
 #fig = pylab.figure()

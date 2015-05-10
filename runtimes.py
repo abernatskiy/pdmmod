@@ -354,12 +354,12 @@ species=[5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,550,600,
          4600,4800,5000,5200,5400,5600,5800,6000,6250,6500,6750,7000]
 #
 #runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species)
-filenames0 = [
+filenames = [
     'collPartSpecTypes-c2.txt',
     'collPartSpecTypes-stochkit-c0.txt',
     'collPartSpecTypes-pssa-c0.txt'
     ]
 
 #filenames = ['collPartSpecTypesDel-c0.txt']
-plotSeveral(filenames0)
+plotSeveral(filenames)
 

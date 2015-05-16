@@ -121,6 +121,7 @@ def getTop(means,topN):
         top[seqLen] = means[seqLen][0:topN]
     return top
 
+            
 def getTopEvolutions(top,evolutions):
     shape=(1,evolutions.shape[1])
     #topEvo=sps.coo_matrix((1,evolutions.shape[1]),dtype='int8')
@@ -197,6 +198,25 @@ def mapSeqsAndIndexes(D,seq2num,reorderedNames):
         maps.append((indx,seq,seq2num[seq]))
     return maps
 
+def getNonZero(evolutions,num2seq):
+    ret =[]
+    indexes = {}
+    indx = -1
+    count = -1
+    for line in evolutions.A:
+        indx+=1
+        if not np.var(line)==0.0:
+            count+=1
+            ret.append(line)
+            indexes[count]=indx
+        else:
+            print('seq '+num2seq[indx]+' is const.')
+    ret = np.array(ret)
+    return ret, indexes
+
+def getCorrMatrix(matrix):
+    C = np.corrcoef(matrix)
+    return C
 
 
 def plotSlice(D,firstNum,lastNum,natData,maps):
@@ -237,19 +257,19 @@ if __name__ == "__main__":
     maxLength = 25
     natData = hpClasses.readNativeList(25)
     trajname='traj0'
-    seq2num,evolutions =  traj2matrix(path,trajname,0,2.20202,0,10000)
+    seq2num,evolutions =  traj2matrix(path,trajname,0,26.20202,0,50000)
     num2seq = dict(zip(seq2num.values(),seq2num.keys()))
-    means =  meansOverLen(seq2num,evolutions)
-    topN = 15
-    top = getTop(means,topN)
-    topEvo, indxTop2Indx = getTopEvolutions(top,evolutions)
-    C = sparseCovMat(topEvo)
-    D = np.array(sparseCorrMat(C))
-    reorderedNames, D = plotBlockCorrMatrix(D,num2seq,indxTop2Indx)
-    maps = mapSeqsAndIndexes(D,seq2num,reorderedNames)
-    firstNum=170
-    lastNum=196
-    plotSlice(D,firstNum,lastNum,'',maps)
+    #means =  meansOverLen(seq2num,evolutions)
+    #topN = 15
+    #top = getTop(means,topN)
+    #topEvo, indxTop2Indx = getTopEvolutions(top,evolutions)
+    #C = sparseCovMat(topEvo)
+    #D = np.array(sparseCorrMat(C))
+    #reorderedNames, D = plotBlockCorrMatrix(D,num2seq,indxTop2Indx)
+    #maps = mapSeqsAndIndexes(D,seq2num,reorderedNames)
+    #firstNum=170
+    #lastNum=196
+    #plotSlice(D,firstNum,lastNum,'',maps)
     
     
 #fig = pylab.figure()

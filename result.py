@@ -102,7 +102,7 @@ class Result(object):
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
         return parameters
 
-    def makeStats(self): 
+    def makeStats(self,natData): 
         '''return countAll, countFold, countCat, countAuto, length
         means/stds -- {name: [populations during time steps]}'''
         print("total number of species in all runs is "+str(len(self.means.keys())))
@@ -207,10 +207,10 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def plotHPstats(self,jointData=None,saveFig=False,nonSteadyPercent=0.9):
+    def plotHPstats(self,natData,jointData=None,saveFig=False,nonSteadyPercent=0.9):
         maxLength = int(self.parameters['maxLength'])
         countAll, countFold, countCat, countAuto, lengths = \
-            self.makeStats()
+            self.makeStats(natData)
         if jointData == None:
             try:
                 jointData = self.jointData
@@ -245,7 +245,7 @@ class Result(object):
             plt.suptitle(self._kin2str(), fontsize=20)
             plt.savefig(self._writeGraphFilename())
         
-        return (times, countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
+        return (countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
     
     def plotLenEvolution(self,show=True):
         '''

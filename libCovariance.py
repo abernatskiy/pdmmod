@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os
-import sys
 import numpy as np
 import scipy.sparse as sps
 import os
@@ -12,8 +11,6 @@ import pylab
 import scipy.cluster.hierarchy as sch
 import pickle
 
-
-sys.path.append('../../')
 import dictUtils
 import hpClasses
 
@@ -252,31 +249,4 @@ def plotSlice(D,firstNum,lastNum,natData,maps):
     pylab.colorbar(im, cax=axcolor)
     fig.show()
 
-if __name__ == "__main__":
-    path='012_output26/'
-    maxLength = 25
-    natData = hpClasses.readNativeList(25)
-    trajname='traj0'
-    seq2num,evolutions =  traj2matrix(path,trajname,0,26.20202,0,50000)
-    num2seq = dict(zip(seq2num.values(),seq2num.keys()))
-    #means =  meansOverLen(seq2num,evolutions)
-    #topN = 15
-    #top = getTop(means,topN)
-    #topEvo, indxTop2Indx = getTopEvolutions(top,evolutions)
-    #C = sparseCovMat(topEvo)
-    #D = np.array(sparseCorrMat(C))
-    #reorderedNames, D = plotBlockCorrMatrix(D,num2seq,indxTop2Indx)
-    #maps = mapSeqsAndIndexes(D,seq2num,reorderedNames)
-    #firstNum=170
-    #lastNum=196
-    #plotSlice(D,firstNum,lastNum,'',maps)
-    
-    
-#fig = pylab.figure()
-#ax = fig.add_axes([0.3,0.1,0.6,0.8])
-#major_ticks = np.arange(0,11,1)
-#ax.set_yticks(major_ticks)
-#x=np.arange(0,12)
-#y=np.arange(0,12)
-#ax.plot(x,y)
-#plt.show()
+

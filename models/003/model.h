@@ -7,11 +7,11 @@
 #include "parameter.h"
 #include "reaction.h"
 
-const float DECAY_RATE = 0.02;
-const float GROWTH_RATE = 0.01;
-const float FAST_RATE = 0.01;
-const float HIDR_RATE = 0.001;
 
+
+
+// const float COLL_RATE = 0.5;
+// const int MAX_LEN = 10;
 
 class Specie
 {
@@ -23,8 +23,8 @@ public:
     
     //attributes
     std::string m_id;
-    int m_length;
-    std::string m_type;
+    int m_len;
+    
     
     //constants
     

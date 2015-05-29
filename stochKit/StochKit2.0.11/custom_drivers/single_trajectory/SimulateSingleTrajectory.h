@@ -45,7 +45,7 @@ void simulateSingleTrajectory(std::vector<std::pair<double, StandardDriverTypes:
         float timeTotal = diff/((float) CLOCKS_PER_SEC);//LISA
         std::ofstream timeFile;//LISA
 	timeFile.open ("runtime.txt");//LISA
-        timeFile << timeTotal/reactionCounter << std::endl;//LISA
+        timeFile << std::scientific << timeTotal/((float) reactionCounter) << std::endl;//LISA
 	if (reactionCounter!=maxSteps) {
 	  //LISA//output.push_back(std::make_pair(simulationTime,solver.getCurrentPopulation()));
 	}

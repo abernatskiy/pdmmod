@@ -5,7 +5,7 @@
 
 #specPop -- {name: [populations during time steps]}
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from os import system as system
@@ -14,6 +14,7 @@ import scipy
 import math
 import glob
 import os
+import subprocess
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
@@ -27,7 +28,7 @@ import hpClasses
 
 
 class Result(object):
-    def __init__(self,modelNum,simNum):
+    def __init__(self,modelNum,simNum,reorganize=False,numOfRuns=None,traj=None):
         '''
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
@@ -45,36 +46,227 @@ class Result(object):
         self.path2Folder = routes.routePDM+'models/'+str("%03d" %self.modelNum)+'/'
         self.outputDir = self.path2Folder+\
             str("%03d" %self.modelNum)+'_output'+str(self.simNum)+'/'
-        self.parameters = self._readSimData()
-        self.means= self._readMeans()
-        self.stds = self._readStds()
-        self.times = self._readTimes()
+        if not reorganize:
+            self.parameters = self._readSimData()
+            #self.means= self.readMeans()
+            #self.stds = self.readStds()
+            self.times = self._readTimes()
+        else:
+            self.reorganizeOutput(numOfRuns,traj)
+            self.parameters = self._readSimData()
+            self.times = self._readTimes()
+    
+        
+    def _makeHeader(self,numOfRuns,traj):
+        filename = 'traj0'
+        proc =subprocess.call(
+            ('rm '+self.outputDir+'parameters.txt'),shell=True)
+        header = open(self.outputDir+'parameters.txt','a')
+        f =open(self.outputDir+filename,'r')
+        for line in f:
+            if line[0]=='#':
+                raw = (line[2:].rstrip('\n')).split(' ')
+                group = '=='+raw[0].rstrip(':')+'==\n'
+                header.write(group)
+                if raw[0]=='Model:':
+                    header.write(raw[1]+'\n')
+                elif raw[0]=='Parameters:':
+                    for item in raw[1:]:
+                        pair = item.split('=')
+                        header.write(pair[0]+' '+pair[1]+'\n')
+                elif raw[0]=='Command:':
+                    header.write('howTerm '+raw[2]+'\n')
+                    self.howTerm = str(raw[2])
+                    header.write('whenTerm '+raw[3]+'\n')
+                    self.whenTerm = float(raw[3])
+                    header.write('records '+raw[4]+'\n')
+                    self.records = float(raw[4])
+                    
+            else:
+                break
+        
+        header.write('==Simulation Parameters==\n')
+        header.write('numOfRuns '+str(numOfRuns )+'\n')
+        header.write('keepTrajectories '+str(traj)+'\n')
+            
+        return None
+    
+    def _points2Evolutions(self,points,evolutions,count):
+        for spec in points.keys():
+                    if self.numOfRuns ==1:
+                        points[spec]=(np.mean(points[spec]),0)
+                    else:
+                        points[spec]=(np.mean(points[spec]),np.std(points[spec]))
+                    
+                    if spec not in evolutions:
+                        #add it and its population
+                        #also add 0s as prev times populations
+                        evolutions[spec]=np.zeros(
+                            int(self.whenTerm/self.records+1), dtype=(float,2))
+                        #FIXME this one has to be fluid to handle simulateTillSteady
+                        evolutions[spec][count]=points[spec]
+                    else:
+                        #otherwise append new point to the existing list of points
+                        evolutions[spec][count]=points[spec]
+
+        return None
+    
+    def _line2Data(self,raw,points,fileCount):
+        for item in raw[1:len(raw)]:#TEST
+            #get a couple specie -- its population
+            point=item.split(' ')
+            if point[0] not in points:
+                #add it and its population
+                #also add 0s as prev times populations
+                #print('point in the second file',point)
+                points[point[0]]=np.zeros(self.numOfRuns)
+                points[point[0]][fileCount-1]=int(point[1])
+            else:
+                points[point[0]][fileCount-1]=int(point[1])
+        return None
+    
+    
+    def _makeStatistics(self):
+        files = [self.outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
+        handles = [open(t, 'r') for t in files]
+        count = -1 #counts time instances
+        evolutions = {}
+        self.times = []
+        breakCondition = False
+        while not breakCondition:
+            points = {}
+            #keeps populations of species at the given moment across files
+            fileCount = 0
+            for inFile in handles:
+                line = inFile.readline()
+                if line =='':
+                    breakCondition = True
+                    print(
+                        'Termination condition is met on line '+
+                        str(count)+' in '+str(inFile))
+                elif line[0]=="#":
+                    continue
+                else:
+                    raw = (line.rstrip(',\n')).split(',')#TEST
+                    if fileCount == 0:
+                        count+=1
+                        self.times.append(float(raw[0]))
+                    fileCount += 1
+                    self._line2Data(raw,points,fileCount)
+            
+            if not breakCondition:
+                self._points2Evolutions(points,evolutions,count)
+            else:
+                actRecords = count+1
+                print('number of points is '+str(actRecords))
+                break
+        
+        [t.close() for t in handles]
+        
+        return evolutions, actRecords
+    
+    def _deleteTraj(self,outputDir):
+        files = [outputDir+'traj'+str(i) for i in range(self.numOfRuns)]
+        for traj in files:
+            system('rm '+traj)
+        
+        return None
+    
+    def _writeEvolutions(self):#TODO
+        evolutions, actRecords = self._makeStatistics()
+        system('rm '+self.outputDir+'means.txt')
+        system('rm '+self.outputDir+'standDivs.txt')
+        fMeans = open(self.outputDir+'means.txt','a')
+        fStd = open(self.outputDir+'standDivs.txt','a')
+        for spec in evolutions:
+            printMean = spec
+            printStd = spec
+            for item in evolutions[spec][0:actRecords]:
+                printMean+=' '+str(item[0])
+                printStd+=' '+str(item[1])
+            fMeans.write(printMean+'\n')
+            fStd.write(printStd+'\n')
+        fMeans.close()
+        fStd.close()
+        return None
+        
+    def _writeTimes(self):
+        string = str(self.times[0])
+        for item in self.times[1:]:
+            string += ' '+str(item)
+        fTimes = open(self.outputDir+'times.txt','w')
+        fTimes.write(string)
+        fTimes.close()
+        return None
+    
+    def _writeRuntimesStats(self):
+        runtimes = []
+        files = [self.outputDir+'timePerReac'+str(i) 
+                 for i in range(self.numOfRuns)]
+        for f in files:
+            with open(f,'r') as cf:
+                runtimes.append(float(cf.read().rstrip('\n')))
+            cf.close()
+        mean = np.mean(runtimes)
+        std = np.std(runtimes)
+        with open(self.outputDir+'runtimeStat.txt','w') as wf:
+            wf.write(str(mean)+' '+str(std))
+        wf.close()
+        
+        return None
+    
+    def _delRuntimes(self):
+        files = [self.outputDir+'timePerReac'+str(i) 
+                 for i in range(self.numOfRuns)]
+        for f in files:
+            system('rm '+f)
+        return None
+        
+    
+    def reorganizeOutput(self,numOfRuns,traj):
+        self.numOfRuns=numOfRuns
+        self.traj=traj
+        self._makeHeader(numOfRuns,traj)
+        self._writeEvolutions()
+        print('means and stds are written')
+        self._writeTimes()
+        #try:
+            #self._writeRuntimesStats()
+        #except:
+            #self.log.warning('runtimes weren\'t saved. something went wrong. Perhabs you were running jobs in parallel.')
+        if not self.traj:
+            self._deleteTraj(outputDir)
+            self._delRuntimes()
+        system('rm '+self.outputDir+'shell*')
+        system('rm '+self.outputDir+'run*')
+        return None
     
     def _readTimes(self):
         with open(self.outputDir+'times.txt','r') as content_file:
             content = content_file.read()
         times =[float(item) for item in content.split(' ')]
         return times
-        
-        
-    def _readMeans(self):
+    
+    def readMeans(self):
         evolutions = {}
         f = open(self.path2Folder+str("%03d" %self.modelNum)+
                  '_output'+str(self.simNum)+'/means.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            #evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            evolutions[raw[0]]=np.array([float(item) for item in raw[1:]])
             
         
         return evolutions
     
-    def _readStds(self):
+    def readStds(self):
         evolutions = {}
         f = open(self.path2Folder+str("%03d" %self.modelNum)+
                  '_output'+str(self.simNum)+'/standDivs.txt','r')
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            #evolutions[raw[0]]=scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            evolutions[raw[0]]=np.array([float(item) for item in raw[1:]])
         
         return evolutions
     
@@ -102,10 +294,15 @@ class Result(object):
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ',''))
         return parameters
 
-    def makeStats(self): 
+    def makeStats(self,natData): 
         '''return countAll, countFold, countCat, countAuto, length
         means/stds -- {name: [populations during time steps]}'''
-        print("total number of species in all runs is "+str(len(self.means.keys())))
+        try:
+            print("total number of species in all runs is "+str(len(self.means.keys())))
+        except:
+            self.means= self.readMeans()
+            self.stds = self.readStds()
+            print("total number of species in all runs is "+str(len(self.means.keys())))
         natData=hpClasses.readNativeList(int(self.parameters['maxLength']))
         lengths=set([])     #keeps lengths present in simulation
         countAll = [(0)]*(len(self.times)) 
@@ -115,7 +312,8 @@ class Result(object):
         #popStats={}#lengths distribution in the last moment of simulation
         #FIXME modify for sparse
         for key in self.means.keys():
-            means=self.means[key].A[0]
+            #means=self.means[key].A[0]
+            means=self.means[key]
             if key.find('f')==-1:
                 polLen=len(key)
                 lengths.add(len(key))
@@ -207,10 +405,11 @@ class Result(object):
         fig.set_title("Length distribution in the last moment")
         return None
         
-    def plotHPstats(self,jointData=None,saveFig=False,nonSteadyPercent=0.9):
+    def plotHPstats(self,natData,jointData=None,
+                    saveFig=False,nonSteadyPercent=0.9):
         maxLength = int(self.parameters['maxLength'])
         countAll, countFold, countCat, countAuto, lengths = \
-            self.makeStats()
+            self.makeStats(natData)
         if jointData == None:
             try:
                 jointData = self.jointData
@@ -228,8 +427,9 @@ class Result(object):
                  for name in jointData[length].keys()]) 
             for length in jointData.keys()
             ]
-        lengthsDistr=[ps/2**li for (ps,li) in 
-                  zip(lenPops,list(lengths))]
+        tp=sum(lenPops)
+        lengthsDistr=[ps/tp for ps in 
+                  lenPops]
         
 
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(18,14))
@@ -245,7 +445,7 @@ class Result(object):
             plt.suptitle(self._kin2str(), fontsize=20)
             plt.savefig(self._writeGraphFilename())
         
-        return (times, countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
+        return (countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
     
     def plotLenEvolution(self,show=True):
         '''
@@ -255,40 +455,47 @@ class Result(object):
         return None
         
     
-    def getSteadyMean(self,nonSteadyPercent):
+    def getSteadyMeanStd(self,nonSteadyPercent):
         border=int(nonSteadyPercent*len(self.times))
-        steady={}
+        steadyMean={}
+        steadyStd={}
         for seq in self.means.keys():
-            means=self.means[seq].A[0]
+            #means=self.means[seq].A[0]
+            means=self.means[seq]
             points=means[border:]
-            steady[seq]=np.mean(points)
+            steadyMean[seq]=np.mean(points)
+            steadyStd[seq]=np.std(points)
         
-        steadySorted = OrderedDict(
-            sorted(steady.items(), key=lambda t: t[1],reverse=True)
+        steadyMeanSorted = OrderedDict(
+            sorted(steadyMean.items(), key=lambda t: t[1],reverse=True)
+            )
+        steadyStdSorted = OrderedDict(
+            sorted(steadyStd.items(), key=lambda t: t[1],reverse=True)
             )
         
-        return steadySorted
+        return steadyMeanSorted, steadyStdSorted
     
-    def getSteadyStd(self,nonSteadyPercent):
-        border=int(nonSteadyPercent*len(self.times))
-        steady={}
-        for seq in self.stds.keys():
-            stds=self.stds[seq].A[0]
-            points=stds[border:]
-            steady[seq]=np.mean(points)
+    #def getSteadyStd(self,nonSteadyPercent):
+        #border=int(nonSteadyPercent*len(self.times))
+        #steady={}
+        #for seq in self.means.keys():
+            ##stds=self.stds[seq].A[0]
+            #stds=self.means[seq]
+            #points=stds[border:]
+            #steady[seq]=np.mean(points)
         
-        steadySorted = OrderedDict(
-            sorted(steady.items(), key=lambda t: t[1],reverse=True)
-            )
+        #steadySorted = OrderedDict(
+            #sorted(steady.items(), key=lambda t: t[1],reverse=True)
+            #)
         
-        return steadySorted
+        #return steadySorted
     
     def makeDictOfLengths(self,maxLength,nonSteadyPercent):
         '''returns dictionary of ordereder dictionaries
         {length: OrderedDict{seq: float}}
         '''
-        steadyMean = self.getSteadyMean(nonSteadyPercent)   #sortedDict
-        steadyStd = self.getSteadyStd(nonSteadyPercent)     #sortedDict
+        steadyMean,steadyStd = self.getSteadyMeanStd(nonSteadyPercent)   #sortedDict
+        
         steadyLen={}
         for i in range(1,maxLength+1):      #initialyze dicts
             steadyLen[i]={}
@@ -340,7 +547,7 @@ class Result(object):
                     means.append(self.jointData[length][seq][0])
                     stds.append(self.jointData[length][seq][1])
                     indxes[i]=seq
-                
+                print('passed means')
                 if samp == None:
                     samp = 10
                 jointLabels[length], epsilons[length]=clustList(
@@ -394,8 +601,27 @@ class Result(object):
             
             
             
-        
+    def getInitPopFromTraj(self,trajNum,atTime,initFileName):
+        trajFile = open(os.path.join(self.path2Folder,
+                    (str("%03d" %self.modelNum)+'_output'+str(self.simNum)),
+                    'traj'+str(trajNum)),'r')
+        time=0
+        while not time == atTime:
+            line = (trajFile.readline()).rstrip('\n')
+            if line[0]=='#':
+                continue
+            else:
+                raw = line.split(',')
+                data = raw[1:]
+                time = float(raw[0])
+                print(time)
+        initFile = open( os.path.join(self.path2Folder,
+                    initFileName),'a')
+        for point in data:
+            initFile.write(point+'\n')
+        return None    
 
+#######EXTRA FUNCTIOS######
 
 def median(mylist):
     sorts = sorted(mylist)
@@ -405,17 +631,20 @@ def median(mylist):
     med=sorts[int(length / 2)]
     if med==0.0:
         i=1
-        while med==0.0:
+        while i<1000:
             med=sorts[int(length *i/(i+1))]
             i+=1
-        print('variance at '+str(i)+'/'+str(i+1))
         if med==0.0:
-            raise ValueError('Average=0!!!!!')
+            med = 0.0001
+            print('artificial median of 0.0001 is set up')
+        else:
+            print('variance at '+str(i)+'/'+str(i+1))
     
     return med
 
 def clustList(means,stds,length,samp,epsilonModifyer):
     X=np.array([means,[1]*len(means)]).T
+    print('got X')
     med=median(stds)
     '''
     if length>8:
@@ -439,12 +668,12 @@ def clustList(means,stds,length,samp,epsilonModifyer):
 
 
 
-
 if __name__ == "__main__":
-    modelNum = 13
-    simNum = 2
+    modelNum = 12
+    simNum = 22
     r = Result(modelNum,simNum)
-    r.plotHPstats()
+    r.getInitPopFromTraj(0,50.0,'populations50.txt')
+    #r.plotHPstats()
     #steadyLen = r.makeDictOfLengths(25)
     #jointLabels, epsilons = r.clustLengths(14,25)
     

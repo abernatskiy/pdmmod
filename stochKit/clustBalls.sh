@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -N run13
+#$ -N stochkit
 #$ -cwd
 #$ -q cpu_long@node061
 #$ -pe openmpi 1

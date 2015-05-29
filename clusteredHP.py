@@ -17,6 +17,8 @@ class ClusteredResults(result.Result):
         self.minLength=minLength
         self.maxLength=maxLength
         self.natData = hpClasses.readNativeList(self.maxLength)
+        self.means = self.readMeans()
+        self.stds = self.readStds()
         self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
                      nonSteadyPercent,samp,epsilonModifyer)
                     #labels for each length

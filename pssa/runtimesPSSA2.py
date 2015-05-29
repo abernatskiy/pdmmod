@@ -11,7 +11,7 @@ from numpy import linspace
 
 sys.path.append('../')
 import routes
-from balls import *
+from growballs import *
 
 '''DATA
 * numSpec -- int.
@@ -48,15 +48,15 @@ def getSimTime(command,numOfRuns):
     std = np.std(times)
     return time, std
 
-def runSeveralBallsVarNSpec(command,runs,population,collRate,species):#TEST
+def runSeveralBallsVarNSpec(command,runs,maxLength,collRate,species):#TEST
     '''runs several simulations with different number of species but fixed population of every specie
     '''
     system('rm runTemp.txt && touch runTemp.txt' )
     for numSpec in species:
-        system('rm -r out/PDM')
-        filewriter('b.sbml','balls',numSpec,population,collRate)
+        system('rm -r out2/PDM')
+        filewriter('b2.sbml','growballs',numSpec,maxLength,collRate,)
         pair=getSimTime(command,runs)
-        with open("runTemp.txt", "a") as myfile:
+        with open("runTemp2.txt", "a") as myfile:
             myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
 
     
@@ -64,14 +64,16 @@ def runSeveralBallsVarNSpec(command,runs,population,collRate,species):#TEST
 
 if __name__ == "__main__":
     runs = 10
-    population = 50
+    population = 1
     collRate = 0.5
+    maxLength = 10
     command = '../libpssa-1.0.0RC/pssa_cli/pssa'
 
-    species = [2200,2300,2400,2500,2600,
-         2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,
-         4000,4100,4200,4300,4400,4500] 
+    species = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,
+         160,170,180,190,200,210,220,230,240,250,260,270,280,
+         290,300,310,320,330,340,350,360,370,380,390,
+         400,410,420,430,440,450] 
 
-    runSeveralBallsVarNSpec(command,runs,population,collRate,species)
+    runSeveralBallsVarNSpec(command,runs,maxLength,collRate,species)
 
 

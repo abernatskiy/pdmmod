@@ -118,9 +118,10 @@ int main (int argc, char** argv){
     clock_t t1,t2;
     int stp = 0;
     t1=clock();
-
+    std::cout << "here!!!!!1" << catPatterns[std::string("HPPPHHPPHHHHPHHPPHHPHHH")] << std::endl;
+//     for (std::map<std::string,std::string>::iterator it=catPatterns.begin(); it!=catPatterns.end(); ++it)
+//         std::cout << it->first << " => " << it->second << '\n';
     while(dataLogger->makeRecords()){
-        std::cout << "here!!!!!1" << catPatterns[std::string("HPPPHHPPHHHHPHHPPHHPHHH")] << std::endl;
         //std::cout << tp << std::endl;
         stp = tp.stepSimulation();
         reacNum++;

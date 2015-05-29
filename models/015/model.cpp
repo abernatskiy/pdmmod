@@ -38,6 +38,7 @@ Specie::Specie(std::string id){
     modelName = std::string("hp-full-hydrolysis-phobicCut");
     m_complex = false;
     m_active = false;
+    m_catalyst = std::string("N");
     m_id = id; //HP sequence
     //define emptyness
     if (m_id==""){}
@@ -110,6 +111,7 @@ Specie::Specie(std::string id){
     }
     //if sequence is folded (it has 'f' in front of the actual sequence)
     else{
+        //if it's a complex of folder and non-folder
         if (m_id.find(std::string("_")) != std::string::npos){
             m_folded = false;
             m_length = 0;
@@ -124,8 +126,14 @@ Specie::Specie(std::string id){
             m_length = m_id.length()-1;
             //it can be a catalyst
             //if it's a catalyst we'll get a catPattern, if not we'll get "N" as m_catalyst
-            m_catalyst = catPatterns[m_id.substr(1,m_length)];
-            m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
+            m_catalyst = catPatterns[m_id.substr(1,m_length+1)];
+            m_native = wellDepths.find(m_id.substr(1,m_length+1)) -> second;
+            if (m_catalyst.length() == 0){
+                std::cout<< catPatterns["HPPHHPPHP"] << std::endl;
+                for (std::map<std::string,std::string>::iterator it=catPatterns.begin(); it!=catPatterns.end(); ++it)
+                    std::cout << "element" <<it->first << " => " << it->second << '\n';
+                throw std::invalid_argument("pattern isn't found in the catPattern dict: "+m_id+" "+m_id.substr(1,m_length+1));
+            }
         }
     }
     
@@ -136,7 +144,7 @@ Specie::Specie(std::string id){
         size_t n = std::count(m_id.begin(), m_id.end(), 'H');
         m_hydrophobicity = ((float)  n)/m_length;
     }
-    
+
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
@@ -204,8 +212,14 @@ void Specie::formComplex(std::list<Reaction>& allReactions,Specie specie,
     int common = std::min(specie.m_catalyst.length(),
                             m_substrate.length());
     if (common == 0){
-        //throw std::invalid_argument( "common = 0" +specie.m_catalyst+"! "+m_substrate+"M:"+catPatterns[std::string("PHHPPPPPHHHPHHHHHPPHP")]);
+        std::cout << common << std::endl;
+        std::cout << specie.m_id << std::endl;
+        std::cout << specie.m_length << std::endl;
+        std::cout << specie.m_id.substr(1,m_length+1) << std::endl;
+        std::cout << specie.m_catalyst << std::endl;
+        std::cout << "!" << std::endl;
     }
+    throw std::invalid_argument(specie.m_id+": "+specie.m_catalyst+" <-C S-> "+m_substrate);
     float rate = exp(eH*common);
     Reaction complexFormation(m_id,1,specie.m_id,1,rate);
     complexFormation.addProduct(specie.m_id+std::string("_")+m_id,1);
@@ -277,7 +291,6 @@ std::list<Reaction> Specie::reactions(Specie specie){
 //             allReactions.push_back(falseGrowP);
 //         }
     }
-    //binary reactions
     //if the other molecule is a catalyst and a given one isn't folded and a substate
     else if (specie.m_catalyst != std::string("N") && m_folded == false && m_substrate != std::string("N")){
         formComplex(allReactions,specie,alpha,eH);

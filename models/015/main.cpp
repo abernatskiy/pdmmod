@@ -41,10 +41,14 @@ char* getCmdOption(char** begin, char** end, const std::string & option){
 }
 
 int main (int argc, char** argv){
+    /* Loading HP-model-specific data */
+    catPatterns = readCatPatterns("nativeList.txt");
+    wellDepths = readWellDepths("nativeList.txt");
 
     /* Parsing command line options */
 
     // treating nonpositinal arguments first
+    
     int positionalArgc = argc;
     std::string configFileName("parameters.ini");
     if (getCmdOption(argv, argv+argc, "-c") != NULL){
@@ -100,9 +104,7 @@ int main (int argc, char** argv){
     std::cout << " before beginning" << std::endl;
     TotalPopulation tp(initialPopulationFileName);
 
-    /* Loading HP-model-specific data */
-    catPatterns = readCatPatterns("nativeList.txt");
-    wellDepths = readWellDepths("nativeList.txt");
+    
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;
@@ -118,13 +120,14 @@ int main (int argc, char** argv){
     clock_t t1,t2;
     int stp = 0;
     t1=clock();
-    std::cout << "here!!!!!1" << catPatterns[std::string("HPPPHHPPHHHHPHHPPHHPHHH")] << std::endl;
+
 //     for (std::map<std::string,std::string>::iterator it=catPatterns.begin(); it!=catPatterns.end(); ++it)
 //         std::cout << it->first << " => " << it->second << '\n';
     while(dataLogger->makeRecords()){
         //std::cout << tp << std::endl;
         stp = tp.stepSimulation();
         reacNum++;
+        //debugging message
         std::cout << tp << std::endl;
         if(stp == 1)
             break;

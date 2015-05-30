@@ -41,7 +41,10 @@ char* getCmdOption(char** begin, char** end, const std::string & option){
 }
 
 int main (int argc, char** argv){
-
+    /* Loading HP-model-specific data */
+    catPatterns = readCatPatterns("nativeList.txt");
+    wellDepths = readWellDepths("nativeList.txt");
+    
     /* Parsing command line options */
 
     // treating nonpositinal arguments first
@@ -100,9 +103,7 @@ int main (int argc, char** argv){
     std::cout << " before beginning" << std::endl;
     TotalPopulation tp(initialPopulationFileName);
 
-    /* Loading HP-model-specific data */
-    catPatterns = readCatPatterns("nativeList.txt");
-    wellDepths = readWellDepths("nativeList.txt");
+    
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;

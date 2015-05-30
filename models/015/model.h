@@ -1,6 +1,6 @@
 #ifndef __SPECIE_H
 #define __SPECIE_H
-
+#include <map>
 #include <vector>
 #include <string>
 #include <list>
@@ -11,11 +11,20 @@
  * sequences grow on its own and never decay
  */
 
-
+extern std::map<std::string,std::string> catPatterns;
 
 
 class Specie
 {
+    /* A Specie can be:
+     * - activated monomer
+     * - unfolded polymer, including 1-mers
+     * - folded polymer
+     * - substrate: unfolded polymer with 'HH' in the end
+     * - catalyst: folded polymer, if catalyst catPatterns[m_id]!= "N"
+     * - complex: catalyst and substate bound together
+     *      m_id = catalyst.m_id+"_"+substate.m_id
+     */
 public:
     std::string modelName;
     Specie(){};

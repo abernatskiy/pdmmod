@@ -28,6 +28,7 @@ int TotalPopulation::stepSimulation(){
     }
 
     Reaction reac = sampleReaction();
+    //debugging message
     std::cout << "Got reaction " << reac << std::endl;
     m_t += sampleTime();
 

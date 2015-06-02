@@ -28,11 +28,15 @@
  */
 #include <map>
 #include <algorithm>
+#include <exception>
+
 
 extern std::map<std::string,Parameter> configDict;
 /* HP-model-specific global variables */
 // extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
+
+
 
 Specie::Specie(std::string id){
     /* A Specie can be:
@@ -48,15 +52,13 @@ Specie::Specie(std::string id){
     m_complex = false;
     m_active = false;
     m_catalyst = std::string("N");
+    m_substrate = std::string("N");
+    m_product = false;
     m_id = id; //HP sequence
     //define emptyness
     if (m_id==""){}
     //if id is one letter
-    else if(m_id.length()==1){
-        m_substrate = std::string("N");
-        m_product = false;
-        
-    }
+    else if(m_id.length()==1){}
     //if id has * -- it's activated
     else if (m_id==std::string("H*") || m_id==std::string("P*")){
         m_length = 1;
@@ -64,6 +66,7 @@ Specie::Specie(std::string id){
         m_substrate = std::string("N");
         m_product = false;
         m_folded = false;
+        m_complex = false;
     }
     //if sequence doesn't have HH as two last monomers in its sequence it cannot be a substrate
     else if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
@@ -178,6 +181,17 @@ void Specie::degradeIt(std::list<Reaction>& allReactions,Specie specie,
     allReactions.push_back(degradation);
     }
 
+void Specie::make2mer(std::list<Reaction>& allReactions,Specie specie,
+                    float alpha){
+    Reaction getHH(m_id,1,specie.m_id,0,alpha);
+    getHH.addProduct((std::string("H")+m_id.substr(0,1)),1);
+    allReactions.push_back(getHH);
+    
+    Reaction getPH(m_id,1,specie.m_id,0,alpha);
+    getPH.addProduct((std::string("P")+m_id.substr(0,1)),1);
+    allReactions.push_back(getPH);
+    }
+    
 void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
                      float aggRate,int aggPower){
     if (aggPower==0){
@@ -218,25 +232,49 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
     unfold.addProduct(m_id.substr(1,m_length),1);
     allReactions.push_back(unfold);
 }
-void Specie::formComplex(std::list<Reaction>& allReactions,Specie specie,
-                        float alpha, float eH){
-    //how many H's are attracted to each other?
-    int common = std::min(specie.m_catalyst.length(),
-                            m_substrate.length());
-    if (common == 0){
-        std::cout << "common=" << common << std::endl;
-        std::cout << specie.m_id << std::endl;
-        std::cout << specie.m_length << std::endl;
-        std::cout <<" "<<specie.m_id.substr(1,m_length+1) << std::endl;
-        std::cout << specie.m_catalyst << std::endl;
-        std::cout << "!" << std::endl;
-    
-        //throw std::invalid_argument(specie.m_id+": "+specie.m_catalyst+" <-C S-> "+m_substrate);
+
+void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
+                    float alpha, int maxLength){//BUG
+    Reaction growth(m_id,1,specie.m_id,1,alpha);
+    if (m_active && specie.m_length<maxLength){
+        std::cout << "self is active " << std::endl;
+        growth.addProduct(specie.m_id+m_id.substr(0,1),1);
+        allReactions.push_back(growth);
     }
-    float rate = exp(eH*common);
-    Reaction complexFormation(m_id,1,specie.m_id,1,rate);
-    complexFormation.addProduct(specie.m_id+std::string("_")+m_id,1);
-    allReactions.push_back(complexFormation);
+    else{
+        std::cout << "other is active " << std::endl;
+        if (m_length<maxLength){
+        growth.addProduct(m_id+specie.m_id.substr(0,1),1);
+        allReactions.push_back(growth);
+        }
+    }
+}
+
+void Specie::formComplex(std::list<Reaction>& allReactions,Specie specie,
+                         float alpha, float eH){//BUG
+    //how many H's are attracted to each other?
+    int common;
+    if (specie.m_folded && (not m_folded)){
+        std::cout << "other is folded " << std::endl;
+        common = std::min(specie.m_catalyst.length(),m_substrate.length());
+        float rate = exp(eH*common);
+        Reaction complexFormation(m_id,1,specie.m_id,1,rate);
+        complexFormation.addProduct(specie.m_id+std::string("_")+m_id,1);
+        allReactions.push_back(complexFormation);
+    }
+    else{
+        std::cout << "self is folded " << std::endl;
+        common = std::min(m_catalyst.length(),specie.m_substrate.length());
+        float rate = exp(eH*common);
+        Reaction complexFormation(m_id,1,specie.m_id,1,rate);
+        complexFormation.addProduct(m_id+std::string("_")+specie.m_id,1);
+        allReactions.push_back(complexFormation);
+    }
+    if (common == 0){
+        throw std::invalid_argument("common = 0");
+    }
+    
+    
 }
 //         //catalyst always stays
 //         catGrowth.addProduct(specie.m_id,1);
@@ -250,17 +288,19 @@ std::list<Reaction> Specie::reactions(Specie specie){
     /* Nothing can:
      * - create Activated monomer (imp.) :implemented 
      * Activated monomer can:
-     * - interact with Unfolded polymer in Growth reaction: (TODO)
+     * - interact with Unfolded polymer in Growth reaction: (imp.)
      * - interact with Unfolded polymer in FalseGrowth reaction 
-     *      if Unfolded polymer is maxLength long: (TODO)
+     *      if Unfolded polymer is maxLength long: (imp.)
      * - interact with Complex in Catalysis reaction(TODO) 
      * - interact with Complex in FalseCatalysis reaction
      *      if substate part of Complex is maxLength long: (TODO) 
-     * - transform into 1mer: (TODO)
+     * - transform into 2mer 
+     *      (this is interactinon with 1mers, 
+     *      but we assume 1 mers are const concentration): (imp.)
      * Unfolded polymer (including 1mers and substrates) can:
-     * - interact with activated monomer in Growth reaction (TODO)
+     * - interact with activated monomer in Growth reaction (imp.)
      * - interact with activated monomer in FalseGrowth reaction
-     *      if it's maxLength long (TODO)
+     *      if it's maxLength long (imp.)
      * - hydrolyze (imp.)
      * - degrade (imp.)
      * - aggregate if condtions met (imp.)
@@ -270,7 +310,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
      * - unfold (imp.)
      * - degrade (imp.)
      * Catalyst is Folded polymer + it can:
-     * - interact with Substrate to form Complex (TODO)
+     * - interact with Substrate to form Complex (imp.)
      * Complex can:
      * - degrade (imp.TEST)
      * - interact with Activated monomer in Catalysis reaction (TODO)
@@ -280,7 +320,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //parameters
     float aH = configDict["monomerBirthH"].getFloat();
     float aP = configDict["monomerBirthP"].getFloat();     
-//    int maxLength = configDict["maxLength"].getInt();
+    int maxLength = configDict["maxLength"].getInt();
      float alpha = configDict["growth"].getFloat();
     float d = configDict["unfoldedDegradation"].getFloat();
 //     float dF = configDict["foldedDegradation"].getFloat();
@@ -294,14 +334,17 @@ std::list<Reaction> Specie::reactions(Specie specie){
     // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.
     if (m_id==std::string("")){
         if (specie.m_id==std::string("")){
-            /*importActive(allReactions,specie,aH,std::string("H"));
-            importActive(allReactions,specie,aP,std::string("P"));*/
+            importActive(allReactions,specie,aH,std::string("H"));
+            importActive(allReactions,specie,aP,std::string("P"));
         }
     }
     //monomolecular reactions
-    else if (m_id == specie.m_id){
+    else if (m_id == specie.m_id && m_active){
+        make2mer(allReactions,specie,alpha);
+    }
+    else if (m_id == specie.m_id && (not m_active)){
          //it degrades
-         degradeIt(allReactions,specie,d);
+        degradeIt(allReactions,specie,d);
     
         //if it's not folded
         if (m_folded == false){
@@ -317,39 +360,26 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //ih unfolds
             unfoldIt(allReactions,specie,k_unf);
         }
-//         //it grows if it's not of a max length and not folded
-//         if (m_length != maxLength && m_folded == false) {
-//             Reaction growH(m_id,1,specie.m_id,0,alpha);
-//             growH.addProduct(m_id+std::string("H"),1);
-//             allReactions.push_back(growH);
-//             Reaction growP(m_id,1,specie.m_id,0,alpha);
-//             growP.addProduct(m_id+std::string("P"),1);
-//             allReactions.push_back(growP);
-//         }
-//         //false degradation (we are blind if sequence grows too long)
-//         else if (m_length == maxLength && m_folded == false){
-//             Reaction falseGrowH(m_id,1,specie.m_id,0,alpha);
-//             allReactions.push_back(falseGrowH);
-//             Reaction falseGrowP(m_id,1,specie.m_id,0,alpha);
-//             allReactions.push_back(falseGrowP);
-//         }
     }
     //if the other molecule is a catalyst and a given one isn't folded and a substate
-    else if (specie.m_catalyst != std::string("N") && m_folded == false && m_substrate != std::string("N")){
+    else if (specie.m_catalyst != std::string("N") && m_folded == false && 
+        m_substrate.find(std::string("HH"))){
+        std::cout << "other is folded " << std::endl;
         formComplex(allReactions,specie,alpha,eH);
     }
     //if a given molecule is a catalyst and the other molecule isn't folded and a substate TODO HERE
-//     else if (m_catalyst != std::string("N") && specie.m_folded == false && specie.m_substrate != std::string("N")){
-//         int common = std::min(m_catalyst.length(), specie.m_substrate.length()+1);
-//         Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
-//         //catalyst always stays
-//         catGrowth.addProduct(m_id,1);
-//         if (specie.m_length<maxLength){
-//             catGrowth.addProduct(specie.m_id+std::string("H"),1);
-//         }
-//         allReactions.push_back(catGrowth);
-         
+    else if (m_catalyst != std::string("N") && specie.m_folded == false && 
+        specie.m_substrate.find(std::string("HH")) != std::string::npos){
+        formComplex(allReactions,specie,alpha,eH);
+    }
+//     else if (m_active && (specie.m_folded==false && specie.m_active==false)){
+//         //growIt(allReactions,specie,alpha,maxLength);
 //     }
+    else if ((m_folded==false && m_active==false) && specie.m_active==true){
+        growIt(allReactions,specie,alpha*10.0,maxLength);
+    }
+
+    
     return allReactions;
 }
 Specie::~Specie(){

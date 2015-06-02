@@ -58,6 +58,10 @@ private:
     //degrades or aggregates molecule
     void degradeIt(std::list<Reaction>& allReactions,Specie specie,
                       float degrRate);
+    void make2mer(std::list<Reaction>& allReactions,Specie specie,
+             float alpha);
+    void growIt(std::list<Reaction>& allReactions,Specie specie,
+                float alpha, int maxLength);
     void hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
                              float dH);
     void aggregateIt(std::list<Reaction>& allReactions,Specie specie,

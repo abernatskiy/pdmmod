@@ -370,7 +370,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //if a given molecule is a catalyst and the other molecule isn't folded and a substate TODO HERE
     else if (m_catalyst != std::string("N") && specie.m_folded == false && 
         specie.m_substrate.find(std::string("HH")) != std::string::npos){
-        formComplex(allReactions,specie,alpha,eH);
+        formComplex(allReactions,specie,3.0*alpha,eH);
     }
 //     else if (m_active && (specie.m_folded==false && specie.m_active==false)){
 //         //growIt(allReactions,specie,alpha,maxLength);

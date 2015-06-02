@@ -317,6 +317,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
      * - interact with Activated monomer in FalseCatalysis reaction
      *      if substate part of Complex is maxLength long: (TODO) 
      */
+
+    std::cout << "CALL " << m_id << ".reactions(" << specie.m_id << "), RETURNED:\n";
+
     //parameters
     float aH = configDict["monomerBirthH"].getFloat();
     float aP = configDict["monomerBirthP"].getFloat();     
@@ -379,7 +382,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
         growIt(allReactions,specie,alpha*10.0,maxLength);
     }
 
-    
+    for(auto it=allReactions.begin(); it != allReactions.end(); it++)
+        std::cout << (*it) <<std::endl;
+
     return allReactions;
 }
 Specie::~Specie(){

@@ -120,108 +120,180 @@ std::ostream& operator<<(std::ostream& os, const Specie& sp)
     os << sp.m_id ;
     return os;
 }
+
+
 //methods
+void Specie::importHorP(std::list<Reaction>& allReactions,Specie specie,
+                          float impRate,std::string HorP){
+    Reaction importIt(m_id, 0, specie.m_id, 0, impRate);
+    importIt.addProduct(HorP,1);
+    allReactions.push_back(importIt);
+}
+
+void Specie::degradeIt(std::list<Reaction>& allReactions,Specie specie,
+                       float degrRate){
+    Reaction degradation(m_id,1,specie.m_id,0,degrRate);
+    allReactions.push_back(degradation);
+}
+
+void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
+                     float aggRate,int aggPower){
+    if (aggPower==0){
+        if (m_hydrophobicity >=0.8){
+            Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
+            allReactions.push_back(aggregation);
+        }
+    }
+    else{
+        Reaction aggregation(m_id,1,specie.m_id,0,
+                         aggRate*pow(m_hydrophobicity,aggPower)*m_length);
+        allReactions.push_back(aggregation);
+    }
+}
+
+void Specie::hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
+                         float dH){
+    for (int i=1; i<(m_length); i++){
+        Reaction hydrolysis(m_id,1,specie.m_id,0,dH);
+        hydrolysis.addProduct(m_id.substr(0,i),1);
+        hydrolysis.addProduct(m_id.substr(i,m_length-i),1);
+        allReactions.push_back(hydrolysis);
+    }
+}
+
+void Specie::foldIt(std::list<Reaction>& allReactions,Specie specie,
+                    float eH, float k_unf){
+        Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));
+        fold.addProduct(std::string("f")+m_id,1);
+        allReactions.push_back(fold);
+}
+
+void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
+                    float k_unf){
+    Reaction unfold(m_id,1,specie.m_id,0,k_unf);
+    unfold.addProduct(m_id.substr(1,m_length),1);
+    allReactions.push_back(unfold);
+}
+
+void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
+                    float alpha, std::string HorP, int maxLength){
+                        Reaction growth(m_id,1,specie.m_id,1,alpha);
+                        if (m_length<maxLength){
+                            growth.addProduct(m_id+HorP,1);
+                        }
+                        allReactions.push_back(growth);
+}
+
+void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
+                         float alpha, float eH, int maxLength){
+    //how many H's are attracted to each other?
+    int common;
+    if (specie.m_folded && (not m_folded)){
+        std::cout << "other is folded " << std::endl;
+        common = std::min(specie.m_catalyst.length(),m_substrate.length());
+        float rate = exp(eH*common);
+        Reaction catalysis(m_id,1,specie.m_id,1,rate);
+        catalysis.addProduct(specie.m_id,1);
+        if (m_length<maxLength){
+            catalysis.addProduct(m_id+std::string("H"),1);
+        }
+        allReactions.push_back(catalysis);
+    }
+    else{
+        std::cout << "self is folded " << std::endl;
+        common = std::min(m_catalyst.length(),specie.m_substrate.length());
+        float rate = exp(eH*common);
+        Reaction catalysis(m_id,1,specie.m_id,1,rate);
+        catalysis.addProduct(m_id,1);
+        if (specie.m_length<maxLength){
+            catalysis.addProduct(specie.m_id+std::string("H"),1);
+        }
+        allReactions.push_back(catalysis);
+    }
+    if (common == 0){
+        throw std::invalid_argument("common = 0");
+    }
+}
+
+
 //Defining reactions here
 std::list<Reaction> Specie::reactions(Specie specie){
+    /* Nothing can:
+     * - create a monomer (imp.) :implemented 
+     * Unfolded polymer (including 1mers and substrates) can:
+     * - grow (imp.)
+     * - false grow(imp.)
+     * - hydrolyze (imp.)
+     * - degrade (imp.)
+     * - aggregate if condtions met (imp.)
+     * - fold (imp.)
+     * Substrate is Unfolded polymer + it can:
+     * - interact with Catalyst  
+     *      to grow(imp.)
+     *      or disappear(imp.)
+     * Folded polymer (including catalysts) can:
+     * - unfold (imp.)
+     * - degrade (imp.)
+     * Catalyst is Folded polymer + it can:
+     * - interact with Substrate 
+     *      for substrate to grow(imp.)
+     *      or to disappear(imp.)
+     */
     //parameters
     float aH = configDict["monomerBirthH"].getFloat();
     float aP = configDict["monomerBirthP"].getFloat();
     int maxLength = configDict["maxLength"].getInt();
     float alpha = configDict["growth"].getFloat();
-    float d = configDict["unfoldedDegradation"].getFloat();
-    float dF = configDict["foldedDegradation"].getFloat();
+    float d = configDict["degradation"].getFloat();
     float k_unf = configDict["unfolding"].getFloat();
     float eH = configDict["hydrophobicEnergy"].getFloat();
     float dH = configDict["hydrolysisRate"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
+    int aggPower = configDict["aggrDegree"].getInt();
     //all the reactions two species can have
     std::list<Reaction> allReactions;
     // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.
     if (m_id==std::string("")){
         if (specie.m_id==std::string("")){
-            Reaction importH(m_id, 0, specie.m_id, 0, aH);
-            importH.addProduct(std::string("H"),1);
-            allReactions.push_back(importH);
-            Reaction importP(m_id, 0, specie.m_id, 0, aP);
-            importP.addProduct(std::string("P"),1);
-            allReactions.push_back(importP);
+            importHorP(allReactions,specie,aH,std::string("H"));
+            importHorP(allReactions,specie,aP,std::string("P"));
         }
     }
     //monomolecular reactions
     else if (m_id == specie.m_id){
+        //it degrades
+        degradeIt(allReactions,specie,d);
         //if it's not folded
         if (m_folded == false){
-            //it degrades
-            Reaction degradation(m_id,1,specie.m_id,0,d);
-            allReactions.push_back(degradation);
-            if (m_hydrophobicity >=0.8){
-                Reaction aggregation(m_id,1,specie.m_id,0,dAgg);
-                allReactions.push_back(aggregation);
-            }
-            
+            //it can aggregate
+            aggregateIt(allReactions,specie,dAgg,aggPower);
             //hydrolysis of any bond can happen
-            for (int i=1; i<(m_length); i++){
-                Reaction hydrolysis(m_id,1,specie.m_id,0,dH);
-                hydrolysis.addProduct(m_id.substr(0,i),1);
-                hydrolysis.addProduct(m_id.substr(i,m_length-i),1);
-                allReactions.push_back(hydrolysis);
-            }
-            
+            hydrolyseIt(allReactions,specie,dH);
             //and might fold
             if (m_native!=0){
-                Reaction fold(m_id,1,specie.m_id,0,k_unf*exp(eH*m_native));
-                fold.addProduct(std::string("f")+m_id,1);
-                allReactions.push_back(fold);
+                foldIt(allReactions,specie,eH,k_unf);
             }
+            //it can grow
+            growIt(allReactions,specie,alpha, std::string("H"),maxLength);
+            growIt(allReactions,specie,alpha, std::string("P"),maxLength);
         }
         else{
-            //folded degrade too
-            Reaction degradationF(m_id,1,specie.m_id,0,dF);
-            allReactions.push_back(degradationF);
-            //and unfold
-            Reaction unfold(m_id,1,specie.m_id,0,k_unf);
-            unfold.addProduct(m_id.substr(1,m_length),1);
-            allReactions.push_back(unfold);
-        }
-        //it grows if it's not of a max length and not folded
-        if (m_length != maxLength && m_folded == false) {
-            Reaction growH(m_id,1,specie.m_id,0,alpha);
-            growH.addProduct(m_id+std::string("H"),1);
-            allReactions.push_back(growH);
-            Reaction growP(m_id,1,specie.m_id,0,alpha);
-            growP.addProduct(m_id+std::string("P"),1);
-            allReactions.push_back(growP);
-        }
-        //false degradation (we are blind if sequence grows too long)
-        else if (m_length == maxLength && m_folded == false){
-            Reaction falseGrowH(m_id,1,specie.m_id,0,alpha);
-            allReactions.push_back(falseGrowH);
-            Reaction falseGrowP(m_id,1,specie.m_id,0,alpha);
-            allReactions.push_back(falseGrowP);
+            //it unfolds
+            unfoldIt(allReactions,specie,k_unf);
         }
     }
     //binary reactions
-    //if the other molecule is a catalyst and a given one isn't folded and a substate
-    else if (specie.m_catalyst != std::string("N") && m_folded == false && m_substrate != std::string("N")){
-        int common = std::min(specie.m_catalyst.length(), m_substrate.length()+1);
-        Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
-        //catalyst always stays
-        catGrowth.addProduct(specie.m_id,1);
-        if (m_length<maxLength){
-            catGrowth.addProduct(m_id+std::string("H"),1);
-        }
-        allReactions.push_back(catGrowth);
+    //if the other molecule is a catalyst 
+    //and a given one isn't folded and is a substate
+    else if (specie.m_catalyst != std::string("N") && 
+            m_folded == false && 
+            m_substrate != std::string("N")){
+        catalyzeIt(allReactions,specie,alpha,eH,maxLength);
     }
-    //if a given molecule is a catalyst and the other molecule isn't folded and a substate
-    else if (m_catalyst != std::string("N") && specie.m_folded == false && specie.m_substrate != std::string("N")){
-        int common = std::min(m_catalyst.length(), specie.m_substrate.length()+1);
-        Reaction catGrowth(m_id,1,specie.m_id,1,alpha*exp(eH*common));
-        //catalyst always stays
-        catGrowth.addProduct(m_id,1);
-        if (specie.m_length<maxLength){
-            catGrowth.addProduct(specie.m_id+std::string("H"),1);
-        }
-        allReactions.push_back(catGrowth);
+    else if (m_catalyst != std::string("N") && 
+            specie.m_folded == false && 
+            specie.m_substrate != std::string("N")){
+        catalyzeIt(allReactions,specie,alpha,eH,maxLength);
     }
     return allReactions;
 }

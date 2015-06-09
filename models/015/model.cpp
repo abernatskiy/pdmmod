@@ -223,7 +223,6 @@ void Specie::foldIt(std::list<Reaction>& allReactions,Specie specie,
         fold.addProduct(std::string("f")+m_id,1);
         allReactions.push_back(fold);
     }
-    
 }
 
 void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
@@ -234,7 +233,7 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
 }
 
 void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
-                    float alpha, int maxLength){//BUG
+                    float alpha, int maxLength){//BUG!
     Reaction growth(m_id,1,specie.m_id,1,alpha);
     if (m_active && specie.m_length<maxLength){
         std::cout << "self is active " << std::endl;
@@ -251,7 +250,7 @@ void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
 }
 
 void Specie::formComplex(std::list<Reaction>& allReactions,Specie specie,
-                         float alpha, float eH){//BUG
+                         float alpha, float eH){
     //how many H's are attracted to each other?
     int common;
     if (specie.m_folded && (not m_folded)){
@@ -273,8 +272,6 @@ void Specie::formComplex(std::list<Reaction>& allReactions,Specie specie,
     if (common == 0){
         throw std::invalid_argument("common = 0");
     }
-    
-    
 }
 //         //catalyst always stays
 //         catGrowth.addProduct(specie.m_id,1);
@@ -304,6 +301,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
      * - hydrolyze (imp.)
      * - degrade (imp.)
      * - aggregate if condtions met (imp.)
+     * - fold (TEST)
      * Substrate is Unfolded polymer + it can:
      * - interact with Catalyst to form Complex (imp.)
      * Folded polymer (including catalysts) can:
@@ -350,23 +348,23 @@ std::list<Reaction> Specie::reactions(Specie specie){
         degradeIt(allReactions,specie,d);
     
         //if it's not folded
-        if (m_folded == false){
+        if (m_folded == false){//BUG need to get read of complexes here
             //hydrolysis of any bond can happen
             hydrolyseIt(allReactions,specie,dH);
             //it can aggregate
             aggregateIt(allReactions,specie,dAgg,aggPower);
-            //and might fold
+            //and might fold BUG what if m_native = 0
             foldIt(allReactions,specie,eH,k_unf);
         }
         //if specie is folded
         else{
-            //ih unfolds
+            //it unfolds
             unfoldIt(allReactions,specie,k_unf);
         }
     }
     //if the other molecule is a catalyst and a given one isn't folded and a substate
     else if (specie.m_catalyst != std::string("N") && m_folded == false && 
-        m_substrate.find(std::string("HH"))){
+        m_substrate.find(std::string("HH"))!= std::string::npos){
         std::cout << "other is folded " << std::endl;
         formComplex(allReactions,specie,alpha,eH);
     }
@@ -376,7 +374,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         formComplex(allReactions,specie,alpha,eH);
     }
     else if (m_active && (specie.m_folded==false && specie.m_active==false)){
-        //growIt(allReactions,specie,alpha,maxLength);
+        growIt(allReactions,specie,alpha,maxLength);
     }
     else if ((m_folded==false && m_active==false) && specie.m_active==true){
         growIt(allReactions,specie,alpha,maxLength);

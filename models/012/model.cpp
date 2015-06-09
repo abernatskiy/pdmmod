@@ -177,7 +177,7 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
 
 void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
                     float alpha, std::string HorP, int maxLength){
-                        Reaction growth(m_id,1,specie.m_id,1,alpha);
+                        Reaction growth(m_id,1,specie.m_id,0,alpha);
                         if (m_length<maxLength){
                             growth.addProduct(m_id+HorP,1);
                         }

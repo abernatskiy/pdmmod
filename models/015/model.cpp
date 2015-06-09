@@ -316,7 +316,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
      *      if substate part of Complex is maxLength long: (TODO) 
      */
 
-    std::cout << "CALL " << m_id << ".reactions(" << specie.m_id << "), RETURNED:\n";
+//    std::cout << "CALL " << m_id << ".reactions(" << specie.m_id << "), RETURNED:\n";
 
     //parameters
     float aH = configDict["monomerBirthH"].getFloat();
@@ -380,8 +380,8 @@ std::list<Reaction> Specie::reactions(Specie specie){
         growIt(allReactions,specie,alpha,maxLength);
     }
 
-    for(auto it=allReactions.begin(); it != allReactions.end(); it++)
-        std::cout << (*it) <<std::endl;
+//    for(auto it=allReactions.begin(); it != allReactions.end(); it++)
+//        std::cout << (*it) <<std::endl;
 
     return allReactions;
 }

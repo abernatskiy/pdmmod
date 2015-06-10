@@ -55,8 +55,8 @@ class Result(object):
             self.reorganizeOutput(numOfRuns,traj)
             self.parameters = self._readSimData()
             self.times = self._readTimes()
-    
-        
+
+
     def _makeHeader(self,numOfRuns,traj):
         filename = 'traj0'
         proc =subprocess.call(
@@ -334,7 +334,8 @@ class Result(object):
             #here we store lengths distribution in the last moment of simulation  
             #addToDictNum(popStats,polLen,self.means[key][-1])
             
-            
+        print('len',lengths)
+        
         return countAll, countFold, countCat, countAuto, lengths
         
     
@@ -421,7 +422,7 @@ class Result(object):
             
         mL=max(lengths)
         print("maximum length of a polymer is "+str(mL))
-        #lengths = list(jointData.copy().keys())
+        lengths = list(jointData.copy().keys())
         lenPops = [
             sum([jointData[length][name][0] 
                  for name in jointData[length].keys()]) 
@@ -435,6 +436,8 @@ class Result(object):
         fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(18,14))
         self._plotTotalPop(ax0,countAll)
         self._plotTypes(ax1,countFold,countCat,countAuto)
+        print(lengthsDistr)
+        print(list(lengths))
         self._plotLenDistr(ax2,mL,list(lengths),lengthsDistr)
         
         title = 'Statistics of a HP-wordl simulation run'

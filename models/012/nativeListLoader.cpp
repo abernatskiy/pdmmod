@@ -25,6 +25,7 @@ std::map<std::string,std::string> readCatPatterns(std::string filename)
     std::map<std::string,std::string> catPatterns;
     std::string line;
     std::ifstream nativeList(filename, std::ifstream::in);
+    std::cout << "reading " << filename << std::endl;
     if(nativeList.is_open())
     {
         std::getline(nativeList, line); // ignoring the first line

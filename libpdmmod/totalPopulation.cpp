@@ -29,7 +29,7 @@ int TotalPopulation::stepSimulation(){
 
     Reaction reac = sampleReaction();
     //debugging message
-    std::cout << "Got reaction " << reac << std::endl;
+    //std::cout << "Got reaction " << reac << std::endl;
     m_t += sampleTime();
 
     // When the reaction is known, iterate through all species involved in the reaction

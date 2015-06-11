@@ -35,6 +35,9 @@ extern std::map<std::string,int> wellDepths;
 
 Specie::Specie(std::string id){
     modelName = std::string("hp-full-hydrolysis-phobicCut");
+    m_catalyst = std::string("N");
+    m_substrate = std::string("N");
+    m_product = false;
     m_id = id; //HP sequence
     if (m_id==""){}
     else if(m_id.length()==1){
@@ -101,7 +104,7 @@ Specie::Specie(std::string id){
         m_length = m_id.length()-1;
         //it can be a catalyst
         //if it's a catalyst we'll get a catPattern, if not we'll get "N" as m_catalyst
-        m_catalyst = catPatterns[m_id.substr(1,m_length)];
+        m_catalyst = catPatterns[m_id.substr(1,m_length+1)];
         m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
     }
     
@@ -189,7 +192,7 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
     //how many H's are attracted to each other?
     int common;
     if (specie.m_folded && (not m_folded)){
-        std::cout << "other is folded " << std::endl;
+//         std::cout << "other is folded " << std::endl;
         common = std::min(specie.m_catalyst.length(),m_substrate.length());
         float rate = exp(eH*common);
         Reaction catalysis(m_id,1,specie.m_id,1,rate);
@@ -200,7 +203,7 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
         allReactions.push_back(catalysis);
     }
     else{
-        std::cout << "self is folded " << std::endl;
+//         std::cout << "self is folded " << std::endl;
         common = std::min(m_catalyst.length(),specie.m_substrate.length());
         float rate = exp(eH*common);
         Reaction catalysis(m_id,1,specie.m_id,1,rate);
@@ -211,6 +214,7 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
         allReactions.push_back(catalysis);
     }
     if (common == 0){
+        std::cout << "c" <<m_catalyst << std::endl;
         throw std::invalid_argument("common = 0");
     }
 }

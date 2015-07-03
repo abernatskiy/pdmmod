@@ -1,5 +1,10 @@
 // Read an INI file into easy-to-access name/value pairs.
 
+// inih and INIReader are released under the New BSD license (see LICENSE.txt).
+// Go to the project home page for more info:
+//
+// https://github.com/benhoyt/inih
+
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -58,7 +63,7 @@ bool INIReader::GetBoolean(string section, string name, bool default_value)
 
 string INIReader::MakeKey(string section, string name)
 {
-    string key = section + "." + name;
+    string key = section + "=" + name;
     // Convert to lower case to make section/name lookups case-insensitive
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     return key;

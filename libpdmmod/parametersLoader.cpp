@@ -1,33 +1,33 @@
 #include "parametersLoader.h"
-#include "inih/cpp/INIReader.h"
-#include <cstdlib>
+
+#include "inih/ini.h"
 #include <iostream>
+#include <cstdlib>
+#include <cstring>
+
+static int handler(void* user, const char* section, const char* name, const char* value){
+    // The function which is called every time a new entry is read from the parameters INI file
+
+    std::map<std::string,Parameter>* dict = (std::map<std::string,Parameter>*) user;
+
+    std::cout << section << std::endl;
+    if(strcmp(section, "kinetic model") == 0) // processing the "kinetic model" section entries
+    {
+        float tempval = std::stof(value); // TODO replace with type autodetection
+        dict->emplace(name, tempval);
+        return 0;
+    }
+    else // no other sections allowed
+        std::cout << "Cannot recognize parameter INI file section " << section << std::endl;
+    return 1;
+}
 
 void readConfig(std::map<std::string,Parameter>* dict, std::string filename){
-
-    std::cout << "Read parameters from " << filename << std::endl;
-
-    INIReader reader(filename);
-    if (reader.ParseError() < 0) {
-        std::cout << "Can't load parameters.ini\n";
+    std::cout << "Reading parameters from " << filename << std::endl;
+    if(ini_parse(filename.c_str(), handler, (void*) dict) < 0){
+        std::cout << "Can't load parameters\n";
         exit(1);
     }
-
-    //dict->emplace("specNumber",          (int) reader.GetInteger("kinetic model", "specNumber", 5));
-    dict->emplace("collRate",          (float) reader.GetReal("kinetic model", "collRate", 0.1));
-    dict->emplace("monomerBirthH",          (float) reader.GetReal("kinetic model", "monomerBirthH", 0.0));
-    dict->emplace("monomerBirthP",          (float) reader.GetReal("kinetic model", "monomerBirthP", 0.0));
-    dict->emplace("growth",                 (float) reader.GetReal("kinetic model", "growth", 0.0));
-    dict->emplace("unfolding",              (float) reader.GetReal("kinetic model", "unfolding", 0.0));
-    dict->emplace("degradation",      (float) reader.GetReal("kinetic model", "degradation", 0.0));
-    dict->emplace("hydrophobicEnergy",      (float) reader.GetReal("kinetic model", "hydrophobicEnergy", -1.0));
-    dict->emplace("maxLength",              (int) reader.GetInteger("kinetic model", "maxLength", -1));
-    dict->emplace("hydrolysisRate",      (float) reader.GetReal("kinetic model", "hydrolysisRate", 0.1));
-    dict->emplace("aggregation",      (float) reader.GetReal("kinetic model", "aggregation", 0.1));
-    dict->emplace("minFoldLen",      (int) reader.GetInteger("kinetic model", "minFoldLen", 9));
-    dict->emplace("aggrDegree",      (int) reader.GetInteger("kinetic model", "aggrDegree", 0));
-    //explicit type convertions are required because GetReal() returns double and GetInteger() returns long int
-
     return;
 }
 

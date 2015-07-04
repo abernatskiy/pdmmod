@@ -7,9 +7,14 @@
 class Parameter
 {
 public:
+    /* Generic interface */
     Parameter();
+    Parameter(std::string valueToParse, bool interpretAsString);
     ~Parameter();
     std::string getType();
+    std::string getString(); //LISA// TODO from .cpp
+
+    /* Type-specific interfaces */
     //bool
     Parameter(bool value);
     bool getBool();
@@ -19,11 +24,10 @@ public:
     //float
     Parameter(float value);
     float getFloat();
-    //variables
+
+    /* Variables */
     short m_type;
     void* m_valuePtr;
-    //TODO from .cpp
-    std::string getString();
 private:
     template<typename T>
     Parameter(T value);

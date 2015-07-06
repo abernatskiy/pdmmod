@@ -3,11 +3,7 @@
 #include "parameter.h"
 
 Parameter::Parameter(){
-    m_valuePtr=NULL;
-}
-
-Parameter::Parameter(std::string valueToParse, bool interpretAsString){
-    // implement the parser here
+    m_valuePtr = NULL;
 }
 
 Parameter::~Parameter(){

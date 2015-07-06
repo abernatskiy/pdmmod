@@ -9,7 +9,6 @@ class Parameter
 public:
     /* Generic interface */
     Parameter();
-    Parameter(std::string valueToParse, bool interpretAsString);
     ~Parameter();
     std::string getType();
     std::string getString(); //LISA// TODO from .cpp

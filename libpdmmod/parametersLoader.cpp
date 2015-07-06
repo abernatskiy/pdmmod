@@ -24,14 +24,18 @@ static int handler(void* user, const char* section, const char* name, const char
 
         std::string tempstring = std::string(value);
         if(tempstring.find_first_not_of("1234567890.-") == std::string::npos){
-            std::size_t periods = std::count(tempstring.begin(), tempstring.end(), '.');
-            if(periods == 0){
-                dict->emplace(name, std::stoi(value));
-                return 0;
-            }
-            if(periods == 1){
-                dict->emplace(name, std::stof(value));
-                return 0;
+            std::size_t minuses = std::count(tempstring.begin(), tempstring.end(), '-');
+            if(minuses == 0 || (minuses == 1 && tempstring[0] == '-'))
+            {
+                std::size_t periods = std::count(tempstring.begin(), tempstring.end(), '.');
+                if(periods == 0){
+                    dict->emplace(name, std::stoi(value));
+                    return 0;
+                }
+                if(periods == 1){
+                    dict->emplace(name, std::stof(value));
+                    return 0;
+                }
             }
         }
 

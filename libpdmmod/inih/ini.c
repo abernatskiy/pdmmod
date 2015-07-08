@@ -3,9 +3,13 @@
 inih is released under the New BSD license (see LICENSE.txt). Go to the project
 home page for more info:
 
-http://code.google.com/p/inih/
+https://github.com/benhoyt/inih
 
 */
+
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <stdio.h>
 #include <ctype.h>

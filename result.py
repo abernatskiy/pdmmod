@@ -449,14 +449,27 @@ class Result(object):
             plt.savefig(self._writeGraphFilename())
         
         return (countAll, countFold, countCat, countAuto), (list(lengths),lengthsDistr)
-    
+
     def plotLenEvolution(self,show=True):
         '''
         '''
-        
-        
         return None
-        
+
+
+    def plotSpecific(self,listOfSeq,timeLims):
+        arrays=[self.means[name] for name in listOfSeq]
+        for (name,data) in zip (listOfSeq,arrays):
+            if not 'f' in name:
+                plt.plot(self.times,data,label=name,color='0.85',linewidth=3)
+            else:
+                plt.plot(self.times,data,label=name,linewidth=3)
+        plt.legend()
+        plt.title('Time evolutions of selected sequences',fontsize=30)
+        plt.ylabel('Population',fontsize=22)
+        plt.xlabel('Time',fontsize=22)
+        plt.xlim(timeLims)
+        plt.show()
+        return None
     
     def getSteadyMeanStd(self,nonSteadyPercent):
         border=int(nonSteadyPercent*len(self.times))

@@ -266,6 +266,8 @@ std::list<Reaction> Specie::reactions(Specie specie){
     int aggPower = configDict["aggrDegree"].getInt();
     float z = configDict["z"].getFloat();//TODO
     //all the reactions two species can have
+    std::cout << "Loadad" << std::endl;
+    std::cout << aH << "\n" << aP<< "\n" << maxLength<< "\n" << alpha<< "\n" << d<< "\n" << eH<< "\n" << dAgg<< "\n" << aggPower<< "\n" << z << std::endl;
     std::list<Reaction> allReactions;
 //     float u_rate = 
     

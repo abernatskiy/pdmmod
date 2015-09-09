@@ -169,13 +169,13 @@ void Specie::hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
 }
 //FOLDING
 float Specie::URate(float eH, float z){
-    return 1/(pow(z,m_length))*exp(16.15-1.28*sqrt(m_length)-0.5*m_length*eH+1.34*eH);}
+    return 0.1*exp(16.15-1.28*sqrt(m_length)-0.5*m_length*eH+1.34*eH);}
 
 void Specie::foldIt(std::list<Reaction>& allReactions,Specie specie,
                     float eH, float z)//TEST!!!!!!!!!!
 {
-    float u_rate = URate(eH, z);
-    Reaction fold(m_id,1,specie.m_id,0,u_rate*exp(eH*m_native));
+    float u_rate = URate(eH, z)*exp(eH*m_native)*1/(pow(z,m_length));
+    Reaction fold(m_id,1,specie.m_id,0,u_rate);
     fold.addProduct(std::string("f")+m_id,1);
     allReactions.push_back(fold);
 }
@@ -264,10 +264,10 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float dH = configDict["hydrolysisRate"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
     int aggPower = configDict["aggrDegree"].getInt();
-    float z = configDict["z"].getFloat();//TODO
+    float z = configDict["z"].getFloat();
     //all the reactions two species can have
-    std::cout << "Loadad" << std::endl;
-    std::cout << aH << "\n" << aP<< "\n" << maxLength<< "\n" << alpha<< "\n" << d<< "\n" << eH<< "\n" << dAgg<< "\n" << aggPower<< "\n" << z << std::endl;
+//     std::cout << "Loadad" << std::endl;
+//     std::cout << aH << "\n" << aP<< "\n" << maxLength<< "\n" << alpha<< "\n" << d<< "\n" << eH<< "\n" << dAgg<< "\n" << aggPower<< "\n" << z << std::endl;
     std::list<Reaction> allReactions;
 //     float u_rate = 
     
@@ -289,7 +289,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //hydrolysis of any bond can happen
             hydrolyseIt(allReactions,specie,dH);
             //and might fold
-            if (m_native!=0){
+            if (m_native!=0 && m_length>4){
                 foldIt(allReactions,specie,eH,z);
             }
             //it can grow

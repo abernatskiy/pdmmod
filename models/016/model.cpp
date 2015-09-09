@@ -144,18 +144,22 @@ void Specie::degradeIt(std::list<Reaction>& allReactions,Specie specie,
 }
 
 void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
-                     float aggRate,int aggPower){
-    if (aggPower==0){
-        if (m_hydrophobicity >=0.8){
-            Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
-            allReactions.push_back(aggregation);
-        }
-    }
-    else{
-        Reaction aggregation(m_id,1,specie.m_id,0,
-                         aggRate*pow(m_hydrophobicity,aggPower)*m_length);
+                     float aggRate,float aggPower){
+    if (m_hydrophobicity >=aggPower){
+        Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
         allReactions.push_back(aggregation);
     }
+//     if (aggPower==0){
+//         if (m_hydrophobicity >=0.8){
+//             Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
+//             allReactions.push_back(aggregation);
+//         }
+//     }
+//     else{
+//         Reaction aggregation(m_id,1,specie.m_id,0,
+//                          aggRate*pow(m_hydrophobicity,aggPower)*m_length);
+//         allReactions.push_back(aggregation);
+//     }
 }
 
 void Specie::hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
@@ -263,7 +267,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float eH = configDict["hydrophobicEnergy"].getFloat();
     float dH = configDict["hydrolysisRate"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
-    int aggPower = configDict["aggrDegree"].getInt();
+    float aggPower = configDict["aggrDegree"].getFloat();
     float z = configDict["z"].getFloat();
     //all the reactions two species can have
 //     std::cout << "Loadad" << std::endl;

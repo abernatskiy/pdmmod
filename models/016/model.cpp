@@ -173,7 +173,7 @@ void Specie::hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
 }
 //FOLDING
 float Specie::URate(float eH, float z){
-    return 0.1*exp(16.15-1.28*sqrt(m_length)-0.5*m_length*eH+1.34*eH);}
+    return exp(16.15-1.28*sqrt(m_length)-0.5*m_length*eH+1.34*eH);}
 
 void Specie::foldIt(std::list<Reaction>& allReactions,Specie specie,
                     float eH, float z)//TEST!!!!!!!!!!

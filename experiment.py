@@ -128,7 +128,7 @@ class Experiment(object):
             s.runSeveralParallelCluster(
                 numOfKernels, 
                 onNode,
-                paramFile=os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'paraeters'+str(i)+'.ini'),
+                paramFile=os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'parameters'+str(i)+'.ini'),
                 populFile=os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'populations.txt'))
             #s.reorganizeOutput()#BUG
         return None

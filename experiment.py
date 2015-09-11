@@ -143,18 +143,18 @@ class Experiment(object):
                 'populations.txt')
             perKernel = int(math.ceil(s.numOfRuns/kernels))
             lastKernel = s.numOfRuns - perKernel*(kernels-1)
-            for i in range(kernels-1):
-                trajFirst = i*perKernel
-                trajLast = int((i+1)*perKernel - 1)
-                self.log.info('kernel'+str(i))
-                self.addToQueue(
-                    self.outputDir,i,trajFirst,trajLast,jobs[i],onNode,
+            for j in range(kernels-1):
+                trajFirst = j*perKernel
+                trajLast = int((j+1)*perKernel - 1)
+                s.log.info('kernel'+str(j))
+                s.addToQueue(
+                    s.outputDir,j,trajFirst,trajLast,jobs[i],onNode,
                     paramFile,populFile)
             if kernels == 1:
-                i = -1
+                j = -1
                 trajLast = -1
-            self.log.info('last kernel')
-            self.addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobs[i],onNode,paramFile,populFile)
+            s.log.info('last kernel')
+            s.addToQueue(s.outputDir,j+1,trajLast+1,self.numOfRuns-1,jobs[i],onNode,paramFile,populFile)
 
         return None
     

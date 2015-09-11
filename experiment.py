@@ -7,6 +7,7 @@ sys.path.append('../../')#BUG potentially
 import libSimulate
 import math
 import result
+import time
 
 
 class Experiment(object):
@@ -195,7 +196,7 @@ class Experiment(object):
                 if jobIsDone:
                     doneVector.append(i)
                     r = result.Result(
-                        self.modelNum,i,reorganize=True,self.numOfRuns,traj=True
+                        self.modelNum,i,True,self.numOfRuns,traj=True
                         )
             if set(doneVector)==set(jobVector):
                 allJobsDone = True
@@ -208,6 +209,6 @@ class Experiment(object):
 
 if __name__ == "__main__":
     expt = Experiment('test',16,new=False)
-    expt.initNew(('simulateTime',10,0.5),2,True)
+    expt.initNew(('simulateReactions',1000,100),2,True)
     jobs = expt.initAndRun(2)
     expt.reorganize(jobs,2)

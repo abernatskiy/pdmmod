@@ -5,6 +5,7 @@ import os
 import itertools
 sys.path.append('../../')#BUG potentially
 import libSimulate
+import math
 
 
 class Experiment(object):
@@ -164,6 +165,6 @@ class Experiment(object):
 
 if __name__ == "__main__":
     expt = Experiment('test',16,new=False)
-    expt.initNew(('simulateTime',10,0.5),1,True)
-    expt.initAndRun(1)
+    expt.initNew(('simulateTime',10,0.5),2,True)
+    expt.initAndRun(2)
 

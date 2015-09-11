@@ -193,13 +193,16 @@ class Experiment(object):
                 time.sleep(10)
                 jobsOnClust = checkJobsOnClust()
                 jobIsDone = ifJobsDone(jobsOnClust,i)
-                if jobIsDone:
+                if jobIsDone and (not i in doneVector):
+                    print('job '+str(i)+' is done, calculating means')
                     doneVector.append(i)
                     r = result.Result(
                         self.modelNum,i,True,self.numOfRuns,traj=True
                         )
+                    print('means are calculated. continue')
             if set(doneVector)==set(jobVector):
                 allJobsDone = True
+                print('done')
             
     
     def restore(self):#TODO

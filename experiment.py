@@ -6,6 +6,7 @@ import itertools
 sys.path.append('../../')#BUG potentially
 import libSimulate
 import math
+import result
 
 
 class Experiment(object):
@@ -156,7 +157,49 @@ class Experiment(object):
             s.log.info('last kernel')
             s.addToQueue(s.outputDir,j+1,trajLast+1,self.numOfRuns-1,jobs[i],onNode,paramFile,populFile)
         print(jobs)
-        return None
+        return jobs
+    
+    def reorganize(self,jobs,kernels,onNode=0):
+        def checkJobsOnClust():
+            p = subprocess.Popen('qstat', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = p.communicate()
+
+            lines = (out.decode().split('\n'))[2:]
+            jobsOnClust = []
+            for line in lines:
+                items =line.split(' ')
+                try:
+                    jobsOnClust.append(int(items[1]))
+                except:
+                    continue
+            return jobsOnClust
+        
+        def ifJobsDone(jobsOnClust,jobNum):
+            jobsDoneList = []
+            for job in jobs[jobNum]:
+                if job in jobsOnClust:
+                    return False
+                else:
+                    jobsDoneList.append(job)
+            if set(jobs[jobNum])==set(jobsDoneList):
+                return True
+            
+        allJobsDone = False
+        jobVector = list(jobs.keys())
+        doneVector = []
+        while not allJobsDone:
+            for i in range(self.firstSim,self.firstSim+self.numOfExperiments):
+                time.sleep(10)
+                jobsOnClust = checkJobsOnClust()
+                jobIsDone = ifJobsDone(jobsOnClust,jobs[i])
+                if jobIsDone:
+                    doneVector.append(i)
+                    r = result.Result(
+                        self.modelNum,i,reorganize=True,self.numOfRuns,traj=True
+                        )
+            if set(doneVector)==set(jobVector):
+                allJobsDone = True
+            
     
     def restore(self):#TODO
         return None

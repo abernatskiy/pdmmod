@@ -117,7 +117,7 @@ class Experiment(object):
     
     def initAndRun(self,numOfKernels,onNode=0):
         for i in range(self.firstSim,self.firstSim+self.numOfExperiments):
-            s = Simulation(
+            s = libSimulate.Simulation(
                 self.modelNum,
                 self.termCond,
                 rewrite=False,
@@ -129,7 +129,7 @@ class Experiment(object):
                 onNode,
                 paramFile=os.path.join(self.experiment,'paraeters'+str(i)+'.ini'),
                 populFile=os.path.join(self.experiment,'populations.txt'))
-            s.reorganizeOutput()
+            #s.reorganizeOutput()#BUG
         return None
     
     def restore(self):#TODO
@@ -139,6 +139,6 @@ class Experiment(object):
 
 if __name__ == "__main__":
     expt = Experiment('test',16,new=False)
-    expt.initNew(('simulateTime',100,0.5),2,True)
-    expt.initAndRun()
+    expt.initNew(('simulateTime',10,0.5),1,True)
+    expt.initAndRun(1)
 

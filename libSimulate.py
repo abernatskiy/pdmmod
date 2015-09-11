@@ -478,6 +478,7 @@ class Simulation(object):
         self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode,paramFile,populFile)
         self._wait(jobsRun)
         self.log.warning('all simulation finished running. calculationg averages and stds')
+        self.reorganizeOutput()
         return None
         
     

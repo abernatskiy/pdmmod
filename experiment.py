@@ -209,5 +209,5 @@ class Experiment(object):
 if __name__ == "__main__":
     expt = Experiment('test',16,new=False)
     expt.initNew(('simulateTime',10,0.5),2,True)
-    expt.initAndRun(2)
-
+    jobs = expt.initAndRun(2)
+    expt.reorganize(jobs,2)

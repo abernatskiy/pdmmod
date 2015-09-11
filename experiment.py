@@ -209,6 +209,6 @@ class Experiment(object):
 
 if __name__ == "__main__":
     expt = Experiment('test',16,new=False)
-    expt.initNew(('simulateReactions',1000,100),2,True)
-    jobs = expt.initAndRun(2)
-    expt.reorganize(jobs,2)
+    expt.initNew(('simulateTime',100,0.1),3,True)
+    jobs = expt.initAndRun(3)
+    expt.reorganize(jobs,3)

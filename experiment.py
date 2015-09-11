@@ -155,7 +155,7 @@ class Experiment(object):
                 trajLast = -1
             s.log.info('last kernel')
             s.addToQueue(s.outputDir,j+1,trajLast+1,self.numOfRuns-1,jobs[i],onNode,paramFile,populFile)
-
+        print(jobs)
         return None
     
     def restore(self):#TODO

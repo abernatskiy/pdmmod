@@ -106,7 +106,6 @@ class Simulation(object):
                 currentRun = 0
             else:
                 dirs=(next(walk(path))[1])
-                print(dirs)
                 nums = []
                 for directory in dirs:
                     if '_output' in directory:
@@ -119,6 +118,7 @@ class Simulation(object):
                     currentRun = 0
                 else:
                     currentRun = max(nums)+1
+                print('current run: '+str(currentRun))
                 #os.makedirs(...)FIXME cross platform
                 system('mkdir '+path+str("%03d" %self.modelNum)+
                     '_output'+str(currentRun)+'/')

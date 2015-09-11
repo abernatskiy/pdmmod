@@ -116,7 +116,8 @@ class Experiment(object):
     def reorderSims(self):#TODO
         return None
     
-    def initAndRun(self,numOfKernels,onNode=0):
+    def initAndRun(self,kernels,onNode=0):
+        jobs={}
         for i in range(self.firstSim,self.firstSim+self.numOfExperiments):
             s = libSimulate.Simulation(
                 self.modelNum,
@@ -125,12 +126,35 @@ class Experiment(object):
                 specialPath=None,
                 numOfRuns=self.numOfRuns,
                 traj=self.traj,log_level='INFO')
-            s.runSeveralParallelCluster(
-                numOfKernels, 
-                onNode,
-                paramFile=os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'parameters'+str(i)+'.ini'),
-                populFile=os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'populations.txt'))
-            #s.reorganizeOutput()#BUG
+            jobs[i]=[]
+            paramFile=os.path.join(
+                routes.routePDM,
+                'models',
+                str("%03d" %self.modelNum),
+                self.experiment,
+                'parameters'+str(i)+'.ini'
+                )
+            populFile=os.path.join(
+                routes.routePDM,
+                'models',
+                str("%03d" %self.modelNum),
+                self.experiment,
+                'populations.txt')
+            perKernel = int(math.ceil(s.numOfRuns/kernels))
+            lastKernel = s.numOfRuns - perKernel*(kernels-1)
+            for i in range(kernels-1):
+                trajFirst = i*perKernel
+                trajLast = int((i+1)*perKernel - 1)
+                self.log.info('kernel'+str(i))
+                self.addToQueue(
+                    self.outputDir,i,trajFirst,trajLast,jobs[i],onNode,
+                    paramFile,populFile)
+            if kernels == 1:
+                i = -1
+                trajLast = -1
+            self.log.info('last kernel')
+            self.addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobs[i],onNode,paramFile,populFile)
+
         return None
     
     def restore(self):#TODO

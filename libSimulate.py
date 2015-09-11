@@ -394,7 +394,7 @@ class Simulation(object):
         inFile.close()
         return pythonFile
     
-    def _addToQueue(self,outputDir,kernelNum,
+    def addToQueue(self,outputDir,kernelNum,
                     trajFirst,trajLast,
                     jobsRun,onNode,
                     paramFile,populFile):
@@ -468,14 +468,14 @@ class Simulation(object):
             trajFirst = i*perKernel
             trajLast = int((i+1)*perKernel - 1)
             self.log.info('kernel'+str(i))
-            self._addToQueue(
+            self.addToQueue(
                 self.outputDir,i,trajFirst,trajLast,jobsRun,onNode,
                 paramFile,populFile)
         if kernels == 1:
             i = -1
             trajLast = -1
         self.log.info('last kernel')
-        self._addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode,paramFile,populFile)
+        self.addToQueue(self.outputDir,i+1,trajLast+1,self.numOfRuns-1,jobsRun,onNode,paramFile,populFile)
         self._wait(jobsRun)
         self.log.warning('all simulation finished running. calculationg averages and stds')
         self.reorganizeOutput()

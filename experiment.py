@@ -191,7 +191,7 @@ class Experiment(object):
             for i in range(self.firstSim,self.firstSim+self.numOfExperiments):
                 time.sleep(10)
                 jobsOnClust = checkJobsOnClust()
-                jobIsDone = ifJobsDone(jobsOnClust,jobs[i])
+                jobIsDone = ifJobsDone(jobsOnClust,i)
                 if jobIsDone:
                     doneVector.append(i)
                     r = result.Result(

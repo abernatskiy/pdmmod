@@ -101,7 +101,7 @@ class Experiment(object):
         self.firstSim = firstSim
         for i in range(firstSim,firstSim+self.numOfExperiments):
             pFile=open(
-                os.path.join(routes.routePDM,models,str("%03d" %self.modelNum),self.experiment,'parameters'+str(i)+'.ini'),
+                os.path.join(routes.routePDM,'models',str("%03d" %self.modelNum),self.experiment,'parameters'+str(i)+'.ini'),
                 'a'
                 )
             pFile.write(constant)

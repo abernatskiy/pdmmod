@@ -65,15 +65,7 @@ class Experiment(object):
         variables = [] #list of lists of values of variables
         with open(os.path.join(self.experiment,'variable.ini'), 'r') as content_file:
             variableSep = (content_file.read()).split('\n')
-            if len(variableSep)%2==0:
-                for i in range(int(len(variableSep)/2)):
-                    #varValues are lists of strings of format varName = value
-                    line1 = variableSep[2*i].split(' ')
-                    line2 = variableSep[2*i+1].split(' ')
-                    varValues=[line1[1]+' = '+ val for val in line2]
-                    self.numOfExperiments=self.numOfExperiments*len(varValues)
-                    variables.append(varValues)
-            else:
+            if not len(variableSep)%2==0:
                 print(variableSep)
                 if not variableSep[-1]=='':#dealing with extra empty line
                     raise ValueError(
@@ -82,6 +74,13 @@ class Experiment(object):
                 else:
                     print('extra line in \"variable.ini\". ignoring')
                     variableSep.pop(-1)#dealing with extra empty line
+            for i in range(int(len(variableSep)/2)):
+                #varValues are lists of strings of format varName = value
+                line1 = variableSep[2*i].split(' ')
+                line2 = variableSep[2*i+1].split(' ')
+                varValues=[line1[1]+' = '+ val for val in line2]
+                self.numOfExperiments=self.numOfExperiments*len(varValues)
+                variables.append(varValues)
         variables = list(itertools.product(*variables))
         
         return constant, variables

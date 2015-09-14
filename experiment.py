@@ -210,8 +210,4 @@ class Experiment(object):
 
 
 
-if __name__ == "__main__":
-    expt = Experiment('test',16,new=False)
-    expt.initNew(('simulateTime',100,0.1),3,True)
-    jobs = expt.initAndRun(3)
-    expt.reorganize(jobs,3)
+

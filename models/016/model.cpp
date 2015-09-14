@@ -145,7 +145,7 @@ void Specie::degradeIt(std::list<Reaction>& allReactions,Specie specie,
 
 void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
                      float aggRate,float aggPower){
-    if (m_hydrophobicity >=aggPower){
+    if (m_hydrophobicity >aggPower){
         Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
         allReactions.push_back(aggregation);
     }

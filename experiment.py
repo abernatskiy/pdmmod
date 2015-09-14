@@ -74,7 +74,12 @@ class Experiment(object):
                     self.numOfExperiments=self.numOfExperiments*len(varValues)
                     variables.append(varValues)
             else:
-                raise ValueError('Wrong number of lines in \"variable.ini\" file')
+                if not variableSep[-1]=='\n':#dealing with extra empty line
+                    raise ValueError(
+                        'Wrong number of lines in \"variable.ini\" file'
+                        )
+                else:
+                    variableSep.pop(-1)#dealing with extra empty line
         variables = list(itertools.product(*variables))
         
         return constant, variables

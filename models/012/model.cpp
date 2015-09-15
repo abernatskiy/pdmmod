@@ -140,9 +140,9 @@ void Specie::degradeIt(std::list<Reaction>& allReactions,Specie specie,
 }
 
 void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
-                         float aggRate,float aggPower){
-    if (m_hydrophobicity >aggPower){
-        Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
+                         float dAgg,float aggrAt){
+    if (m_hydrophobicity >aggrAt){
+        Reaction aggregation(m_id,1,specie.m_id,0,dAgg);
         allReactions.push_back(aggregation);
     }
 }
@@ -263,7 +263,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
         //if it's not folded
         if (m_folded == false){
             //it can aggregate
-            aggregateIt(allReactions,specie,dAgg,aggPower);
+            aggregateIt(allReactions,specie,dAgg,aggrAt);
             //hydrolysis of any bond can happen
             hydrolyseIt(allReactions,specie,dH);
             //and might fold

@@ -145,6 +145,7 @@ void Specie::aggregateIt(std::list<Reaction>& allReactions,Specie specie,
         Reaction aggregation(m_id,1,specie.m_id,0,aggRate);
         allReactions.push_back(aggregation);
     }
+}
 
 void Specie::hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
                          float dH){
@@ -236,16 +237,16 @@ std::list<Reaction> Specie::reactions(Specie specie){
      *      or to disappear(imp.)
      */
     //parameters
-    float aH = configDict["monomerBirthH"].getFloat();
-    float aP = configDict["monomerBirthP"].getFloat();
+    float aH = configDict["importH"].getFloat();
+    float aP = configDict["importP"].getFloat();
     int maxLength = configDict["maxLength"].getInt();
     float alpha = configDict["growth"].getFloat();
     float d = configDict["degradation"].getFloat();
     float k_unf = configDict["unfolding"].getFloat();
-    float eH = configDict["hydrophobicEnergy"].getFloat();
-    float dH = configDict["hydrolysisRate"].getFloat();
+    float eH = configDict["eH"].getFloat();
+    float dH = configDict["hydrolysis"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
-    float aggPower = configDict["aggrDegree"].getFloat();
+    float aggrAt = configDict["aggrAt"].getFloat();
     //all the reactions two species can have
     std::list<Reaction> allReactions;
     // 'H' and 'P' monomers are being produced from activated monomers, concentration of which is const.

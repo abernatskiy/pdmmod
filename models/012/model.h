@@ -50,7 +50,7 @@ private:
               float degrRate);
 
     void aggregateIt(std::list<Reaction>& allReactions,Specie specie,
-                      float aggRate,float aggPower);
+                      float dAgg,float aggrAt);
     void hydrolyseIt(std::list<Reaction>& allReactions,Specie specie,
                      float dH);
     void foldIt(std::list<Reaction>& allReactions,Specie specie,

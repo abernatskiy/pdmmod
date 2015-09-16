@@ -3,6 +3,8 @@ import sys
 import os
 sys.path.append('../../')
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import subprocess
 
 import hpClasses

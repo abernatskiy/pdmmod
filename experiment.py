@@ -158,6 +158,7 @@ class Experiment(object):
                 s.addToQueue(
                     s.outputDir,j,trajFirst,trajLast,jobs[i],onNode,
                     paramFile,populFile)
+                print(str(i)+' has been submitted')
             if kernels == 1:
                 j = -1
                 trajLast = -1

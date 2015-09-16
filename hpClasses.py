@@ -64,11 +64,11 @@ def getUserFriendData(seq,natData):
     return 'len '+str(seqLen)+' '+let1+let2+let3
     
 
-#TESTING
-if __name__ == "__main__":
-    maxLength = 25
-    natData = readNativeList(25)
-    fold, cat, autocat = getHPClassOfSeq('fHPPPHHPPHHHHPHHPPHHPHHH',natData)
+##TESTING
+#if __name__ == "__main__":
+    #maxLength = 25
+    #natData = readNativeList(25)
+    #fold, cat, autocat = getHPClassOfSeq('fHPPPHHPPHHHHPHHPPHHPHHH',natData)
     
     
     

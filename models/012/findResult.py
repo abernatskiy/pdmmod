@@ -33,7 +33,7 @@ minLength=4
 maxLength=25
 noR=1
 
-for simNum in range(0,107):
+for simNum in range(117,126):
     try:
         os.mkdir('012_output'+str(simNum)+'/figures/')
     except:

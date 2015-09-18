@@ -360,7 +360,7 @@ class Simulation(object):
             inFile.write('#$ -q cpu_long\n')
         else:
             if not type(onNode)==int:
-                inFile.write('#$ -l highio=')
+                inFile.write('#$ -l highio=1\n')
                 inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')
             else:
                 inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')

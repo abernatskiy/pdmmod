@@ -359,8 +359,7 @@ class Simulation(object):
             inFile.write('#$ -q cpu_long\n')
         else:
             if not type(onNode)==int:
-                inFile.write('#$ -l mem_total=30GB\n')
-                inFile.write('#$ -q cpu_long\n')
+                inFile.write('#$ -q cpu_long@node05*'+'\n')
             else:
                 inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')
         inFile.write('#$ -P kenprj\n')

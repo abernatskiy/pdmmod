@@ -259,15 +259,15 @@ std::list<Reaction> Specie::reactions(Specie specie){
      *      or to disappear(imp.)
      */
     //parameters
-    float aH = configDict["monomerBirthH"].getFloat();
-    float aP = configDict["monomerBirthP"].getFloat();
+    float aH = configDict["importH"].getFloat();
+    float aP = configDict["importP"].getFloat();
     int maxLength = configDict["maxLength"].getInt();
     float alpha = configDict["growth"].getFloat();
     float d = configDict["degradation"].getFloat();
-    float eH = configDict["hydrophobicEnergy"].getFloat();
-    float dH = configDict["hydrolysisRate"].getFloat();
+    float eH = configDict["eH"].getFloat();
+    float dH = configDict["hydrolysis"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
-    float aggPower = configDict["aggrDegree"].getFloat();
+    float aggPower = configDict["aggrAt"].getFloat();
     float z = configDict["z"].getFloat();
     //all the reactions two species can have
 //     std::cout << "Loadad" << std::endl;

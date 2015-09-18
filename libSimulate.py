@@ -134,6 +134,7 @@ class Simulation(object):
             if not os.path.exists(outputDir):
                 os.makedirs(outputDir)
             self.log = init_log(self.log_level,log_path=os.path.join(outputDir,'sim.log'))
+        self.simNum = currentRun
         return outputDir
     
     def _formCommand(self,trajNum,paramFile,populFile):
@@ -359,7 +360,8 @@ class Simulation(object):
             inFile.write('#$ -q cpu_long\n')
         else:
             if not type(onNode)==int:
-                inFile.write('#$ -q cpu_long@node05*'+'\n')
+                inFile.write('#$ -l highio=')
+                inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')
             else:
                 inFile.write('#$ -q cpu_long@node'+str("%03d" %onNode)+'\n')
         inFile.write('#$ -P kenprj\n')

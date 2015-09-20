@@ -66,10 +66,12 @@ def plotStandardReplot(
     redone=[]
     new=[]
     for simNum in range(startSim,endSim):
+        print('plotReplot of '+str(simNum))
         commonPath =  str("%03d" %modelNum)+'_output'+str(simNum)+'/'
         if os.path.isfile(commonPath+'figures/000.png'):
             if os.path.isfile(commonPath+'not_done'):
                 subprocess.call(['rm','-r',commonPath+'figures'])
+                subprocess.call(['mkdir',commonPath+'figures'])
                 r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
                 cr = ClusteredResults(
                     modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5

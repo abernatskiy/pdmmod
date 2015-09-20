@@ -80,29 +80,10 @@ def plotStandardReplot(
             else:
                 continue
         else:
-            try:
-                cr = ClusteredResults(
-                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-                    )
-                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-                cr.plot2DClustLen(4,7,saveFig=save)
-                cr.plot2DClustLen(8,13,saveFig=save)
-                cr.plot2DClustLen(14,19,saveFig=save)
-                cr.plot2DClustLen(20,25,saveFig=save)
-            except:
-                print(str(simNum)+' not finished')
-                subprocess.call(['touch',str("%03d" %modelNum)+'_output'+str(simNum)+'/not_done'])
-                r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
-                cr = ClusteredResults(
-                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-                    )
-                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-                cr.plot2DClustLen(4,7,saveFig=save)
-                cr.plot2DClustLen(8,13,saveFig=save)
-                cr.plot2DClustLen(14,19,saveFig=save)
-                cr.plot2DClustLen(20,25,saveFig=save)
-            else:
-                print(str(simNum)+' done')
+            plotStandardFirstTime(
+                simNum,simNum+1,
+                modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
+                )
 
 ###EDIT HERE###
 

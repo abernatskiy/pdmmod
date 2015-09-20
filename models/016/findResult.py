@@ -63,10 +63,12 @@ def plotStandardReplot(
     startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
     ):
     save = True
+    redone=[]
+    new=[]
     for simNum in range(startSim,endSim):
         commonPath =  str("%03d" %modelNum)+'_output'+str(simNum)+'/'
         if os.path.isfile(commonPath+'figures/000.png'):
-            if os.pat.isfile(commonPath+'not_done'):
+            if os.path.isfile(commonPath+'not_done'):
                 r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
                 cr = ClusteredResults(
                     modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
@@ -77,13 +79,18 @@ def plotStandardReplot(
                 cr.plot2DClustLen(14,19,saveFig=save)
                 cr.plot2DClustLen(20,25,saveFig=save)
                 subprocess.call(['rm','-r',commonPath+'not_done'])
+                redone.append(simNum)
             else:
+                print(str(simNum)+' already has been done')
                 continue
         else:
+            new.append(simNum)
             plotStandardFirstTime(
                 simNum,simNum+1,
                 modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
                 )
+    print('redone',redone)
+    print('new',new)
 
 ###EDIT HERE###
 

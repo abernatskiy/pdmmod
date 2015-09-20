@@ -26,7 +26,83 @@ def plotSpecific(cr,names):
     plt.show()
     return None
 
-def
+def plotStandardFirstTime(
+    startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
+    ):
+    for simNum in range(0,7):
+        try:
+            os.mkdir(str("%03d" %modelNum)+'_output'+str(simNum)+'/figures/')
+        except:
+            print('folder exists')
+        save = True
+        try:
+            cr = ClusteredResults(
+                modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
+                )
+            cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
+            cr.plot2DClustLen(4,7,saveFig=save)
+            cr.plot2DClustLen(8,13,saveFig=save)
+            cr.plot2DClustLen(14,19,saveFig=save)
+            cr.plot2DClustLen(20,25,saveFig=save)
+        except:
+            print(str(simNum)+' not finished')
+            subprocess.call(['touch',str("%03d" %modelNum)+'_output'+str(simNum)+'/not_done'])
+            r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
+            cr = ClusteredResults(
+                modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
+                )
+            cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
+            cr.plot2DClustLen(4,7,saveFig=save)
+            cr.plot2DClustLen(8,13,saveFig=save)
+            cr.plot2DClustLen(14,19,saveFig=save)
+            cr.plot2DClustLen(20,25,saveFig=save)
+        else:
+            print(str(simNum)+' done')
+            
+def plotStandardReplot(
+    startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
+    ):
+    save = True
+    for simNum in range(startSim,endSim):
+        commonPath =  str("%03d" %modelNum)+'_output'+str(simNum)+'/'
+        if os.path.isfile(commonPath+'figures/000.png'):
+            if os.pat.isfile(commonPath+'not_done'):
+                r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
+                cr = ClusteredResults(
+                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
+                    )
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
+                cr.plot2DClustLen(4,7,saveFig=save)
+                cr.plot2DClustLen(8,13,saveFig=save)
+                cr.plot2DClustLen(14,19,saveFig=save)
+                cr.plot2DClustLen(20,25,saveFig=save)
+                subprocess.call(['rm','-r',commonPath+'not_done'])
+            else:
+                continue
+        else:
+            try:
+                cr = ClusteredResults(
+                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
+                    )
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
+                cr.plot2DClustLen(4,7,saveFig=save)
+                cr.plot2DClustLen(8,13,saveFig=save)
+                cr.plot2DClustLen(14,19,saveFig=save)
+                cr.plot2DClustLen(20,25,saveFig=save)
+            except:
+                print(str(simNum)+' not finished')
+                subprocess.call(['touch',str("%03d" %modelNum)+'_output'+str(simNum)+'/not_done'])
+                r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
+                cr = ClusteredResults(
+                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
+                    )
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
+                cr.plot2DClustLen(4,7,saveFig=save)
+                cr.plot2DClustLen(8,13,saveFig=save)
+                cr.plot2DClustLen(14,19,saveFig=save)
+                cr.plot2DClustLen(20,25,saveFig=save)
+            else:
+                print(str(simNum)+' done')
 
 ###EDIT HERE###
 
@@ -36,34 +112,7 @@ minLength=4
 maxLength=25
 noR=1
 startSim = 0
-endSim = 7
+endSim = 78
+plotStandardReplot(startSim,endSim,
+                   modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5)
 
-for simNum in range(0,7):
-    try:
-        os.mkdir(str("%03d" %modelNum)+'_output'+str(simNum)+'/figures/')
-    except:
-        print('folder exists')
-    save = True
-    try:
-        cr = ClusteredResults(
-            modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-            )
-        cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-        cr.plot2DClustLen(4,7,saveFig=save)
-        cr.plot2DClustLen(8,13,saveFig=save)
-        cr.plot2DClustLen(14,19,saveFig=save)
-        cr.plot2DClustLen(20,25,saveFig=save)
-    except:
-        print(str(simNum)+' not finished')
-        subprocess.call(['touch','016_output'+str(simNum)+'/not_done'])
-        r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
-        cr = ClusteredResults(
-            modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-            )
-        cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-        cr.plot2DClustLen(4,7,saveFig=save)
-        cr.plot2DClustLen(8,13,saveFig=save)
-        cr.plot2DClustLen(14,19,saveFig=save)
-        cr.plot2DClustLen(20,25,saveFig=save)
-    else:
-        print(str(simNum)+' done')

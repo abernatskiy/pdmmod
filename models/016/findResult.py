@@ -30,6 +30,7 @@ def plotStandardFirstTime(
     startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
     ):
     for simNum in range(startSim,endSim):
+        print('newPlot of '+str(simNum))
         try:
             os.mkdir(str("%03d" %modelNum)+'_output'+str(simNum)+'/figures/')
         except:

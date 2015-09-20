@@ -354,7 +354,7 @@ class Simulation(object):
         inFile = open(shell,'a')
         inFile.write('#!/bin/bash\n')
         inFile.write('#$ -S /bin/bash\n')
-        inFile.write('#$ -N pdm'+str(self.modelNum)+'-k'+str(kernelNum)+'\n')
+        inFile.write('#$ -N p'+str(self.modelNum)+'s'+str(self.simNum)+'k'+str(kernelNum)+'\n')
         inFile.write('#$ -cwd\n')
         if onNode == 0:
             inFile.write('#$ -q cpu_long\n')

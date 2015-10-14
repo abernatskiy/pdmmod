@@ -305,16 +305,138 @@ class Experiment(object):
 
         return None
 
-
+    def _ifFinished(self):#TODO
+        return None
+    
+    def _ifPlots(self):#TODO
+        return None
+    
+    def _restoreSimNums(self):
+        '''
+        reads content of the experiment containing folder and from the 
+        parameters<num>.ini determines the output files of all the simulation 
+        of the experiment
+        
+        Returns:
+            list[int]: list of the numbers of the simulation which were run
+            for the experiment
+        '''
+        path = self.experiment+'/'#WARNING local path
+        simNums = []
+        for file in os.listdir(path):
+            if file.startswith("parameters"):
+                simNums.append(int((file[10:])[:-4]))
+        return simNums
+    
+    def simulationDataBase(self):
+        db = {}
+        simNums = self._restoreSimNums()
+        for num in simNums:
+            with open(
+                os.path.join(self.experiment,'parameters'+str(num)+'.ini'),
+                'r'
+                ) as content_file:
+                parameters = (content_file.read()).split('\n')[1:]
+            try:
+                if parameters[-1] == '':
+                    parameters.pop(-1)
+            except IndexError:
+                print('for the simulation '+str(num)+' parameter file is empty'+
+                      ' not adding it to the database:\n'+
+                      ' parameters = '+str(parameters))
+            else:
+                db[num]=parameters
+        db = DataBase(db,self.experiment)
+        return db
+    
     def restore(self):#TODO
         '''given the name of experiment and corresponding _output directories
         restores Experiment instance
         '''
         self._readSimParam()
+        simNums = self._restoreSimNums()
+        #db = self.simulationDataBase()
         finished = self._ifFinished()
         plots = self._ifPlots()
-        return finished, plots
+        return None
 
-
-
+class DataBase(object):
+    '''stores parameters of simulations in the experiment
+    '''
+    def __init__(self,dbDict,experiment):
+        '''class DataBase
+        Args:
+            dbDict dict[int]=list[str]:
+                dictkey is a number of simulation,
+                dictvalue is the list of strings 'param_name = param_value'
+        Attributes:
+            db = argument dbDict
+        '''
+        self.db = dbDict
+        self.experiment = experiment
+        
+    def getSimNums(self,silent=False):
+        string = ''
+        for key in self.db.keys():
+            string += str(key)+' '
+        if not silent:
+            print(string)
+        return set(list(self.db.keys()))
+    
+    def getParamNames(self):
+        paramList = next (iter (self.db.values()))
+        paramNames = paramList.copy()
+        for i in range(len(paramList)):
+            string = paramNames[i]
+            paramNames[i] = string[:(string.index('=')-1)]
+            print(paramNames[i])
+        return paramNames
+    
+    def getParamValues(self,paramName):
+        string = paramName+': '
+        values = set([])
+        for (simNums, params) in self.db.items():
+            for param in params:
+                if paramName in param:
+                    values.add(param[(param.index('=')+2):])
+        print(string)
+        print(values)
+        
+    def getVariables(self):
+        with open(
+                os.path.join(self.experiment,'variable.ini'),
+                'r'
+                ) as content_file:
+            print('\n')
+            print('Parameters which are variable')
+            print(content_file.read())
+        
+    
+    def getWithParameter(self,paramName,paramValue,silent=False):
+        result=set([])
+        for (simNum, paramList) in self.db.items():
+            for param in paramList:
+                if paramName in param:
+                    if str(paramValue) in param:
+                        result.add(simNum)
+        if not silent:
+            print('Simulations with '+paramName+' = '+str(paramValue)+':')
+            print(result)
+        return result
+    
+    def getSimsWithSeveralParams(self,listOfTuples):
+        results=self.getSimNums(silent=True)
+        print('\n')
+        print('Simulations with')
+        for tup in listOfTuples:
+            result = self.getWithParameter(tup[0],tup[1],silent=True)
+            results = results.intersection(result)
+            print(tup[0]+' = '+str(tup[1]))
+        
+        print(results)
+        return results
+        
+    
+    
+                    
 

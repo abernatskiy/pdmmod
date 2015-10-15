@@ -199,7 +199,7 @@ class Result(object):
                 elif line[0] == "#":
                     continue
                 else:
-                    raw = (line.rstrip(', \n')).split(', ')#TEST
+                    raw = (line.rstrip(', \n')).split(',')#TEST
                     if fileCount == 0:
                         count += 1
                         self.times.append(float(raw[0]))
@@ -749,7 +749,7 @@ class Result(object):
             if line[0] == '#':
                 continue
             else:
-                raw = line.split(', ')
+                raw = line.split(',')
                 data = raw[1:]
                 time = float(raw[0])
                 print(time)

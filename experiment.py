@@ -436,7 +436,20 @@ class DataBase(object):
         print(results)
         return results
         
-    
+    def getParamsOfSeletcted(self,simList):
+        common = set(next (iter (self.db.values())))
+        for simNum in simList:
+            common = common.intersection(set(db.db[simNum]))
+        separate = {}
+        for simNum in simList:
+            separate[simNum] = set(db.db[simNum]).difference(common)
+        print('Common parameters')
+        print(common)
+        print('Specific parametres')
+        print(separate)
+        
+        return common, separate
+            
     
                     
 

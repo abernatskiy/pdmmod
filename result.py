@@ -63,14 +63,15 @@ class Result(object):
             str("%03d" %self.modelNum) + '_output' + str(self.simNum) + '/'
         print('reorganize or not to reorganize?')
         if not reorganize:
-            print('reorganize!')
+            print(' do not reorganize!')
             self.parameters = self._readSimData()
             self.times = self._readTimes()
         else:
-            print('do not reorganize!')
+            print('reorganize!')
             self.reorganizeOutput(numOfRuns, traj)
             self.parameters = self._readSimData()
             self.times = self._readTimes()
+        print('Result.__init__ done')
 
 
     def _makeHeader(self, numOfRuns, traj):

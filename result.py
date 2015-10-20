@@ -38,7 +38,7 @@ class Result(object):
     '''
     # pylint: disable=too-many-instance-attributes
     # it's 15 here
-    def __init__(self, modelNum, simNum, reorganize=False, numOfRuns=None, traj=None):
+    def __init__(self, modelNum, simNum, paramFileName='parameters.txt', reorganize=False, numOfRuns=None, traj=None):
         '''
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
@@ -67,7 +67,7 @@ class Result(object):
         else:
             print('reorganize!')
             self.reorganizeOutput(numOfRuns, traj)
-        self.parameters = self._readSimData()
+        self.parameters = self._readSimData(paramFileName)
         self.times = self._readTimes()
         print('Result.__init__ done')
 
@@ -367,12 +367,12 @@ class Result(object):
         
         return evolutions
     
-    def _readSimData(self):
+    def _readSimData(self,filename='parameters.txt'):
         '''reads parameters.txt
         stores it as a dictionary: {par.name: par.value}
         '''
         print('reading simulation parameters')
-        header = open(self.outputDir + 'parameters.txt', 'r')
+        header = open(self.outputDir + filename, 'r')
         line = header.readline()
         parameters = {}
         while not line == ' == Parameters == \n':

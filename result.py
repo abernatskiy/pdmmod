@@ -64,13 +64,11 @@ class Result(object):
         print('reorganize or not to reorganize?')
         if not reorganize:
             print(' do not reorganize!')
-            self.parameters = self._readSimData()
-            self.times = self._readTimes()
         else:
             print('reorganize!')
             self.reorganizeOutput(numOfRuns, traj)
-            self.parameters = self._readSimData()
-            self.times = self._readTimes()
+        self.parameters = self._readSimData()
+        self.times = self._readTimes()
         print('Result.__init__ done')
 
 
@@ -328,9 +326,11 @@ class Result(object):
         reads times.txt
         returns times: list of the recorded times
         '''
+        print('read times.txt')
         with open(self.outputDir + 'times.txt', 'r') as content_file:
             content = content_file.read()
         times = [float(item) for item in content.split(' ')]
+        print('done reading')
         return times
     
     def readMeans(self):
@@ -371,6 +371,7 @@ class Result(object):
         '''reads parameters.txt
         stores it as a dictionary: {par.name: par.value}
         '''
+        print('reading simulation parameters')
         header = open(self.outputDir + 'parameters.txt', 'r')
         line = header.readline()
         parameters = {}
@@ -392,6 +393,7 @@ class Result(object):
         line = header.readline()
         self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ', ''))
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ', ''))
+        print('done reading')
         return parameters
 
     def makeStats(self, natData): 

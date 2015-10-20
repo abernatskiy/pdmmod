@@ -336,11 +336,15 @@ class Result(object):
         evolutions = {}
         f = open(self.path2Folder + str("%03d" %self.modelNum) + 
                  '_output' + str(self.simNum) + '/means.txt', 'r')
+        count = 0
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
             #evolutions[raw[0]] = \
             #scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
             evolutions[raw[0]] = np.array([float(item) for item in raw[1:]])
+            count += 1
+            if count%100:
+                print('line',count)
 
         return evolutions
 

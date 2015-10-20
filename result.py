@@ -61,10 +61,13 @@ class Result(object):
         self.path2Folder = routes.routePDM + 'models/' + str("%03d" %self.modelNum) + '/'
         self.outputDir = self.path2Folder + \
             str("%03d" %self.modelNum) + '_output' + str(self.simNum) + '/'
+        print('reorganize or not to reorganize?')
         if not reorganize:
+            print('reorganize!')
             self.parameters = self._readSimData()
             self.times = self._readTimes()
         else:
+            print('do not reorganize!')
             self.reorganizeOutput(numOfRuns, traj)
             self.parameters = self._readSimData()
             self.times = self._readTimes()

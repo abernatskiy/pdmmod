@@ -12,6 +12,7 @@ from collections import OrderedDict
 class ClusteredResults(result.Result):
     def __init__(self,modelNum,simNum,minLength,maxLength,
                      nonSteadyPercent=0.9,samp=None,epsilonModifyer={0:0}):
+        print('about to create a Result instance')
         result.Result.__init__(self,modelNum,simNum)
         print('this is simulation '+str(self.modelNum)+'.'+str(self.simNum))
         self.minLength=minLength
@@ -497,8 +498,8 @@ def plotStandardFirstTime(
             print(str(simNum)+' done')
             
 def plotStandardReplot(
-    startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
-    ):
+        startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
+        ):
     save = True
     redone=[]
     new=[]

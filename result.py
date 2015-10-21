@@ -38,7 +38,7 @@ class Result(object):
     '''
     # pylint: disable=too-many-instance-attributes
     # it's 15 here
-    def __init__(self, modelNum, simNum, paramFileName='parameters.txt', reorganize=False, numOfRuns=None, traj=None):
+    def __init__(self, modelNum, simNum, reorganize=False, numOfRuns=None, traj=None):
         '''
             modelNum: int
             termCond: is a Tuple representing termination condition. It's one of:
@@ -67,7 +67,7 @@ class Result(object):
         else:
             print('reorganize!')
             self.reorganizeOutput(numOfRuns, traj)
-        self.parameters = self._readSimData(paramFileName)
+        self.parameters = self._readSimData()
         self.times = self._readTimes()
         print('Result.__init__ done')
 
@@ -367,19 +367,22 @@ class Result(object):
         
         return evolutions
     
-    def _readSimData(self,filename='parameters.txt'):
+    def _readSimData(self):
         '''reads parameters.txt
         stores it as a dictionary: {par.name: par.value}
         '''
         print('reading simulation parameters')
-        header = open(self.outputDir + filename, 'r')
+        header = open(self.outputDir + 'parameters.txt', 'r')
+        print("we've opened file")
         line = header.readline()
+        print('and read a line')
         parameters = {}
-        while not line == ' == Parameters == \n':
+        while not line == '==Parameters==\n':
             self.name = line.rstrip('\n')
             line = header.readline()
+        print("we've exited first while loop")
         line = header.readline()
-        while not line == ' == Command == \n':
+        while not line == '==Command==\n':
             _list = line.rstrip('\n').split(' ')
             parameters[_list[0]] = float(_list[1])
             line = header.readline()
@@ -667,7 +670,7 @@ class Result(object):
         _labels = {}
         labels = {}
         epsilons = {}
-        
+
         for length in range(minLength, maxLength + 1):
             _labels[length] = []
             labels[length] = {}
@@ -705,6 +708,7 @@ class Result(object):
                         continue
 
             if not _labels[length] == []:
+                print(_labels)
                 raise NotImplementedError
                 #for couple in _labels[length]:
                     #addToDictList(labels[length], couple[1], couple[0])

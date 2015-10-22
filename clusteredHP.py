@@ -235,6 +235,38 @@ class ClusteredResults(result.Result):
         plt.xlim((0,100))
         plt.show()
         return None
+    
+    def plotOutstanders(self,natData):
+        '''
+        takes clustDict, gets outstanders for all the clusters and puts them 
+        on the graph population vs length
+        '''
+        points = []
+        lengths = list(self.clustDict.keys())
+        regMedianPops = []
+        for (length,clusters) in self.clustDict.items():
+            for seq in clusters.outstanders:
+                if seq.autocat:
+                    points.append(seq)
+                else:
+                    pass
+            #now calculate median value of populations of regular sequences
+            regulars = []
+            for (clusterNum, cluster) in clusters.clusters.items():
+                for seq in cluster.sequences:
+                    regulars.append(seq.meanPop)
+            regMedianPops.append(np.median(regulars))
+        
+        plt.plot(lengths,regMedianPops)
+        for seq in points:
+            plt.scatter(seq.length,seq.meanPop,s=20,c='b',marker='v',label=seq.hpstring)
+        plt.yscale('log')
+        plt.xlim(1,25)
+        #plt.xscale('log')
+        plt.show()
+        
+        return points, regMedianPops
+            
         
         
 class Clusters(object):

@@ -409,7 +409,7 @@ class Result(object):
             self.means = self.readMeans()
             self.stds = self.readStds()
             print("total number of species in all runs is " + str(len(self.means.keys())))
-        natData = hpClasses.readNativeList(int(self.parameters['maxLength']))
+        #natData = hpClasses.readNativeList(int(self.parameters['maxLength']))
         lengths = set([])     #keeps lengths present in simulation
         countAll = [(0)]*(len(self.times)) 
         countFold = [(0)]*(len(self.times)) 
@@ -523,13 +523,27 @@ class Result(object):
         fig.set_xlabel('length')
         fig.set_title("Length distribution in the last moment")
         return None
-
+    
+    def getLengthDistribution(self,natData,jointData,nonSteadyPercent):
+        lengths = list(jointData.copy().keys())
+        mL = max(lengths)
+        print("maximum length of a polymer is " + str(mL))
+        lenPops = [
+            sum([jointData[length][name][0] 
+                    for name in jointData[length].keys()]) 
+            for length in jointData.keys()
+            ]
+        tp = sum(lenPops)
+        lengthsDistr = [ps/tp for ps in lenPops]
+        return lengthsDistr
+    
     def plotHPstats(self, natData, jointData=None, 
                     saveFig=False, nonSteadyPercent=0.9):
         '''combines 3 subplots above
         '''
         #pylint:disable=too-many-locals
         maxLength = int(self.parameters['maxLength'])
+        print('getting data for plots')
         countAll, countFold, countCat, countAuto, lengths = \
             self.makeStats(natData)
         if jointData == None:
@@ -600,6 +614,13 @@ class Result(object):
         border = int(nonSteadyPercent*len(self.times))
         steadyMean = {}
         steadyStd = {}
+        try:
+            type(self.means)
+        except AttributeError:
+            print('we have to read means.txt')
+            self.means = self.readMeans()
+        else:
+            pass
         for seq in self.means.keys():
             #means = self.means[seq].A[0]
             means = self.means[seq]

@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append('../../')
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import subprocess
 
@@ -21,11 +21,11 @@ from clusteredHP import *
 
 modelNum = 16
 natData = hpClasses.readNativeList(25)
-minLength=4
+minLength=6
 maxLength=25
 noR=1
 cr = ClusteredResults(
-                modelNum,12,minLength,maxLength,nonSteadyPercent=0.5
+                modelNum,69,minLength,maxLength,nonSteadyPercent=0.5
                 )
 #startSim = 0
 #endSim = 78

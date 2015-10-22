@@ -29,6 +29,7 @@ import routes
 #from dictUtils import * #pylint:disable=wildcard-import
 #if dealing with HP-model import this
 import hpClasses
+from dictUtils import *
 
 
 class Result(object):
@@ -340,15 +341,15 @@ class Result(object):
         evolutions = {}
         f = open(self.path2Folder + str("%03d" %self.modelNum) + 
                  '_output' + str(self.simNum) + '/means.txt', 'r')
-        count = 0
+        #count = 0
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
             #evolutions[raw[0]] = \
             #scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
             evolutions[raw[0]] = np.array([float(item) for item in raw[1:]])
-            count += 1
-            if count%100:
-                print('line',count)
+            #count += 1
+            #if count%100:
+                #print('line',count)
 
         return evolutions
 
@@ -517,6 +518,7 @@ class Result(object):
             str(mL) + '/' + str(len(self.means.keys())))
         fig.grid(True)
         fig.set_yscale('log')
+        fig.set_xscale('log')
         fig.set_ylabel('average population')
         fig.set_xlabel('length')
         fig.set_title("Length distribution in the last moment")
@@ -686,7 +688,7 @@ class Result(object):
                     means.append(self.jointData[length][seq][0])
                     stds.append(self.jointData[length][seq][1])
                     indxes[i] = seq
-                print('passed means')
+                #print('passed means')
                 if samp == None:
                     samp = 10
                 jointLabels[length], epsilons[length] = \
@@ -706,13 +708,11 @@ class Result(object):
                         raise IndexError
                     else:
                         continue
-
             if not _labels[length] == []:
-                print(_labels)
-                raise NotImplementedError
-                #for couple in _labels[length]:
-                    #addToDictList(labels[length], couple[1], couple[0])
-
+                #print(_labels)
+                #raise NotImplementedError('???')
+                for couple in _labels[length]:
+                    addToDictList(labels[length], couple[1], couple[0])
 
         return labels, epsilons
 

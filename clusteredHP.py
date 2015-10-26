@@ -261,9 +261,8 @@ class ClusteredResults(result.Result):
         for seq in points:
             plt.scatter(seq.length,seq.meanPop,s=20,c='b',marker='v',label=seq.hpstring)
         plt.yscale('log')
-        plt.xlim(1,25)
-        #plt.xscale('log')
-        plt.show()
+        plt.xlim(self.minLength,self.maxLength)
+        plt.savefig(self.outputDir+'outstanders.png')
         
         return points, regMedianPops
             

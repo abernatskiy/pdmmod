@@ -19,8 +19,9 @@ maxLength=25
 noR=1
 nonSteadyPercent = 0.5
 simNum = 12
-cr = ClusteredResults(modelNum,simNum,minLength,maxLength,nonSteadyPercent)
-cr.plotOutstanders(natData)
+r = Result(modelNum, simNum, reorganize=True, numOfRuns=3, traj=True)
+#cr = ClusteredResults(modelNum,simNum,minLength,maxLength,nonSteadyPercent)
+#cr.plotOutstanders(natData)
 #for simNum in range(0,9):
     #print('simNum is',simNum)
     #r = Result(modelNum,simNum)

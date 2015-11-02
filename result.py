@@ -181,6 +181,9 @@ class Result(object):
         a dictionary of populations of every specie at every moment 
         averaged over the trajectories 
         *evolutions -- dict.: {specie:np.arry[populations over time]}
+        
+        trajectory files are of form <time>,<spec.name1> <spec.pop1>,etc
+        
         '''
         files = [self.outputDir + 'traj' + str(i) for i in range(self.numOfRuns)]
         handles = [open(t, 'r') for t in files]
@@ -378,12 +381,19 @@ class Result(object):
         line = header.readline()
         print('and read a line')
         parameters = {}
-        while not line == '==Parameters==\n':
+        count = 0
+        while not 'Parameters' in line:
+            count +=1
+            if count > 100:
+                raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
             self.name = line.rstrip('\n')
             line = header.readline()
         print("we've exited first while loop")
         line = header.readline()
-        while not line == '==Command==\n':
+        count = 0
+        while not 'Command' in line:
+            if count > 100:
+                raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
             _list = line.rstrip('\n').split(' ')
             parameters[_list[0]] = float(_list[1])
             line = header.readline()

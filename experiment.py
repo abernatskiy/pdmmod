@@ -209,6 +209,7 @@ class Experiment(object):
             perKernel = int(math.ceil(s.numOfRuns/kernels))
             #lastKernel = s.numOfRuns - perKernel*(kernels-1)
             for ker in range(kernels-1):
+                time.sleep(1)
                 trajFirst = ker*perKernel
                 trajLast = int((ker+1)*perKernel - 1)
                 s.log.info('kernel'+str(ker))

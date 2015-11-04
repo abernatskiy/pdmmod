@@ -380,6 +380,7 @@ class Simulation(object):
         inFile = open(pythonFile,'a')
         inFile.write('#!'+routes.path2python+'\n')
         inFile.write('import subprocess\n')
+        inFile.write('import time\n')
         inFile.write('subprocess.call("pwd",)'+'\n')
         #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
         
@@ -391,6 +392,7 @@ class Simulation(object):
                         #str(self.records),
                         #self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
+            inFile.write('time.sleep(1)\n')
             inFile.write('subprocess.call(("mv","'+
                             self.path2Folder+'runtime.txt","'+
                             self.outputDir+"timePerReac"+str(j)+'"))'+'\n')
@@ -476,6 +478,7 @@ class Simulation(object):
             self.addToQueue(
                 self.outputDir,i,trajFirst,trajLast,jobsRun,onNode,
                 paramFile,populFile)
+            time.sleep(1)
         if kernels == 1:
             i = -1
             trajLast = -1

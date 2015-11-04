@@ -128,7 +128,10 @@ class Result(object):
          *evolutions -- is a dict.: {specie: np.array([populations over time])
          *count -- is int.: it counts time instances
         '''
+        print('making evolutions')
+        print('points\n',points)
         for spec in points.keys():
+            #print(spec)
             if self.numOfRuns == 1:
                 points[spec] = (np.mean(points[spec]), 0)
             else:
@@ -175,7 +178,7 @@ class Result(object):
                 points[point[0]][fileCount-1] = int(point[1])
         return None
 
-    def _makeStatistics(self):
+    def _makeStatistics(self):#BUG !!! FIXME
         '''
         reads all the trajectory files and makes and evolutions dictionary:
         a dictionary of populations of every specie at every moment 
@@ -186,11 +189,13 @@ class Result(object):
         
         '''
         files = [self.outputDir + 'traj' + str(i) for i in range(self.numOfRuns)]
+        print(files)
         handles = [open(t, 'r') for t in files]
         count = -1 #counts time instances
         evolutions = {}
         self.times = []
         breakCondition = False
+        print('evolutions\n',evolutions)
         while not breakCondition:
             points = {}
             #keeps populations of species at the given moment across files
@@ -211,13 +216,23 @@ class Result(object):
                         self.times.append(float(raw[0]))
                     fileCount += 1
                     self._line2Data(raw, points, fileCount)
+                    print('file #',fileCount)
+                    #print('line\n',raw)
+                    #print('points\n',points)#CORRECT
+            #print('points2\n',points)
 
             if not breakCondition:
+                #print('points again\n',points)
                 self._points2Evolutions(points, evolutions, count)
+                print('evolutions\n',evolutions)#FIXME
+                if count>1:
+                    breakCondition = True
+                    actRecords = 3
             else:
                 actRecords = count + 1
                 print('number of points is ' + str(actRecords))
                 break
+            
 
         [t.close() for t in handles]#pylint:disable=expression-not-assigned
 
@@ -233,7 +248,7 @@ class Result(object):
 
         return None
 
-    def _writeEvolutions(self):#TEST
+    def _writeEvolutions(self):
         '''
         reads trajectory files, calculates average and std over them and
         writes files means.txt and standDivs.txt
@@ -377,9 +392,7 @@ class Result(object):
         '''
         print('reading simulation parameters')
         header = open(self.outputDir + 'parameters.txt', 'r')
-        print("we've opened file")
         line = header.readline()
-        print('and read a line')
         parameters = {}
         count = 0
         while not 'Parameters' in line:
@@ -388,7 +401,6 @@ class Result(object):
                 raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
             self.name = line.rstrip('\n')
             line = header.readline()
-        print("we've exited first while loop")
         line = header.readline()
         count = 0
         while not 'Command' in line:
@@ -407,7 +419,6 @@ class Result(object):
         line = header.readline()
         self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ', ''))
         self.traj = bool(line.rstrip('\n').replace('keepTrajectories ', ''))
-        print('done reading')
         return parameters
 
     def makeStats(self, natData): 

@@ -18,8 +18,10 @@ minLength=6
 maxLength=25
 noR=1
 nonSteadyPercent = 0.5
-simNum = 12
+simNum = 100
 r = Result(modelNum, simNum, reorganize=True, numOfRuns=3, traj=True)
+
+#m = r.readMeans()
 #cr = ClusteredResults(modelNum,simNum,minLength,maxLength,nonSteadyPercent)
 #cr.plotOutstanders(natData)
 #for simNum in range(0,9):

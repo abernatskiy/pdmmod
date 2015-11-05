@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fstream>
 #include <time.h>
+#include <cstdlib>
 #include "totalPopulation.h"
 #include "dataLogger.h"
 
@@ -20,8 +21,10 @@ std::map<std::string,int> wellDepths;
 
 void printUsage(){
     std::cout << "Usage:" << std::endl;
-    std::cout << "  pdmmod simulateTime <totalTime> <timeBetweenRecords> <outputFileName> [-c <parametersFileName>] [-i <initialPopulationFileName>]" << std::endl;
-    std::cout << "  pdmmod simulateReactions <numberOfReactions> <recordingPeriod> <outputFileName> [-c <parametersFileName>] [-i <initialPopulationFileName>]" << std::endl;
+    std::cout << "  pdmmod simulateTime <totalTime> <timeBetweenRecords> <outputFileName> [<options>]" << std::endl;
+    std::cout << "  pdmmod simulateReactions <numberOfReactions> <recordingPeriod> <outputFileName> [<options>]" << std::endl;
+    std::cout << "Possible options:" << std::endl;
+    std::cout << "  -c <parametersFileName> -i <initialPopulationFileName> -r <randomSeed>" << std::endl;
     std::cout << "totalTime=0 causes the program to run the simulation until it runs out of possible reactions or indefinitely" << std::endl;
     std::cout << "timeBetweenRecords=0 causes the program to record the population after every reaction" << std::endl;
     std::cout << "numberOfReactions must be a multiple of recordingPeriod" << std::endl;
@@ -41,10 +44,7 @@ char* getCmdOption(char** begin, char** end, const std::string & option){
 }
 
 int main (int argc, char** argv){
-    /* Loading HP-model-specific data */
-    catPatterns = readCatPatterns("nativeList.txt");
-    wellDepths = readWellDepths("nativeList.txt");
-    
+
     /* Parsing command line options */
 
     // treating nonpositinal arguments first
@@ -59,6 +59,12 @@ int main (int argc, char** argv){
     if (getCmdOption(argv, argv+argc, "-i") != NULL){
         char* cInitialPopulationsFileName = getCmdOption(argv, argv+argc, "-i");
         initialPopulationFileName = std::string(cInitialPopulationsFileName);
+        positionalArgc -= 2;
+    }
+    int randomSeed = -1;
+    if (getCmdOption(argv, argv+argc, "-r") != NULL){
+        char* cRandomSeed = getCmdOption(argv, argv+argc, "-r");
+        randomSeed = atoi(cRandomSeed);
         positionalArgc -= 2;
     }
 
@@ -101,9 +107,11 @@ int main (int argc, char** argv){
 
     /* Reading initial conditions from file */
     std::cout << " before beginning" << std::endl;
-    TotalPopulation tp(initialPopulationFileName);
+    TotalPopulation tp(randomSeed, initialPopulationFileName);
 
-    
+    /* Loading HP-model-specific data */
+    catPatterns = readCatPatterns("nativeList.txt");
+    wellDepths = readWellDepths("nativeList.txt");
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;
@@ -121,10 +129,8 @@ int main (int argc, char** argv){
     t1=clock();
 
     while(dataLogger->makeRecords()){
-        //std::cout << tp << std::endl;
         stp = tp.stepSimulation();
         reacNum++;
-        //std::cout << tp << std::endl;
         if(stp == 1)
             break;
     }

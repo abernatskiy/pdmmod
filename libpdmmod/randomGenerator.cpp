@@ -1,8 +1,14 @@
 #include "randomGenerator.h"
+#include <iostream>
 
 RandomGenerator::RandomGenerator(){
     seedWithClock();
     m_distribution = std::uniform_real_distribution<PROPFLOAT>(0.f, 1.f);
+}
+
+void RandomGenerator::seedWithUInt(unsigned int seed){
+    m_seed = seed;
+    m_generator.seed(seed);
 }
 
 void RandomGenerator::seedWithString(std::string str){

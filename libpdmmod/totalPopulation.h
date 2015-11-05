@@ -15,7 +15,7 @@ class TotalPopulation
 {
 public:
     // Constructors/Destructors
-    TotalPopulation(std::string source);
+    TotalPopulation(int randomSeed, std::string source);
     /* constructs the object from the file listing all initial species and their populations
      */
     // TODO generation from distribution
@@ -39,7 +39,7 @@ private:
     // moved to public float m_t; // current simulation time
     PROPFLOAT m_a; // sum of sigmas, full propensity of the system
     // made public std::list<Population> m_listOfPopulations;
-    RandomGenerator m_randGen; // TODO organize civilized seeding
+    RandomGenerator m_randGen;
 
     // Methods
     std::list<Population>::iterator findPopulation(std::string specie);

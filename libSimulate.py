@@ -11,6 +11,7 @@ import math
 import time
 import subprocess
 import itertools
+import random
 
 from log_utils import init_log
 import routes
@@ -137,18 +138,28 @@ class Simulation(object):
         self.simNum = currentRun
         return outputDir
     
-    def _formCommand(self,trajNum,paramFile,populFile):
-        command = (self.path2Folder+'pdmmod',
-                    str(self.howTerm), 
-                    str(self.whenTerm), 
-                    str(self.records),
-                    os.path.join(self.outputDir,'traj'+str(trajNum)),
-                    '-c',paramFile,
-                    '-i',populFile)
+    def _formCommand(self,trajNum,paramFile,populFile,seed=None):
+        if not seed == None:
+            command = (self.path2Folder+'pdmmod',
+                        str(self.howTerm), 
+                        str(self.whenTerm), 
+                        str(self.records),
+                        os.path.join(self.outputDir,'traj'+str(trajNum)),
+                        '-c',paramFile,
+                        '-i',populFile,
+                        '-r',seed)
+        else:
+            command = (self.path2Folder+'pdmmod',
+                        str(self.howTerm), 
+                        str(self.whenTerm), 
+                        str(self.records),
+                        os.path.join(self.outputDir,'traj'+str(trajNum)),
+                        '-c',paramFile,
+                        '-i',populFile)
         return command
         
     
-    def runSeveralSeries(self,paramFile=None,populFile=None):
+    def runSeveralSeries(self,paramFile=None,populFile=None,seed=None):
         '''runs several simulations sequentially, 
         stores average, st.deviation and optionally trajectories
         '''
@@ -157,7 +168,7 @@ class Simulation(object):
         if populFile == None:
             populFile = self.path2Folder+'populations.txt'
         for trajNum in range(self.numOfRuns):
-            command = self._formCommand(trajNum,paramFile,populFile)
+            command = self._formCommand(trajNum,paramFile,populFile,seed)
             print(command)
             subprocess.call(command)
             self.log.info(str(command))
@@ -383,16 +394,16 @@ class Simulation(object):
         inFile.write('import time\n')
         inFile.write('subprocess.call("pwd",)'+'\n')
         #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
-        
+        seeds = []
         for j in range(trajFirst,trajLast+1):
-            command = self._formCommand(j,paramFile,populFile)
+            command = self._formCommand(j,paramFile,populFile,random.randint(0,10000))
             #command = (self.path2Folder+'pdmmod',
                         #str(self.howTerm), 
                         #str(self.whenTerm), 
                         #str(self.records),
                         #self.outputDir+'traj'+str(j))
             inFile.write('subprocess.call('+str(command)+')'+'\n')
-            inFile.write('time.sleep(1)\n')
+            #inFile.write('time.sleep(1)\n')
             inFile.write('subprocess.call(("mv","'+
                             self.path2Folder+'runtime.txt","'+
                             self.outputDir+"timePerReac"+str(j)+'"))'+'\n')
@@ -417,7 +428,7 @@ class Simulation(object):
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
         out, err = p.communicate()
-        time.sleep(5)
+        #time.sleep(5)
         self.log.info(out.decode())
         self.log.warning(err.decode())
         output = out.decode().split(' ')
@@ -540,7 +551,7 @@ class SimulationsSet(object):
     
     
     
-    def runSimsOnPC(self):#TEST
+    def runSimsOnPC(self,populFile=None,seed=None):#TEST
         #database = open(self.path2Folder+'database','a')
         paramDict, runs = readSet(self.correspond)
         for i in range(runs):
@@ -551,7 +562,7 @@ class SimulationsSet(object):
                            traj=self.traj,
                            log_level=self.log_level)
             paramFile = s.writeParamIni(paramDict,i)
-            s.runSeveralSeries(paramFile,populFile=None)
+            s.runSeveralSeries(paramFile,populFile,seed)
             s.reorganizeOutput()
             #database.write(str(s.currRun)+',,')
             line = ''

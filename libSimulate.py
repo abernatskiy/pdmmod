@@ -414,7 +414,8 @@ class Simulation(object):
         p =subprocess.Popen(('qsub',shell),
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
-        out, err = p.communicate() 
+        out, err = p.communicate()
+        time.sleep(2)
         self.log.info(out.decode())
         self.log.warning(err.decode())
         output = out.decode().split(' ')

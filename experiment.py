@@ -62,7 +62,7 @@ class Experiment(object):
         self.writeSimParams()
 
     def writeSimParams(self):
-        paramFileName =os.path.join(self.outputDir,self.experiment,'simParams.txt')
+        paramFileName =os.path.join(self.experiment,'simParams.txt')
         paramFile = open(paramFileName,'w')
         paramFile.write(
             'termCond = '+str(self.termCond[0])+' '+

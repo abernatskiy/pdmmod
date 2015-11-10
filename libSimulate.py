@@ -405,6 +405,8 @@ class Simulation(object):
                     trajFirst,trajLast,
                     jobsRun,onNode,
                     paramFile,populFile):
+        '''????
+        '''
         pythonFile = self._writePython(
             outputDir,kernelNum,trajFirst,trajLast,paramFile,populFile)
         shell = self._makeShell(outputDir,kernelNum,pythonFile,onNode)
@@ -415,7 +417,7 @@ class Simulation(object):
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
         out, err = p.communicate()
-        time.sleep(2)
+        time.sleep(5)
         self.log.info(out.decode())
         self.log.warning(err.decode())
         output = out.decode().split(' ')

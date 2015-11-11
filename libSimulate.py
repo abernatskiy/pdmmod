@@ -147,7 +147,7 @@ class Simulation(object):
                         os.path.join(self.outputDir,'traj'+str(trajNum)),
                         '-c',paramFile,
                         '-i',populFile,
-                        '-r',seed)
+                        '-r',str(seed))
         else:
             command = (self.path2Folder+'pdmmod',
                         str(self.howTerm), 

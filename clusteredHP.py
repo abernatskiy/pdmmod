@@ -545,7 +545,7 @@ def plotStandardReplot(
                     r = Result(modelNum,simNum,reorganize,numOfRuns,traj)
                 cr = ClusteredResults(
                     modelNum,simNum,minLength,maxLength,nonSteadyPercent)
-                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent)
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=nonSteadyPercent)
                 cr.plot2DClustLen(6,9,saveFig=save)
                 cr.plot2DClustLen(10,13,saveFig=save)
                 cr.plot2DClustLen(14,17,saveFig=save)

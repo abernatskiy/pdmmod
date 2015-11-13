@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
-#import subprocess
+import subprocess
 import os
 import result
 import hpClasses
@@ -529,8 +529,8 @@ def plotStandardFirstTime(
             print(str(simNum)+' done')
             
 def plotStandardReplot(
-        startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
-        ):
+        startSim,endSim,modelNum,formResult=False,numOfRuns=1,traj=True,
+        minLength=4,maxLength=25,nonSteadyPercent=0.5):
     save = True
     redone=[]
     new=[]
@@ -541,15 +541,16 @@ def plotStandardReplot(
             if os.path.isfile(commonPath+'not_done'):
                 subprocess.call(['rm','-r',commonPath+'figures'])
                 subprocess.call(['mkdir',commonPath+'figures'])
-                r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
+                if formResult:
+                    r = Result(modelNum,simNum,reorganize,numOfRuns,traj)
                 cr = ClusteredResults(
-                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-                    )
-                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-                cr.plot2DClustLen(4,7,saveFig=save)
-                cr.plot2DClustLen(8,13,saveFig=save)
-                cr.plot2DClustLen(14,19,saveFig=save)
-                cr.plot2DClustLen(20,25,saveFig=save)
+                    modelNum,simNum,minLength,maxLength,nonSteadyPercent)
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent)
+                cr.plot2DClustLen(6,9,saveFig=save)
+                cr.plot2DClustLen(10,13,saveFig=save)
+                cr.plot2DClustLen(14,17,saveFig=save)
+                cr.plot2DClustLen(18,21,saveFig=save)
+                cr.plot2DClustLen(22,25,saveFig=save)
                 subprocess.call(['rm','-r',commonPath+'not_done'])
                 redone.append(simNum)
             else:

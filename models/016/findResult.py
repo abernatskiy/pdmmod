@@ -19,8 +19,11 @@ maxLength=25
 noR=1
 nonSteadyPercent = 0.5
 simNum = 100
-r = Result(modelNum, simNum, reorganize=True, numOfRuns=3, traj=True)
-
+r = Result(modelNum, 0, reorganize=False, numOfRuns=3, traj=True)
+e, ar = r.makeStatistics()
+#jD0 = r.makeDictOfLengths(25,0.5)
+#jL0, eps0 = r.clustLengths(4,25,0.5)
+#cr = ClusteredResults(modelNum,simNum,minLength=4,maxLength=25,nonSteadyPercent)
 #m = r.readMeans()
 #cr = ClusteredResults(modelNum,simNum,minLength,maxLength,nonSteadyPercent)
 #cr.plotOutstanders(natData)

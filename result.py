@@ -128,8 +128,8 @@ class Result(object):
          *evolutions -- is a dict.: {specie: np.array([populations over time])
          *count -- is int.: it counts time instances
         '''
-        print('making evolutions')
-        print('points\n',points)
+        #print('making evolutions')
+        #print('points\n',points)
         for spec in points.keys():
             #print(spec)
             if self.numOfRuns == 1:
@@ -195,7 +195,7 @@ class Result(object):
         evolutions = {}
         self.times = []
         breakCondition = False
-        print('evolutions\n',evolutions)
+        #print('evolutions\n',evolutions)
         while not breakCondition:
             points = {}
             #keeps populations of species at the given moment across files
@@ -216,7 +216,7 @@ class Result(object):
                         self.times.append(float(raw[0]))
                     fileCount += 1
                     self._line2Data(raw, points, fileCount)
-                    print('file #',fileCount)
+                    #print('file #',fileCount)
                     #print('line\n',raw)
                     #print('points\n',points)#CORRECT
             #print('points2\n',points)
@@ -224,10 +224,10 @@ class Result(object):
             if not breakCondition:
                 #print('points again\n',points)
                 self._points2Evolutions(points, evolutions, count)
-                print('evolutions\n',evolutions)#FIXME
-                if count>1:
-                    breakCondition = True
-                    actRecords = 3
+                #print('evolutions\n',evolutions)#FIXME
+                #if count>1:
+                    #breakCondition = True
+                    #actRecords = 3
             else:
                 actRecords = count + 1
                 print('number of points is ' + str(actRecords))
@@ -674,7 +674,8 @@ class Result(object):
         #return steadySorted
     
     def makeDictOfLengths(self, maxLength, nonSteadyPercent):
-        '''returns dictionary of ordereder dictionaries
+        '''returns dictionary of ordereder dictionaries 
+        it's called jointData everywhere. it has the following structure
         {length: OrderedDict{seq: float}}
         '''
         steadyMean, steadyStd = self.getSteadyMeanStd(nonSteadyPercent)   #sortedDict
@@ -715,10 +716,10 @@ class Result(object):
         labels = {}
         epsilons = {}
 
-        for length in range(minLength, maxLength + 1):
+        for length in range(minLength, maxLength + 1):#for every length
             _labels[length] = []
             labels[length] = {}
-            if not self.jointData[length] == {}:
+            if not self.jointData[length] == {}:#if there's data to analyze
                 print('analyzing length ' + str(length))
                 #lenOffset=length-minLength
                 means = []
@@ -739,7 +740,10 @@ class Result(object):
                 n_clusters = len(set(jointLabels[length])) - \
                     (1 if -1 in jointLabels[length] else 0)
                 print('Estimated number of clusters: %d' % n_clusters)
+            # if steady pop dict jointData is empty -- nothing to analyze
+            # assign empty array to labels
             else:
+                print('there are no sequences of length '+str(length))
                 jointLabels[length] = np.array([])
             #i=-1
             for (i, seq) in indxes.items():
@@ -756,7 +760,7 @@ class Result(object):
                 for couple in _labels[length]:
                     addToDictList(labels[length], couple[1], couple[0])
 
-        return labels, epsilons
+        return jointLabels, epsilons
 
     def enumerateAll(self, num2name=False, name2num=False):
         '''makes correspondence seq-name - to integer
@@ -831,8 +835,8 @@ def median(mylist):
             med = sorts[int(length *i/(i + 1))]
             i += 1
         if med == 0.0:
-            med = 0.0001
-            print('artificial median of 0.0001 is set up')
+            med = 0.0000000000001#BUG
+            print('artificial median of 0.0000000000001 is set up')
         else:
             print('variance at ' + str(i) + '/' + str(i + 1))
 

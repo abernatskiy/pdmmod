@@ -180,7 +180,7 @@ class Result(object):
 
     def _makeStatistics(self):#BUG !!! FIXME
         '''
-        reads all the trajectory files and makes and evolutions dictionary:
+        reads all the trajectory files and makes and evolutions dictionary:   
         a dictionary of populations of every specie at every moment 
         averaged over the trajectories 
         *evolutions -- dict.: {specie:np.arry[populations over time]}
@@ -627,7 +627,20 @@ class Result(object):
         plt.xlim(timeLims)
         plt.show()
         return None
-    
+
+    def plotLenDistrLogLog(self,natData,jointData,nonSteadyPercent,show=True):
+        lengthsDistr = \
+            self.getLengthDistribution(natData,jointData,nonSteadyPercent)
+        plt.plot(list(range(1,maxLength+1)), lengthsDistr, linewidth=4)
+        plt.yscale('log')
+        plt.xscale('log')
+        plt.title(self._kin2str(), fontsize=20)
+        if show:
+            plt.show()
+        else:
+            plt.savefig(self._writeGraphFilename())
+        return None
+
     def getSteadyMeanStd(self, nonSteadyPercent):
         '''takes average over time in the final x percent of data:
         x = 1 - nonSteadyPercent

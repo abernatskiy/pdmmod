@@ -20,7 +20,8 @@ class ClusteredResults(result.Result):
         self.natData = hpClasses.readNativeList(self.maxLength)
         self.means = self.readMeans()
         self.stds = self.readStds()
-        self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
+        self.jointLabels, self.epsilons = \
+            self.clustLengths(minLength,maxLength,
                      nonSteadyPercent,samp,epsilonModifyer)
                     #labels for each length
         self.clustDict=self.makeClustDict()
@@ -32,6 +33,13 @@ class ClusteredResults(result.Result):
         return self.clustDict[length].theClusters[label]
     
     def makeClustDict(self):
+        '''for every length forms on object Clusters
+        and adds a dict. entry len: Clusters
+        Args:
+            self - ClusteredResults
+        Output:
+            dict - {int:Clusters}
+        '''
         print('making clustDict')
         clustDict={}
         for length in range(self.minLength,self.maxLength+1):

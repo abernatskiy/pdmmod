@@ -714,66 +714,64 @@ class Result(object):
 
         return steadyLen
 
-    def clustLengths(self, minLength, maxLength, 
-                     nonSteadyPercent, samp=None, epsilonModifyer={0:0}):#TEST
+    def clustLengths(self,minLength,maxLength,
+                     nonSteadyPercent,samp=None,epsilonModifyer={0:0}):#TEST
         ''' returns dict jointLabels'''
         if self.numOfRuns == 1:
-            raise ValueError('I cannot cluster data from 1 simulation:' + 
-                             ' standard deviation isn\'t defined')
+            raise ValueError('I cannot cluster data from 1 simulation:'+
+                ' standard deviation isn\'t defined')
         try:
             type(self.jointData)
-        except:#pylint:disable=bare-except
-            self.jointData = self.makeDictOfLengths(maxLength, nonSteadyPercent)
-        jointLabels = {}
-        _labels = {}
-        labels = {}
+        except:
+            self.jointData=self.makeDictOfLengths(maxLength,nonSteadyPercent)
+        jointLabels={}
+        _labels={}
+        labels={}
         epsilons = {}
-
-        for length in range(minLength, maxLength + 1):#for every length
+        
+        for length in range(minLength,maxLength+1):
             _labels[length] = []
             labels[length] = {}
-            if not self.jointData[length] == {}:#if there's data to analyze
-                print('analyzing length ' + str(length))
-                #lenOffset=length-minLength
+            if not self.jointData[length]=={}:
+                print('analyzing length '+str(length))
+                lenOffset=length-minLength
                 means = []
                 stds = []
                 indxes = {}
-                i = -1
+                i=-1
                 for seq in self.jointData[length].keys():
-                    i += 1
+                    i+=1
                     means.append(self.jointData[length][seq][0])
                     stds.append(self.jointData[length][seq][1])
-                    indxes[i] = seq
-                #print('passed means')
+                    indxes[i]=seq
+                print('passed means')
                 if samp == None:
                     samp = 10
-                jointLabels[length], epsilons[length] = \
-                    clustList(means, stds, length, samp, epsilonModifyer)
- 
-                n_clusters = len(set(jointLabels[length])) - \
-                    (1 if -1 in jointLabels[length] else 0)
+                jointLabels[length], epsilons[length]=clustList(
+                        means,stds,length,samp,epsilonModifyer)
+                
+                n_clusters = len(set(jointLabels[length])) - (1 if -1 in jointLabels[length] else 0)
                 print('Estimated number of clusters: %d' % n_clusters)
-            # if steady pop dict jointData is empty -- nothing to analyze
-            # assign empty array to labels
             else:
-                print('there are no sequences of length '+str(length))
                 jointLabels[length] = np.array([])
+                indexes = {}
+                print('indexes are empty')
             #i=-1
-            for (i, seq) in indxes.items():
+            for (i,seq) in indxes.items():
                 try:
                     _labels[length].append((seq, jointLabels[length][i]))
                 except IndexError:
-                    if not self.jointData[length] == OrderedDict():
+                    if not self.jointData[length]==OrderedDict():
                         raise IndexError
                     else:
                         continue
-            if not _labels[length] == []:
-                #print(_labels)
-                #raise NotImplementedError('???')
+                    
+            if not _labels[length]==[]:
                 for couple in _labels[length]:
-                    addToDictList(labels[length], couple[1], couple[0])
-
-        return jointLabels, epsilons
+                    addToDictList(labels[length],couple[1],couple[0])
+            
+            
+        return labels, epsilons
 
     def enumerateAll(self, num2name=False, name2num=False):
         '''makes correspondence seq-name - to integer

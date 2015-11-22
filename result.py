@@ -631,7 +631,7 @@ class Result(object):
     def plotLenDistrLogLog(self,natData,jointData,nonSteadyPercent,show=True):
         lengthsDistr = \
             self.getLengthDistribution(natData,jointData,nonSteadyPercent)
-        plt.plot(list(range(1,maxLength+1)), lengthsDistr, linewidth=4)
+        plt.plot(list(range(1,25+1)), lengthsDistr, linewidth=4)
         plt.yscale('log')
         plt.xscale('log')
         plt.title(self._kin2str(), fontsize=20)

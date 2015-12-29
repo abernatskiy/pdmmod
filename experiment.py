@@ -59,6 +59,19 @@ class Experiment(object):
         self.numOfRuns = numOfRuns
         self.traj = traj
         self.makeParams()
+        self.writeSimParams()
+
+    def writeSimParams(self):
+        paramFileName =os.path.join(self.experiment,'simParams.txt')
+        paramFile = open(paramFileName,'w')
+        paramFile.write(
+            'termCond = '+str(self.termCond[0])+' '+
+            str(self.termCond[1])+' '+
+            str(self.termCond[2])+'\n')
+        paramFile.write('traj = '+str(self.traj)+'\n')
+        paramFile.write('numOfRuns = '+str(self.numOfRuns)+'\n')
+        paramFile.close()
+        return None
 
 
     def readParameters(self):
@@ -209,6 +222,7 @@ class Experiment(object):
             perKernel = int(math.ceil(s.numOfRuns/kernels))
             #lastKernel = s.numOfRuns - perKernel*(kernels-1)
             for ker in range(kernels-1):
+                time.sleep(1)
                 trajFirst = ker*perKernel
                 trajLast = int((ker+1)*perKernel - 1)
                 s.log.info('kernel'+str(ker))

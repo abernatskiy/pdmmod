@@ -7,11 +7,17 @@
 #include <cmath>
 #include <limits>
 
-TotalPopulation::TotalPopulation(std::string source){
+TotalPopulation::TotalPopulation(int randomSeed, std::string source){
 //    m_randGen.seedWithString("shg;l ivnmsvceg dgfh d0sfdfsd ");
 //    // This random seed is known to trigger a numerical error in top-level sampling
 //    // with older sampler code (dded6fac3a92ff3aec1d92216a66971dbc9b9605 and older).
 //    // I'll just leave it here for a while.
+    if( randomSeed >= 0 )
+    {
+      m_randGen.seedWithUInt((unsigned int) randomSeed);
+      std::cout << "Using custom random seed of " << randomSeed << std::endl;
+    }
+
     m_t = 0.f;
     addPopulation("", 1); // adding "vacuum"
     addPopulationsFromFile(source);

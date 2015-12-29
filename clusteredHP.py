@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
-#import subprocess
+import subprocess
 import os
 import result
 import hpClasses
@@ -20,7 +20,8 @@ class ClusteredResults(result.Result):
         self.natData = hpClasses.readNativeList(self.maxLength)
         self.means = self.readMeans()
         self.stds = self.readStds()
-        self.jointLabels, self.epsilons = self.clustLengths(minLength,maxLength,
+        self.jointLabels, self.epsilons = \
+            self.clustLengths(minLength,maxLength,
                      nonSteadyPercent,samp,epsilonModifyer)
                     #labels for each length
         self.clustDict=self.makeClustDict()
@@ -32,6 +33,13 @@ class ClusteredResults(result.Result):
         return self.clustDict[length].theClusters[label]
     
     def makeClustDict(self):
+        '''for every length forms on object Clusters
+        and adds a dict. entry len: Clusters
+        Args:
+            self - ClusteredResults
+        Output:
+            dict - {int:Clusters}
+        '''
         print('making clustDict')
         clustDict={}
         for length in range(self.minLength,self.maxLength+1):
@@ -235,6 +243,37 @@ class ClusteredResults(result.Result):
         plt.xlim((0,100))
         plt.show()
         return None
+    
+    def plotOutstanders(self,natData):
+        '''
+        takes clustDict, gets outstanders for all the clusters and puts them 
+        on the graph population vs length
+        '''
+        points = []
+        lengths = list(self.clustDict.keys())
+        regMedianPops = []
+        for (length,clusters) in self.clustDict.items():
+            for seq in clusters.outstanders:
+                if seq.autocat:
+                    points.append(seq)
+                else:
+                    pass
+            #now calculate median value of populations of regular sequences
+            regulars = []
+            for (clusterNum, cluster) in clusters.clusters.items():
+                for seq in cluster.sequences:
+                    regulars.append(seq.meanPop)
+            regMedianPops.append(np.median(regulars))
+        
+        plt.plot(lengths,regMedianPops)
+        for seq in points:
+            plt.scatter(seq.length,seq.meanPop,s=20,c='b',marker='v',label=seq.hpstring)
+        plt.yscale('log')
+        plt.xlim(self.minLength,self.maxLength)
+        plt.savefig(self.outputDir+'outstanders.png')
+        
+        return points, regMedianPops
+            
         
         
 class Clusters(object):
@@ -498,8 +537,8 @@ def plotStandardFirstTime(
             print(str(simNum)+' done')
             
 def plotStandardReplot(
-        startSim,endSim,modelNum,minLength=4,maxLength=25,nonSteadyPercent=0.5
-        ):
+        startSim,endSim,modelNum,formResult=False,numOfRuns=1,traj=True,
+        minLength=4,maxLength=25,nonSteadyPercent=0.5):
     save = True
     redone=[]
     new=[]
@@ -510,15 +549,16 @@ def plotStandardReplot(
             if os.path.isfile(commonPath+'not_done'):
                 subprocess.call(['rm','-r',commonPath+'figures'])
                 subprocess.call(['mkdir',commonPath+'figures'])
-                r = Result(modelNum,simNum,reorganize=True,numOfRuns=3,traj=True)
+                if formResult:
+                    r = Result(modelNum,simNum,reorganize,numOfRuns,traj)
                 cr = ClusteredResults(
-                    modelNum,simNum,minLength,maxLength,nonSteadyPercent=0.5
-                    )
-                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=0.5)
-                cr.plot2DClustLen(4,7,saveFig=save)
-                cr.plot2DClustLen(8,13,saveFig=save)
-                cr.plot2DClustLen(14,19,saveFig=save)
-                cr.plot2DClustLen(20,25,saveFig=save)
+                    modelNum,simNum,minLength,maxLength,nonSteadyPercent)
+                cr.plotHPstats(natData,None,saveFig=save,nonSteadyPercent=nonSteadyPercent)
+                cr.plot2DClustLen(6,9,saveFig=save)
+                cr.plot2DClustLen(10,13,saveFig=save)
+                cr.plot2DClustLen(14,17,saveFig=save)
+                cr.plot2DClustLen(18,21,saveFig=save)
+                cr.plot2DClustLen(22,25,saveFig=save)
                 subprocess.call(['rm','-r',commonPath+'not_done'])
                 redone.append(simNum)
             else:

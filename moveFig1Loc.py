@@ -19,4 +19,4 @@ def copyThem(modelNum,firstSim,lastSim,newLoc):
         
     return None
 
-copyThem(16,0,30,'/tmp/fig')
+copyThem(16,15,56,'/tmp/fig')

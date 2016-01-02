@@ -40,7 +40,7 @@ def drawTurn(drawing,turn,startPoint,length=30):
         raise ValueError('turn = '+turn+', but turns (directions) can be only "U","R","L","D"')
     drawing.add(
         drawing.line(startPoint,endPoint,
-                    stroke=svgwrite.rgb(0, 0, 0, '%'),stroke_width=2
+                    stroke=svgwrite.rgb(0, 0, 0, '%'),stroke_width=10
                     )
         )
     return endPoint

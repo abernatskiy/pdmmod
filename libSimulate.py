@@ -386,6 +386,9 @@ class Simulation(object):
     
     def _writePython(self,outputDir,kernelNum,trajFirst,trajLast,
                      paramFile,populFile):
+        '''writes python script which calls pdmmod command
+        also writes seeds.txt file in the outputDir in order to reproduce results
+        '''
         pythonFile = self.outputDir+'run'+str(kernelNum)+'.py'
         #system('echo "" > '+str(pythonFile))
         inFile = open(pythonFile,'a')
@@ -394,9 +397,11 @@ class Simulation(object):
         inFile.write('import time\n')
         inFile.write('subprocess.call("pwd",)'+'\n')
         #inFile.write('subprocess.call(("cp","../parameters.ini","./"))'+'\n')
-        seeds = []
+        seeds = {}
         for j in range(trajFirst,trajLast+1):
-            command = self._formCommand(j,paramFile,populFile,random.randint(0,10000))
+            seed = random.randint(0,10000)
+            seeds[j]=seed
+            command = self._formCommand(j,paramFile,populFile,seed)
             #command = (self.path2Folder+'pdmmod',
                         #str(self.howTerm), 
                         #str(self.whenTerm), 
@@ -410,6 +415,10 @@ class Simulation(object):
             
             
         inFile.close()
+        seedsFile = open(self.outputDir+'seeds.txt','a')
+        for (core, seed) in seeds.items():
+            seedsFile.write(str(core)+' '+str(seed)+'\n')
+        seedsFile.close()
         return pythonFile
     
     def addToQueue(self,outputDir,kernelNum,

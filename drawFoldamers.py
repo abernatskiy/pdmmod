@@ -40,7 +40,7 @@ def drawTurn(drawing,turn,startPoint,length=30):
         raise ValueError('turn = '+turn+', but turns (directions) can be only "U","R","L","D"')
     drawing.add(
         drawing.line(startPoint,endPoint,
-                    stroke=svgwrite.rgb(0, 0, 0, '%'),stroke_width=2
+                    stroke=svgwrite.rgb(0, 0, 0, '%'),stroke_width=10
                     )
         )
     return endPoint
@@ -97,14 +97,39 @@ def getConfiguration(sequence):
             configuration = conf
             return configuration
     if configuration == None:
-        raise ValueError('configuration not found')
+        if not chainDict == {}:
+            print(chainDict.keys())
+            raise ValueError('configuration not found')
+        else:
+            raise FileNotFoundError('HP library reader didn\'t find sequece files')
 
+def drawLinearChain(drawing,sequence,startPoint,length=30):
+    N=len(sequence)
+    turns = 'R'*(N-1)
+    drawBalls(drawing,turns,sequence,startPoint,length)
+    return None
 
+dwg = svgwrite.Drawing('/tmp/test.svg', size=(1000,1000))
 
-dwg = svgwrite.Drawing('/tmp/test.svg', size=(200,200))
-drawBalls(dwg,'URD','HPHH',(0,0))
-drawBalls(dwg,getConfiguration('HHHHPPHPHPHPHHHH'),'HHHHPPHPHPHPHHHH',(100,100))
-drawBalls(dwg,getConfiguration('PPPP'),'PPPP',(0,0))
+s1 = 'HHHHPPHPHPHPHHHH'
+drawBalls(dwg,getConfiguration(s1),s1,(0,100))
+drawLinearChain(dwg,s1,(0,200))
+
+s2 = 'HHHPHHPHPHPHHPPH'
+drawBalls(dwg,getConfiguration(s2),s2,(0,400))
+drawLinearChain(dwg,s2,(0,500))
+
+s3 = 'HPHHPHHHHPHHHHHH'
+drawBalls(dwg,getConfiguration(s3),s3,(0,600))
+drawLinearChain(dwg,s3,(0,700))
+
+s4 = 'HHHPPHPPPHHPHPPH'
+drawBalls(dwg,getConfiguration(s4),s4,(0,900))
+drawLinearChain(dwg,s4,(0,1000))
+
+s5 = 'HHHPPHPPPHPPHHHH'
+drawBalls(dwg,getConfiguration(s5),s5,(0,1100))
+drawLinearChain(dwg,s5,(0,1200))
 
 dwg.save()
 

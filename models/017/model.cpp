@@ -5,7 +5,7 @@
 #include <algorithm> // std::min
 #include "parameter.h"
 #include "model.h"
-/* hp-model "hp-full-hydrolysis-phobicCut-limitMonomers kings-folding" #016
+/* hp-model "hp-basic-hydrolysis-phobicCut-limitMonomers kings-folding" #017
  * monomers import
  * degradation
  * folded degradation
@@ -17,17 +17,7 @@
  * unfolding
  */
 /*DATA
- * catPattern -- string. (cases)
- * interp.:
- * - if consists of 'H' and 'P' then represents a catalytic site of a given catalyst.
- * - if it's 'N' then it means the sequence is NOT a catalyst
- *
- * catPatterns -- dict. {string: string}
- * interp. a dictionary from sequence string to catalytic pattern string
- *
- * wellDepth -- dict. {string: int}
- * interp. a dictionary form monomer sequence string to potential well depth (energy of folded state)
- * z -- number of rotational freedoms
+
  */
 #include <map>
 #include <algorithm>
@@ -38,12 +28,9 @@ extern std::map<std::string,std::string> catPatterns;
 extern std::map<std::string,int> wellDepths;
 
 Specie::Specie(std::string id){
-    modelName = std::string("hp-full-hydrolysis-phobicCut-phenomen.folding");
-    m_catalyst = std::string("N");
-    m_substrate = std::string("N");
-    m_product = false;
-    m_folded = false;
+    modelName = std::string("hp-basic-hydrolysis-phobicCut-phenomen.folding");
     m_id = id; //HP sequence
+    m_length = m_id.length();
 
     if (m_length <5 || m_id == ""){
         m_hydrophobicity = 0;
@@ -146,11 +133,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
     int maxLength = configDict["maxLength"].getInt();
     float alpha = configDict["growth"].getFloat();
     float d = configDict["degradation"].getFloat();
-    float eH = configDict["eH"].getFloat();
     float dH = configDict["hydrolysis"].getFloat();
     float dAgg = configDict["aggregation"].getFloat();
     float aggPower = configDict["aggrAt"].getFloat();
-    float z = configDict["z"].getFloat();
     //all the reactions two species can have
 //     std::cout << "Loadad" << std::endl;
 //     std::cout << aH << "\n" << aP<< "\n" << maxLength<< "\n" << alpha<< "\n" << d<< "\n" << eH<< "\n" << dAgg<< "\n" << aggPower<< "\n" << z << std::endl;

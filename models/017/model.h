@@ -24,14 +24,9 @@ public:
     
     //attributes
     std::string m_id;
-    std::string m_catalyst;
-    std::string m_substrate;
-    bool m_product;
+
     int m_length;
-    bool m_folded;
-    int m_native;
     float m_hydrophobicity;
-    bool m_active;
     
     //constants
     

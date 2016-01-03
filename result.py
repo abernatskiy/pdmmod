@@ -705,7 +705,11 @@ class Result(object):
             else:
                 sLen = len(seq)-1
             if not (steadyMean[seq], steadyStd[seq]) == (0.0, 0.0):
-                steadyLen[sLen][seq] = (steadyMean[seq], steadyStd[seq])
+                try:
+                    steadyLen[sLen][seq] = (steadyMean[seq], steadyStd[seq])
+                except KeyError:
+                    print(seq,'length',sLen)
+                    raise KeyError
 
         for length in steadyLen.keys():
             tmp = OrderedDict(

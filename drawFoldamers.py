@@ -71,7 +71,7 @@ def drawBalls(drawing,turns,sequence,startPoint,length=30):
         dwg.add(
             dwg.circle(
                 center=currStart, 
-                r=int(length/2-2),
+                r=int(length/2-4),
                 stroke='black',
                 fill=getColor(letter)
                 )
@@ -81,7 +81,7 @@ def drawBalls(drawing,turns,sequence,startPoint,length=30):
     dwg.add(
         dwg.circle(
             center=currStart, 
-            r=int(length/2-2),
+            r=int(length/2-4),
             stroke='black',
             fill=getColor(sequence[-1])
             )
@@ -111,15 +111,15 @@ def drawLinearChain(drawing,sequence,startPoint,length=30):
 
 dwg = svgwrite.Drawing('/tmp/test.svg', size=(1000,1000))
 
-s1 = 'HHHHPPHPHPHPHHHH'
+s1 = 'HHHPPPHHHPPHPH'
 drawBalls(dwg,getConfiguration(s1),s1,(0,100))
 drawLinearChain(dwg,s1,(0,200))
 
-s2 = 'HHHPHHPHPHPHHPPH'
+s2 = 'HHHHHHPPHHPHPH'
 drawBalls(dwg,getConfiguration(s2),s2,(0,400))
 drawLinearChain(dwg,s2,(0,500))
 
-s3 = 'HPHHPHHHHPHHHHHH'
+s3 = 'HPPHPHPHHHHPHH'
 drawBalls(dwg,getConfiguration(s3),s3,(0,600))
 drawLinearChain(dwg,s3,(0,700))
 

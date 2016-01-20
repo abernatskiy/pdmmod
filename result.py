@@ -347,10 +347,14 @@ class Result(object):
         returns times: list of the recorded times
         '''
         print('read times.txt')
-        with open(self.outputDir + 'times.txt', 'r') as content_file:
-            content = content_file.read()
-        times = [float(item) for item in content.split(' ')]
-        print('done reading')
+        try:
+            with open(self.outputDir + 'times.txt', 'r') as content_file:
+                content = content_file.read()
+            times = [float(item) for item in content.split(' ')]
+            print('done reading')
+        except FileNotFoundError:
+            times = None
+            print('WARNING! times.txt is missing. Continue without it.')
         return times
     
     def readMeans(self):
@@ -392,34 +396,39 @@ class Result(object):
         stores it as a dictionary: {par.name: par.value}
         '''
         print('reading simulation parameters')
-        header = open(self.outputDir + 'parameters.txt', 'r')
-        line = header.readline()
-        parameters = {}
-        count = 0
-        while not 'Parameters' in line:
-            count +=1
-            if count > 100:
-                raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
-            self.name = line.rstrip('\n')
+        try:
+            header = open(self.outputDir + 'parameters.txt', 'r')
+        except FileNotFoundError:
+            print('WARNING! parametres.txt is missing, continue without')
+            parameters = None
+        else:
             line = header.readline()
-        line = header.readline()
-        count = 0
-        while not 'Command' in line:
-            if count > 100:
-                raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
-            _list = line.rstrip('\n').split(' ')
-            parameters[_list[0]] = float(_list[1])
+            parameters = {}
+            count = 0
+            while not 'Parameters' in line:
+                count +=1
+                if count > 100:
+                    raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
+                self.name = line.rstrip('\n')
+                line = header.readline()
             line = header.readline()
-        line = header.readline()
-        self.howTerm = line.rstrip('\n').replace('howTerm ', '')
-        line = header.readline()
-        self.whenTerm = int(line.rstrip('\n').replace('whenTerm ', ''))
-        line = header.readline()
-        self.records = float(line.rstrip('\n').replace('records ', ''))
-        line = header.readline()
-        line = header.readline()
-        self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ', ''))
-        self.traj = bool(line.rstrip('\n').replace('keepTrajectories ', ''))
+            count = 0
+            while not 'Command' in line:
+                if count > 100:
+                    raise ValueError("coulnd't read"+str(self.outputDir)+'parameters.txt')
+                _list = line.rstrip('\n').split(' ')
+                parameters[_list[0]] = float(_list[1])
+                line = header.readline()
+            line = header.readline()
+            self.howTerm = line.rstrip('\n').replace('howTerm ', '')
+            line = header.readline()
+            self.whenTerm = int(line.rstrip('\n').replace('whenTerm ', ''))
+            line = header.readline()
+            self.records = float(line.rstrip('\n').replace('records ', ''))
+            line = header.readline()
+            line = header.readline()
+            self.numOfRuns = int(line.rstrip('\n').replace('numOfRuns ', ''))
+            self.traj = bool(line.rstrip('\n').replace('keepTrajectories ', ''))
         return parameters
 
     def makeStats(self, natData): 

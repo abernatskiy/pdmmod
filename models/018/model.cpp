@@ -344,7 +344,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     else if (m_folded == false && specie.m_length == 1){
         growIt(allReactions,specie,alpha,maxLength);
     }
-    else if (m_length == 1 && specie.m_folded == false){
+    else if (m_length == 1 && specie.m_folded == false && specie.m_id!=std::string("")){
         growOther(allReactions,specie,alpha,maxLength);
     }
     else if (m_catalyst != std::string("N") && 
@@ -365,7 +365,8 @@ std::list<Reaction> Specie::reactions(Specie specie){
     }
     else if (m_catalyst != std::string("N") && 
             specie.m_folded == false && m_id.find(std::string("*"))!= std::string::npos &&
-            specie.m_substrate != std::string("N")){
+            specie.m_substrate != std::string("N")
+            && specie.m_id!=std::string("")){
         catalyzeIt(allReactions,specie,alpha,eH,maxLength);
     }
     return allReactions;

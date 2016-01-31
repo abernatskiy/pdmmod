@@ -196,7 +196,7 @@ def outToIn(result,filename):
                     popsFIle.write(couple+'\n')
     popsFIle.close()
 
-def bugPlot(r,filename,title):
+def lengthAsTimePlot(r,filename,title):
     t, tpt = totalPopTime(r,filename)
     plt.plot(t,tpt,label='totalpop')
     plt.legend()
@@ -300,7 +300,7 @@ for par in parameters:
     if 'hydrolysis' in par or 'degradation' in par:
         title+=par+' '
 
-bugPlot(r,filename,title)
+lengthAsTimePlot(r,filename,title)
 sd, denominator = seqDict(r,filename,10)
 
 d = seqDictToData(sd,denominator)

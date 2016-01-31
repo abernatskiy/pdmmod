@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import sys
 sys.path.append('../../')
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import subprocess
 import pickle
@@ -133,8 +133,8 @@ def seqDict(result,filename,minTime):
                             seqDict[pair[0]]=[int(pair[1])]
                             
     print(len(times))
-    print(times)
-    return seqDict
+    #print(times)
+    return seqDict, len(times)
 
 def seqDictToData(seqDict,timeSteps):
     sequences = [[] for i in range(25)]
@@ -182,7 +182,7 @@ def boxplotThem(dataToPlot,title):
     ax.set_xlabel(r'length',fontsize = 30)
     ax.set_xlim(0,26)
     ax.set_ylim(0.00000005)
-    plt.suptitle(title,fontsize=25)
+    plt.suptitle(title,fontsize=30)
     plt.savefig(r.outputDir+'distr.png')
 
 def outToIn(result,filename):
@@ -200,7 +200,6 @@ def bugPlot(r,filename,title):
     t, tpt = totalPopTime(r,filename)
     plt.plot(t,tpt,label='totalpop')
     plt.legend()
-    plt.title(title,fontsize=25)
     plt.savefig(r.outputDir+'tpt.png')
     dd = lenDistrAsTime(r,filename,1,25)
     odd = OrderedDict(sorted(dd.items(), key=lambda t: t[0], reverse=False))
@@ -214,7 +213,7 @@ def bugPlot(r,filename,title):
     for l in lenDistr:
         plt.plot(t,l,label = str(idx))
         plt.legend()
-        plt.title(title,fontsize=25)
+        plt.title(title,fontsize=30)
         plt.savefig(r.outputDir+'len'+str(idx)+'.png')
         idx+=1
         plt.clf()
@@ -268,7 +267,7 @@ def plotInLen(r,freqs,fits,title):
             axes[int((index)/nc),(index)%(nc)].set_title(str(length)+'-mers')
             index+=1
     
-    plt.suptitle(title,fontsize=25)
+    plt.suptitle(title,fontsize=30)
     plt.savefig(r.outputDir+'inlen.png')
 
 
@@ -287,50 +286,45 @@ def readParams(result,filename):
                 return parameters
 
 plt.clf()
-modelNum = 16
-simNum = 7
+modelNum = 17
+simNum = 29
 minLength = 1
 maxLength = 25
-for simNum in range(9,11):
-    r = Result(modelNum, simNum, reorganize=False, numOfRuns=1, traj=True)
-    filename = 'traj0'
-    denominator = 100001
-    l = list(range(1,26))
-    
-    title=''
-    parameters = readParams(r,filename)
-    for par in parameters:
-        if 'hydrolysis' in par or 'degradation' in par:
-            title+=par+' '
-    plt.clf()
-    bugPlot(r,filename,title)
-    sd = seqDict(r,filename,40)
+r = Result(modelNum, simNum, reorganize=False, numOfRuns=1, traj=True)
+filename = 'traj0'
+l = list(range(1,26))
 
-    d = seqDictToData(sd,denominator)
-    nd = normalize(d,np.mean(d[0]))
-    ##pickle.dump(nd,open('nd22-1000.p','wb'))
-    plt.clf()
-    boxplotThem(nd,title)
+title=''
+parameters = readParams(r,filename)
+for par in parameters:
+    if 'hydrolysis' in par or 'degradation' in par:
+        title+=par+' '
 
-    sums = []
-    for i in d:
-        sums.append(sum(i))
-    
-    s = sum(sums)
-    plt.clf()
-    distr = [i/s for i in sums]
-    plt.plot(l,distr,linewidth=4)
-    plt.yscale('log')
-    plt.title(title,fontsize=30)
-    plt.savefig(r.outputDir+'lenDistr.png')
-    sds = {}
-    for seq in sd.keys():
-        sds[seq]=sum(sd[seq])/denominator
+bugPlot(r,filename,title)
+sd, denominator = seqDict(r,filename,10)
 
-    p, fr = getFreqs(sds,maxLength)
-    fits =  fitInLen(fr)
-    plt.clf()
-    plotInLen(r,fr,fits,title)
+d = seqDictToData(sd,denominator)
+nd = normalize(d,np.mean(d[0]))
+##pickle.dump(nd,open('nd22-1000.p','wb'))
+boxplotThem(nd,title)
+
+sums = []
+for i in d:
+    sums.append(sum(i))
+s = sum(sums)
+plt.clf()
+distr = [i/s for i in sums]
+plt.plot(l,distr,linewidth=4)
+plt.yscale('log')
+plt.title(title,fontsize=30)
+plt.savefig(r.outputDir+'lenDistr.png')
+sds = {}
+for seq in sd.keys():
+    sds[seq]=sum(sd[seq])/denominator
+
+p, fr = getFreqs(sds,maxLength)
+fits =  fitInLen(fr)
+plotInLen(r,fr,fits,title)
 
 
 

@@ -201,7 +201,12 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
 {
     float u_rate = URate( eH, z);
     Reaction unfold(m_id,1,specie.m_id,0,u_rate);
-    unfold.addProduct(m_id.substr(1,m_length),1);
+    if (m_id.find(std::string("*")) == std::string::npos){
+        unfold.addProduct(m_id.substr(1,m_length),1);
+    }
+    else{
+        unfold.addProduct(m_id.substr(2,m_length),1);
+    }
     allReactions.push_back(unfold);
 }
 

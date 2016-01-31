@@ -200,6 +200,7 @@ def bugPlot(r,filename,title):
     t, tpt = totalPopTime(r,filename)
     plt.plot(t,tpt,label='totalpop')
     plt.legend()
+    plt.title(title,fontsize=25)
     plt.savefig(r.outputDir+'tpt.png')
     dd = lenDistrAsTime(r,filename,1,25)
     odd = OrderedDict(sorted(dd.items(), key=lambda t: t[0], reverse=False))
@@ -213,7 +214,7 @@ def bugPlot(r,filename,title):
     for l in lenDistr:
         plt.plot(t,l,label = str(idx))
         plt.legend()
-        plt.title(title,fontsize=30)
+        plt.title(title,fontsize=25)
         plt.savefig(r.outputDir+'len'+str(idx)+'.png')
         idx+=1
         plt.clf()
@@ -267,7 +268,7 @@ def plotInLen(r,freqs,fits,title):
             axes[int((index)/nc),(index)%(nc)].set_title(str(length)+'-mers')
             index+=1
     
-    plt.suptitle(title,fontsize=30)
+    plt.suptitle(title,fontsize=25)
     plt.savefig(r.outputDir+'inlen.png')
 
 
@@ -287,12 +288,12 @@ def readParams(result,filename):
 
 plt.clf()
 modelNum = 17
-simNum = 29
+simNum = 1
 minLength = 1
 maxLength = 25
 r = Result(modelNum, simNum, reorganize=False, numOfRuns=1, traj=True)
 filename = 'traj0'
-l = list(range(1,26))
+
 
 title=''
 parameters = readParams(r,filename)
@@ -301,30 +302,32 @@ for par in parameters:
         title+=par+' '
 
 bugPlot(r,filename,title)
-sd, denominator = seqDict(r,filename,10)
 
-d = seqDictToData(sd,denominator)
-nd = normalize(d,np.mean(d[0]))
+l = list(range(1,26))
+#sd, denominator = seqDict(r,filename,80)
+
+#d = seqDictToData(sd,denominator)
+#nd = normalize(d,np.mean(d[0]))
 ##pickle.dump(nd,open('nd22-1000.p','wb'))
-boxplotThem(nd,title)
+#boxplotThem(nd,title)
 
-sums = []
-for i in d:
-    sums.append(sum(i))
-s = sum(sums)
-plt.clf()
-distr = [i/s for i in sums]
-plt.plot(l,distr,linewidth=4)
-plt.yscale('log')
-plt.title(title,fontsize=30)
-plt.savefig(r.outputDir+'lenDistr.png')
-sds = {}
-for seq in sd.keys():
-    sds[seq]=sum(sd[seq])/denominator
+#sums = []
+#for i in d:
+#    sums.append(sum(i))
+#s = sum(sums)
+#plt.clf()
+#distr = [i/s for i in sums]
+#plt.plot(l,distr,linewidth=4)
+#plt.yscale('log')
+#plt.title(title,fontsize=30)
+#plt.savefig(r.outputDir+'lenDistr.png')
+#sds = {}
+#for seq in sd.keys():
+#    sds[seq]=sum(sd[seq])/denominator
 
-p, fr = getFreqs(sds,maxLength)
-fits =  fitInLen(fr)
-plotInLen(r,fr,fits,title)
+#p, fr = getFreqs(sds,maxLength)
+#fits =  fitInLen(fr)
+#plotInLen(r,fr,fits,title)
 
 
 

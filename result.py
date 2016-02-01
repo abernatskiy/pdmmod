@@ -946,13 +946,17 @@ class Result(object):
                 axes[int((index)/nc),(index)%(nc)].plot(
                     list(sortedFreqs.keys()),list(sortedFreqs.values()),'o'
                     )
-                m, c = fits[length-1]
-                axes[int((index)/nc),(index)%(nc)].plot(
-                    list(sortedFreqs.keys()),
-                    [(10**(c)*xi**(m)) for xi in sortedFreqs.keys()],
-                    linewidth = 3,
-                    label = 'y = '+str("%.2f" %(10**c))+'x^'+str("%.2f" %m)
-                    )
+                try:
+                    m, c = fits[length-1]
+                except KeyError:
+                    m, c = (0,0)
+                else:
+                    axes[int((index)/nc),(index)%(nc)].plot(
+                        list(sortedFreqs.keys()),
+                        [(10**(c)*xi**(m)) for xi in sortedFreqs.keys()],
+                        linewidth = 3,
+                        label = 'y = '+str("%.2f" %(10**c))+'x^'+str("%.2f" %m)
+                        )
                 axes[int((index)/nc),(index)%(nc)].set_yscale('log')
                 axes[int((index)/nc),(index)%(nc)].set_xscale('log')
                 #axes[int((index)/nc),(index)%(nc)].legend()

@@ -46,19 +46,29 @@ std::list<Reaction> Specie::reactions(Specie specie){
         }
         std::string tmp1 = m_id;
         std::string tmp2 = specie.m_id;
-        if (m_len<maxLength){
-            collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),1);
+        if (m_id == specie.m_id){
+            if (m_len<maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),2);
+            }
+            else{
+                collision.addProduct(m_id.substr(0,5)+std::string("1"),2);
+            }
         }
-        else if (m_len == maxLength){
-            collision.addProduct(m_id.substr(0,5)+std::string("1"),1);
+        else{
+            if (m_len<maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),1);
+            }
+            else if (m_len == maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::string("1"),1);
+            }
+            if (specie.m_len<maxLength){
+                collision.addProduct(specie.m_id.substr(0,5)+std::to_string(atoi((tmp2.erase(0,5)).c_str())+1),1);
+            }
+            else if (specie.m_len==maxLength){
+                collision.addProduct(specie.m_id.substr(0,5)+std::string("1"),1);
+            }
+            allReactions.push_back(collision);
         }
-        if (specie.m_len<maxLength){
-            collision.addProduct(specie.m_id.substr(0,5)+std::to_string(atoi((tmp2.erase(0,5)).c_str())+1),1);
-        }
-        else if (specie.m_len==maxLength){
-            collision.addProduct(specie.m_id.substr(0,5)+std::string("1"),1);
-        }
-        allReactions.push_back(collision);
     }
     
     return allReactions;

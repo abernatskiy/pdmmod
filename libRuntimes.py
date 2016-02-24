@@ -14,6 +14,9 @@ from numpy import linspace
 import numpy as np
 from matplotlib.legend_handler import HandlerLine2D
 import libSimulate
+from matplotlib import cm
+#plt.gcf().subplots_adjust(bottom=0.15)
+#plt.gcf().subplots_adjust(left=0.15)
 
 '''DATA
 * numSpec -- int.
@@ -123,7 +126,7 @@ def runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species):#TES
             modelNum,termCond,rewrite,None,numOfRuns,traj,log_level)
     system('touch '+s.path2Folder+'runTemp.txt' )
     for numSpec in species:
-        changeParameters(collRate,numSpec)
+        changeParameters(0.5,numSpec)
         s = libSimulate.Simulation(
             modelNum,termCond,rewrite,None,numOfRuns,traj,log_level)
         changeInitPop(numSpec,population)
@@ -142,7 +145,7 @@ def runSeveralChangeNumSpec2(command,runs,population,species,collRate):#TODO
     '''
     system('rm runTemp.txt && touch runTemp.txt' )
     for numSpec in species:
-        changeParameters(numSpec,collRate)
+        changeParameters(collRate,numSpec)
         pair=getTimeStat(command,numSpec,population,runs)#average time and standard deviation of it.
         with open("runTemp.txt", "a") as myfile:
             myfile.write(str(numSpec)+' '+str(pair[0])+' '+str(pair[1])+'\n')
@@ -274,9 +277,14 @@ def analyzeFile(filename):
 def plotSeveral(filenames):#TODO
     '''filenames = [string]
     '''
-    fig, (ax0, ax1) = plt.subplots(nrows=2,sharex=False)
+    plt.gcf().subplots_adjust(bottom=0.15)
+    #plt.gcf().subplots_adjust(left=0.15)
+    fig = plt.figure(1, figsize=(9,6))
+    ax0 = fig.add_subplot(111)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     labCols = dict(
-        zip(filenames,cm.rainbow(np.linspace(0, 1, len(filenames))))
+        zip(filenames,['r','g','b'])
         )
     for filename in filenames:
         data, lines, slope, ratios, fits = analyzeFile(filename)
@@ -284,36 +292,110 @@ def plotSeveral(filenames):#TODO
         if not filename.find('pssa')== -1:
             ax0.errorbar(data[0],data[1],yerr=data[2],fmt='v',
                          color = col,
-                         markersize=12)
+                         markersize=10)
             ax0.plot([],[],marker='v',
-                        markersize=12,
+                        markersize=10,
                         color = col,label='PDM')
             ax0.plot(lines[0],lines[1],
-                     linewidth=3,
+                     linewidth=5,
                      color = col)
             print('PDM: y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1])
         elif not filename.find('stochkit')== -1:
             ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',
-                         color = col,markersize=12)
+                         color = col,markersize=10)
             ax0.plot([],[],marker='o',
-                        markersize=12,
+                        markersize=10,
                         color = col,label='SSA')
             ax0.plot(lines[0],lines[2],
-                     linewidth=3,
+                     linewidth=5,
                      color = col)
             print('SSA: y = '+
                     '%.2e' %fits[1][0]+' x^2 +'+
                     '%.2e' %fits[1][1]+' x '+
                     '%.2e' %fits[1][2],)
         else:
-            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D', 
-                        color = col,markersize=12)
-            ax0.plot([],[],marker='D',
-                        markersize=12,
-                        color = col,label='PDMmod')
             ax0.plot(lines[0],lines[1],
-                     linewidth=3,
+                     linewidth=5,
                      color = col)
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D', 
+                        color = col,markersize=10)
+            ax0.plot([],[],marker='D',
+                        markersize=10,
+                        color = col,label='EPDM')
+            
+        #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
+            print('PDMmod: y ='+'%.2e' %fits[0][0]+
+                        ' x'+'%.2e' %fits[0][1])
+        #for i in range(len(data[1])):
+            #element=data[1][i]
+        
+            #rat=ratios[i-1]
+            #ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o',color = col)
+        
+    ax0.set_xticks([0,2500,5000,7500])
+    ax0.legend(loc=4,fontsize=20)
+    ax0.set_xticklabels([r"$0$",r"$2500$",r"$5000$",r"$7500$"],fontsize = 25)
+    ax0.set_yticks([0,1,2,3,4])
+    ax0.set_yticklabels([r"$0$",r"$1$",r"$2$",r"$3$",r"$4$"],fontsize = 25)
+    #ax1.legend(loc=4,fontsize=20)
+    ax0.set_ylabel(r't, ms',fontsize =25)
+    ax0.set_xlabel(r'N',fontsize=25)
+    ax0.set_xlim(0,7500)
+    ax0.set_ylim(0,4)
+    #plt.savefig('timeStats.pdf')
+    #fig.suptitle(title)
+    plt.savefig('../projects/pdmmod/coll_part.pdf')
+    return None
+
+def plotSeveralWithDel(filenames):#TODO
+    '''filenames = [string]
+    '''
+    plt.gcf().subplots_adjust(bottom=0.15)
+    #plt.gcf().subplots_adjust(left=0.15)
+    fig, (ax0,ax1) = plt.subplots(nrows=2, figsize=(9,12),sharex=False)
+    #ax0 = fig.add_subplot(111)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    labCols = dict(
+        zip(filenames,['r','g','b'])
+        )
+    for filename in filenames:
+        data, lines, slope, ratios, fits = analyzeFile(filename)
+        col = labCols[filename]
+        if not filename.find('pssa')== -1:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='v',
+                         color = col,
+                         markersize=10)
+            ax0.plot([],[],marker='v',
+                        markersize=10,
+                        color = col,label='PDM')
+            ax0.plot(lines[0],lines[1],
+                     linewidth=5,
+                     color = col)
+            print('PDM: y = '+'%.2e' %fits[0][0]+' x'+'%.2e' %fits[0][1])
+        elif not filename.find('stochkit')== -1:
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='o',
+                         color = col,markersize=10)
+            ax0.plot([],[],marker='o',
+                        markersize=10,
+                        color = col,label='SSA')
+            ax0.plot(lines[0],lines[2],
+                     linewidth=5,
+                     color = col)
+            print('SSA: y = '+
+                    '%.2e' %fits[1][0]+' x^2 +'+
+                    '%.2e' %fits[1][1]+' x '+
+                    '%.2e' %fits[1][2],)
+        else:
+            ax0.plot(lines[0],lines[1],
+                     linewidth=5,
+                     color = col)
+            ax0.errorbar(data[0],data[1],yerr=data[2],fmt='D', 
+                        color = col,markersize=10)
+            ax0.plot([],[],marker='D',
+                        markersize=10,
+                        color = col,label='EPDM')
+            
         #ax1.plot(slope[0],slope[1],label='y = '+'%.2e' %fits[2][0]+' x +'+'%.2e' %fits[2][1])
             print('PDMmod: y ='+'%.2e' %fits[0][0]+
                         ' x'+'%.2e' %fits[0][1])
@@ -322,20 +404,31 @@ def plotSeveral(filenames):#TODO
         
             rat=ratios[i-1]
             ax1.errorbar(rat[0],rat[1],yerr=rat[2],fmt='-o',color = col)
-        
     
-    ax0.legend(loc=4,fontsize=20)
-    ax1.legend(loc=4,fontsize=20)
-    ax0.set_title('Simulation run time vs number species types in the simulation',
-                  fontsize = 20)
-    ax1.set_title('Current slope of the graph above',
-                  fontsize = 20)
-    ax0.set_ylabel('t, ms',
-                   fontsize =16)
-    ax0.set_xlabel('N',fontsize=16)
+    ax1.get_yaxis().get_major_formatter().labelOnlyBase = False
+    ax0.set_xticks([0,2500,5000,7500])
+    #ax0.legend(loc=4,fontsize=20)
+    ax0.set_xticklabels([r"$0$",r"$2500$",r"$5000$",r"$7500$"],fontsize = 25)
+    ax1.set_xticks([0,2500,5000,7500])
+    #ax0.legend(loc=4,fontsize=20)
+    ax1.set_xticklabels([r"$0$",r"$2500$",r"$5000$",r"$7500$"],fontsize = 25)
+    ax0.set_yticks([0,25,50])
+    ax0.set_yticklabels([r"$0$",r"$25$",r"$50$"],fontsize = 25)
+    #ax1.legend(loc=4,fontsize=20)
+    ax0.set_ylabel(r't, ms',fontsize =25)
+    ax1.set_xlabel(r'N',fontsize=25)
+    ax1.set_xlim(0,7500)
+    ax0.set_ylim(0,50)
+    ax1.set_ylim(0,0.00002)
+    ax1.set_yticks([0,0.00001,0.00002])
+    ax1.set_yticklabels([r"$0$",r"$1\cdot 10^{-5}$",r"$2\cdot 10^{-5}$"],fontsize = 25)
     #plt.savefig('timeStats.pdf')
     #fig.suptitle(title)
-    plt.show()
+    plt.savefig('../projects/pdmmod/coll_part_del.pdf')
     return None
 
 
+filenames = ['collPartSpecTypesDel-c0.txt']
+plotSeveralWithDel(filenames)
+filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-pssa-c0.txt','collPartSpecTypes-stochkit-c0.txt']
+plotSeveral(filenames)

@@ -3,7 +3,7 @@
 #include <iostream>
 #include "model.h"
 
-/* colliding particles  #008
+/* colliding particles  #008 This one is used in EPDM
  * there are several types of particles 
  * reactions are binary collisions, particles don't change when interact.
  */

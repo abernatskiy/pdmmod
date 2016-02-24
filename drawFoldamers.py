@@ -111,25 +111,12 @@ def drawLinearChain(drawing,sequence,startPoint,length=30):
 
 dwg = svgwrite.Drawing('/tmp/test.svg', size=(1000,1000))
 
-s1 = 'HHHPPPHHHPPHPH'
-drawBalls(dwg,getConfiguration(s1),s1,(0,100))
-drawLinearChain(dwg,s1,(0,200))
+ss =['HPHPHPHPHHHHHHHH','HPPPHPHHHHHHHHHHHH','HPPHPPPHPPHHHHHHHHH','HPHPHPHPPHHHHHHHHHHH','HPHPHPHPHHHHHHHHHHHHH','HPHPHPHPHPHHHHHHHHHHHH','HPPHPHPHPHPPHHHHHHHHHHH','HPPHPHPHPHHHHHHHHHHHHHHH','HPPHPPPHPHPPPPHPHHHHHHHHH']
 
-s2 = 'HHHHHHPPHHPHPH'
-drawBalls(dwg,getConfiguration(s2),s2,(0,400))
-drawLinearChain(dwg,s2,(0,500))
+for i in range(len(ss)):
+    drawBalls(dwg,getConfiguration(ss[i]),ss[i],(0,i*400))
 
-s3 = 'HPPHPHPHHHHPHH'
-drawBalls(dwg,getConfiguration(s3),s3,(0,600))
-drawLinearChain(dwg,s3,(0,700))
-
-s4 = 'HHHPPHPPPHHPHPPH'
-drawBalls(dwg,getConfiguration(s4),s4,(0,900))
-drawLinearChain(dwg,s4,(0,1000))
-
-s5 = 'HHHPPHPPPHPPHHHH'
-drawBalls(dwg,getConfiguration(s5),s5,(0,1100))
-drawLinearChain(dwg,s5,(0,1200))
+#drawLinearChain(dwg,s5,(0,1200))
 
 dwg.save()
 

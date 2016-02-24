@@ -126,7 +126,7 @@ def runSeveralChangeNumSpec(modelNum,termCond,numOfRuns,population,species):#TES
             modelNum,termCond,rewrite,None,numOfRuns,traj,log_level)
     system('touch '+s.path2Folder+'runTemp.txt' )
     for numSpec in species:
-        changeParameters(0.5,numSpec)
+        #changeParameters(0.5,numSpec)
         s = libSimulate.Simulation(
             modelNum,termCond,rewrite,None,numOfRuns,traj,log_level)
         changeInitPop(numSpec,population)

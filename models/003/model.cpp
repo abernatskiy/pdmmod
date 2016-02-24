@@ -38,7 +38,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float COLL_RATE = configDict["collRate"].getFloat();
     int maxLength = configDict["maxLength"].getInt();
     //nothing is being produced from vacuum in this model
-    if (m_id==std::string("")){}
+    if (m_id==std::string("") or specie.m_id==std::string("")){}
     else {
         Reaction collision(m_id, 1, specie.m_id, 1, COLL_RATE);
         if (m_len>maxLength || specie.m_len> maxLength){

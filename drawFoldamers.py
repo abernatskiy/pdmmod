@@ -111,25 +111,18 @@ def drawLinearChain(drawing,sequence,startPoint,length=30):
 
 dwg = svgwrite.Drawing('/tmp/test.svg', size=(1000,1000))
 
-s1 = 'HHHPPPHHHPPHPH'
-drawBalls(dwg,getConfiguration(s1),s1,(0,100))
-drawLinearChain(dwg,s1,(0,200))
+list1= ['HPHHPPHPHPHHPHHH','PHPPHPHHHPHHPHPH','HHHPHPPHPHHPHPHH','PHPPHPHHPHHPPHHH','HHHHPHPHPHPHHPHP','HHHPPPPHPPHPPPPH','HHHPHPHPHPPHHPPH','HPPHHPPHHPHHPHHH','HHPPPHHPHPPPHPHH','HHPHPHPPPHHPPPHH']
 
-s2 = 'HHHHHHPPHHPHPH'
-drawBalls(dwg,getConfiguration(s2),s2,(0,400))
-drawLinearChain(dwg,s2,(0,500))
+list2 = ['HHHPPHHPHHHPPPHH','HPHHHPPHHHPPHHHH','HHHPPHHHHPPPHPPH','HPPHPPHHPHPHHHHH','HHPHHPPHHHPHPHHH','HPHHHHHHHHHHHPHH','HHHPPHPHPHHPPHHH','HPHHHPPHHHHHHPPH','HHHHHPHPPHPHPPHH','HPPHPPPHHHHPPHHH']
 
-s3 = 'HPPHPHPHHHHPHH'
-drawBalls(dwg,getConfiguration(s3),s3,(0,600))
-drawLinearChain(dwg,s3,(0,700))
+count = 0
+for item in list2:
+    drawBalls(dwg,getConfiguration(item),item,(0,100+300*count))
+    drawLinearChain(dwg,item,(0,200+300*count))
+    count+=1
 
-s4 = 'HHHPPHPPPHHPHPPH'
-drawBalls(dwg,getConfiguration(s4),s4,(0,900))
-drawLinearChain(dwg,s4,(0,1000))
 
-s5 = 'HHHPPHPPPHPPHHHH'
-drawBalls(dwg,getConfiguration(s5),s5,(0,1100))
-drawLinearChain(dwg,s5,(0,1200))
+
 
 dwg.save()
 

@@ -842,8 +842,133 @@ class Result(object):
         for point in data:
             initFile.write(point + '\n')
         return None    
+    
+    #########Trajectory analyzers########
+    
+    def totalPopTime(self,filename):
+        totalPopList = []
+        times = []
+        with open(self.outputDir+filename) as infile:
+            for line in infile:
+                if not line[0]=='#':
+                    dlist=line.split(',')[0:-1]
+                    times.append(float(dlist[0]))
+                    totalPopList.append(
+                        sum([int((item.split(' '))[1]) for item in dlist[1:]])
+                        )
+
+        return times, totalPopList
+    
+    def seqDict(self,filename,minTime):
+        seqDict = {}
+        times = []
+        with open(self.outputDir+filename) as infile:
+            for line in infile:
+                if not line[0]=='#':
+                    dlist=line.split(',')[0:-1]
+                    time = float(dlist[0])
+                    if time >= minTime:
+                        times.append(time)
+                        for couple in dlist[1:]:
+                            pair = couple.split(' ')
+                            if pair[0] in seqDict.keys():
+                                seqDict[pair[0]].append(int(pair[1]))
+                            else:
+                                seqDict[pair[0]]=[int(pair[1])]
+
+        print(len(times))
+        #print(times)
+        return seqDict, len(times)
+    
+    def getFreqs(self,seqDict,maxLength,denominator):
+        '''seqDict -- output of seqDict(self,filename,minTime)
+        maxLength -- usually 25
+        denominator -- number of time steps also output of
+        seqDict(self,filename,minTime)
+        '''
+        seqSumDict = {}
+        for seq in seqDict.keys():
+            seqSumDict[seq]=sum(seqDict[seq])/denominator
+
+        freqs = dict([(i,{}) for i in  range(1,maxLength+1)])
+        for (seq, pop) in seqSumDict.items():
+            if 'f' in seq:
+                l = len(seq)-1
+            else:
+                l = len(seq)
+            if pop in freqs[l].keys():
+                (freqs[l])[pop]+=1
+            else:
+                (freqs[l])[pop]=1
+        for (l, fr) in freqs.items():
+            freqs[l]=OrderedDict(sorted(fr.items(), key=lambda t: t[0], reverse=False))
+        intFr = {}
+        for (l, fr) in freqs.items():
+            intFr[l]={}
+            for (freq,count) in fr.items():
+                counts = list(fr.values())
+                freqs = list(fr.keys())
+                i = freqs.index(freq)
+                intFr[l][freq]=sum(counts[i:])
+        
+        return freqs,intFr
+    
+    def plotInLen(self,freqs,title):
+        '''
+        freqs are either integral frequences or raw ones
+        fits are results of fitting those frequences to straight lines (log-log)
+        '''
+        def fitInLen(freqs):
+            fits = {}
+            for (length, values) in freqs.items():
+                xx = []
+                yy = []
+                for (pop,freq) in values.items():
+                    xx.append(math.log10(pop))
+                    yy.append(math.log10(freq))
+                    x = np.array(xx)
+                    y = np.array(yy)
+                    A = np.vstack([x, np.ones(len(x))]).T
+                    fits[length] = np.linalg.lstsq(A, y)[0]
+            return fits
+        
+        fits = fitInLen(freqs)
+        nc = 3
+        minLength=8
+        maxLength=25
+        fig, axes = plt.subplots(
+            nrows=int((maxLength-minLength+1)/2/nc), ncols=nc, figsize=(12, 12)
+            )
+        index = 0
+        for (length,freqs) in freqs.items():
+            if length>=minLength and length<=maxLength and length%2==1:
+                sortedFreqs = OrderedDict(sorted(freqs.items(),key=lambda t: t[0], reverse=False))
+                axes[int((index)/nc),(index)%(nc)].plot(
+                    list(sortedFreqs.keys()),list(sortedFreqs.values()),'o'
+                    )
+                try:
+                    m, c = fits[length-1]
+                except KeyError:
+                    m, c = (0,0)
+                else:
+                    axes[int((index)/nc),(index)%(nc)].plot(
+                        list(sortedFreqs.keys()),
+                        [(10**(c)*xi**(m)) for xi in sortedFreqs.keys()],
+                        linewidth = 3,
+                        label = 'y = '+str("%.2f" %(10**c))+'x^'+str("%.2f" %m)
+                        )
+                axes[int((index)/nc),(index)%(nc)].set_yscale('log')
+                axes[int((index)/nc),(index)%(nc)].set_xscale('log')
+                #axes[int((index)/nc),(index)%(nc)].legend()
+                axes[int((index)/nc),(index)%(nc)].set_title(str(length)+'-mers')
+                index+=1
+        
+        plt.suptitle(title,fontsize=30)
+        plt.savefig(self.outputDir+'inlen.png')
 
 #######EXTRA FUNCTIOS######
+
+
 
 def median(mylist):
     '''calculates median, if median is zero:

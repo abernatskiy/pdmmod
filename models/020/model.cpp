@@ -5,7 +5,7 @@
 #include <algorithm> // std::min
 #include "parameter.h"
 #include "model.h"
-/* hp-model "hp-full-hydrolysis-phobicCut-limitMonomers kings-folding" #016
+/* hp-model "hp-full-limited-food" #018
  * monomers import
  * degradation
  * folded degradation
@@ -28,6 +28,9 @@
  * wellDepth -- dict. {string: int}
  * interp. a dictionary form monomer sequence string to potential well depth (energy of folded state)
  * z -- number of rotational freedoms
+ * sequence:
+ * fHP... - folded
+ * f*HP... - catalyst
  */
 #include <map>
 #include <algorithm>
@@ -39,60 +42,18 @@ extern std::map<std::string,int> wellDepths;
 
 Specie::Specie(std::string id){
     modelName = std::string("hp-full-hydrolysis-phobicCut-phenomen.folding");
-    m_catalyst = std::string("N");
-    m_substrate = std::string("N");
-    m_product = false;
+    m_folded = false;
     m_id = id; //HP sequence
     if (m_id==""){}
     else if(m_id.length()==1){
-        m_substrate = std::string("N");
-        m_product = false;
-        
-    }
-    //if sequence doesn't have HH as two last monomers in its sequence it cannot be a substrate
-    else if (m_id.substr(m_id.length()-2, 2) != std::string("HH")){
-        m_substrate = std::string("N");
-    }
-    //otherwise we need to check how long the substrate site is
-    else{
-        std::string maxPat = std::string("HHHHHHHH");
-        int patLength=8;
-        for (int i=0;i<patLength-1;i++){
-            //we gonna reduce pattern length by 1 every step and compare
-            int subLen=patLength-i;
-            //pat is a reduced pattern which we are looking for in the end of the sequence
-            std::string pat= maxPat.substr(i,subLen);
-            if (m_id.length()<pat.length()){
-                continue;
-            }
-            else if (m_id.substr(m_id.length()-pat.length(), pat.length()) == maxPat.substr(0,pat.length())){
-                //if last pat.length() letters of the sequence are all 'H'
-                m_substrate = pat;
-                if (subLen>2){
-                    m_product = true;
-                }
-                else{
-                    if (m_id.length()<3){
-                        m_product = false;
-                    }
-                    else if (m_id.find(std::string("HHH")) != std::string::npos){
-                        m_product = true;
-                    }
-                    else{
-                        m_product = false;
-                    }
-                }
-                break;
-            }
-        }
+        m_folded = false;
+
     }
     //if sequence isn't folded (it doesn't have 'f' letter)
     if (m_id.find(std::string("f"))==std::string::npos){
         m_folded = false;
         //its length is the length of the m_id
         m_length = m_id.length();
-        //it's not a catalyst
-        m_catalyst = std::string("N");
         auto it = wellDepths.find(m_id);
         if (it!=wellDepths.end()){
             m_native = (it -> second);
@@ -106,12 +67,9 @@ Specie::Specie(std::string id){
         m_folded = true;
         //so the length of the sequence is shorter than m_id by 1.
         m_length = m_id.length()-1;
-        //it can be a catalyst
-        //if it's a catalyst we'll get a catPattern, if not we'll get "N" as m_catalyst
-        m_catalyst = catPatterns[m_id.substr(1,m_length)];
         m_native = wellDepths.find(m_id.substr(1,m_length)) -> second;
     }
-    
+
     if (m_length <5 || m_id == ""){
         m_hydrophobicity = 0;
     }
@@ -119,7 +77,7 @@ Specie::Specie(std::string id){
         size_t n = std::count(m_id.begin(), m_id.end(), 'H');
         m_hydrophobicity = ((float)  n)/m_length;
     }
-    
+
 }
 //Overloading <<
 std::ostream& operator<<(std::ostream& os, const Specie& sp)
@@ -189,50 +147,34 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
 {
     float u_rate = URate( eH, z);
     Reaction unfold(m_id,1,specie.m_id,0,u_rate);
-    unfold.addProduct(m_id.substr(1,m_length),1);
+    if (m_id.find(std::string("*")) == std::string::npos){
+        unfold.addProduct(m_id.substr(1,m_length),1);
+    }
+    else{
+        unfold.addProduct(m_id.substr(2,m_length),1);
+    }
     allReactions.push_back(unfold);
 }
 
 void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
-                    float alpha, std::string HorP, int maxLength){
-                        Reaction growth(m_id,1,specie.m_id,0,alpha);
-                        if (m_length<maxLength){
-                            growth.addProduct(m_id+HorP,1);
-                        }
-                        allReactions.push_back(growth);
+                    float alpha, int maxLength){
+    Reaction growth(m_id,1,specie.m_id,1,alpha);
+    if (m_length<maxLength){
+        growth.addProduct(m_id+specie.m_id,1);
+    }
+    allReactions.push_back(growth);
 }
 
-void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
-                         float alpha, float eH, int maxLength){
-    //how many H's are attracted to each other?
-    int common;
-    if (specie.m_folded && (not m_folded)){
-//         std::cout << "other is folded " << std::endl;
-        common = std::min(specie.m_catalyst.length(),m_substrate.length());
-        float rate = exp(eH*common);
-        Reaction catalysis(m_id,1,specie.m_id,1,rate);
-        catalysis.addProduct(specie.m_id,1);
-        if (m_length<maxLength){
-            catalysis.addProduct(m_id+std::string("H"),1);
-        }
-        allReactions.push_back(catalysis);
+void Specie::growOther(std::list<Reaction>& allReactions,Specie specie,
+                    float alpha, int maxLength){
+    
+    Reaction growth(m_id,1,specie.m_id,1,alpha);
+    if (specie.m_length<maxLength){
+        growth.addProduct(specie.m_id+m_id,1);
     }
-    else{
-//         std::cout << "self is folded " << std::endl;
-        common = std::min(m_catalyst.length(),specie.m_substrate.length());
-        float rate = exp(eH*common);
-        Reaction catalysis(m_id,1,specie.m_id,1,rate);
-        catalysis.addProduct(m_id,1);
-        if (specie.m_length<maxLength){
-            catalysis.addProduct(specie.m_id+std::string("H"),1);
-        }
-        allReactions.push_back(catalysis);
-    }
-    if (common == 0){
-        std::cout << "c" <<m_catalyst << std::endl;
-        throw std::invalid_argument("common = 0");
-    }
+    allReactions.push_back(growth);
 }
+
 
 
 //Defining reactions here
@@ -246,17 +188,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
      * - degrade (imp.)
      * - aggregate if condtions met (imp.)
      * - fold (imp.)
-     * Substrate is Unfolded polymer + it can:
-     * - interact with Catalyst  
-     *      to grow(imp.)
-     *      or disappear(imp.)
      * Folded polymer (including catalysts) can:
      * - unfold (imp.)
      * - degrade (imp.)
-     * Catalyst is Folded polymer + it can:
-     * - interact with Substrate 
-     *      for substrate to grow(imp.)
-     *      or to disappear(imp.)
      */
     //parameters
     float aH = configDict["importH"].getFloat();
@@ -293,12 +227,9 @@ std::list<Reaction> Specie::reactions(Specie specie){
             //hydrolysis of any bond can happen
             hydrolyseIt(allReactions,specie,dH);
             //and might fold
-            if (m_native!=0 && m_length>4){
+            if (m_native!=0 && m_length>6){
                 foldIt(allReactions,specie,eH,z);
             }
-            //it can grow
-            growIt(allReactions,specie,alpha, std::string("H"),maxLength);
-            growIt(allReactions,specie,alpha, std::string("P"),maxLength);
         }
         else{
             //it unfolds
@@ -308,15 +239,12 @@ std::list<Reaction> Specie::reactions(Specie specie){
     //binary reactions
     //if the other molecule is a catalyst 
     //and a given one isn't folded and is a substate
-    else if (specie.m_catalyst != std::string("N") && 
-            m_folded == false && 
-            m_substrate != std::string("N")){
-        catalyzeIt(allReactions,specie,alpha,eH,maxLength);
+    //it can grow
+    else if (m_folded == false && specie.m_length == 1){
+        growIt(allReactions,specie,alpha,maxLength);
     }
-    else if (m_catalyst != std::string("N") && 
-            specie.m_folded == false && 
-            specie.m_substrate != std::string("N")){
-        catalyzeIt(allReactions,specie,alpha,eH,maxLength);
+    else if (m_length == 1 && specie.m_folded == false && specie.m_id!=std::string("")){
+        growOther(allReactions,specie,alpha,maxLength);
     }
     return allReactions;
 }

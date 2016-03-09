@@ -38,7 +38,7 @@ std::list<Reaction> Specie::reactions(Specie specie){
     float COLL_RATE = configDict["collRate"].getFloat();
     int maxLength = configDict["maxLength"].getInt();
     //nothing is being produced from vacuum in this model
-    if (m_id==std::string("")){}
+    if (m_id==std::string("") or specie.m_id==std::string("")){}
     else {
         Reaction collision(m_id, 1, specie.m_id, 1, COLL_RATE);
         if (m_len>maxLength || specie.m_len> maxLength){
@@ -46,19 +46,29 @@ std::list<Reaction> Specie::reactions(Specie specie){
         }
         std::string tmp1 = m_id;
         std::string tmp2 = specie.m_id;
-        if (m_len<maxLength){
-            collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),1);
+        if (m_id == specie.m_id){
+            if (m_len<maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),2);
+            }
+            else{
+                collision.addProduct(m_id.substr(0,5)+std::string("1"),2);
+            }
         }
-        else if (m_len == maxLength){
-            collision.addProduct(m_id.substr(0,5)+std::string("1"),1);
+        else{
+            if (m_len<maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::to_string(atoi((tmp1.erase(0,5)).c_str())+1),1);
+            }
+            else if (m_len == maxLength){
+                collision.addProduct(m_id.substr(0,5)+std::string("1"),1);
+            }
+            if (specie.m_len<maxLength){
+                collision.addProduct(specie.m_id.substr(0,5)+std::to_string(atoi((tmp2.erase(0,5)).c_str())+1),1);
+            }
+            else if (specie.m_len==maxLength){
+                collision.addProduct(specie.m_id.substr(0,5)+std::string("1"),1);
+            }
+            allReactions.push_back(collision);
         }
-        if (specie.m_len<maxLength){
-            collision.addProduct(specie.m_id.substr(0,5)+std::to_string(atoi((tmp2.erase(0,5)).c_str())+1),1);
-        }
-        else if (specie.m_len==maxLength){
-            collision.addProduct(specie.m_id.substr(0,5)+std::string("1"),1);
-        }
-        allReactions.push_back(collision);
     }
     
     return allReactions;

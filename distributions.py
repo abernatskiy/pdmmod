@@ -39,23 +39,26 @@ for array,label in zip(arrays,labels):
     popt, pcov = curve_fit(func, lengths, x)                                                                                                                                           
     yfit = np.array([func(l,popt[0]) for l in lengths])                                                                                                                                
     plt.plot(lengths,x,'o'+label[1],                                                                                                                                                   
-             markersize=20,linewidth='4',label=label[0]+': <l>='+str("%0.2f" % a))                                                                                                     
-    plt.plot(lengths,yfit,label[1],linewidth='4',label=label[0]+': Flory fit')                                                                                                         
-                                                                                                                                                                                       
-                                                                                                                                                                                       
-                                                                                                                                                                                       
-                                                                                                                                                                                       
-                                                                                                                                                                                       
+             markersize=20,linewidth='6',label=label[0]+': <l>='+str("%0.2f" % a))                                                                                                     
+    plt.plot(lengths,yfit,label[1],linewidth='6',label=label[0]+': Flory fit')                                                                                                         
+                                                                                                                   
+
+plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(left=0.15)
+fig = plt.figure(1, figsize=(9,6))
+ax = fig.add_subplot(111)
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')                                                                                                                                                                                       
 print(aves)                                                                                                                                                                            
-plt.legend(fontsize=20)                                                                                                                                                                
+#plt.legend(fontsize=20)                                                                                                                                                                
 plt.tick_params(axis='both', which='major', labelsize=24)                                                                                                                              
-plt.title('Some chain length distribution from experiment',fontsize=36)
+#plt.title('Some chain length distribution from experiment',fontsize=36)
 plt.xlabel('Chain length',fontsize=28)
 plt.ylabel('Prevalence in population',fontsize=28)
 plt.xlim((1,11))
 plt.ylim((0.0001,1))
 plt.yscale('log')
-plt.savefig('/tmp/some_flory.png')
+plt.savefig('/tmp/some_flory.pdf')
 
 
 

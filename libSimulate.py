@@ -135,6 +135,7 @@ class Simulation(object):
             if not os.path.exists(outputDir):
                 os.makedirs(outputDir)
             self.log = init_log(self.log_level,log_path=os.path.join(outputDir,'sim.log'))
+            currentRun=0
         self.simNum = currentRun
         return outputDir
     

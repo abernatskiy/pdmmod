@@ -419,16 +419,17 @@ def plotSeveralWithDel(filenames):#TODO
     ax1.set_xlabel(r'N',fontsize=25)
     ax1.set_xlim(0,7500)
     ax0.set_ylim(0,50)
-    ax1.set_ylim(0,0.00002)
-    ax1.set_yticks([0,0.00001,0.00002])
-    ax1.set_yticklabels([r"$0$",r"$1\cdot 10^{-5}$",r"$2\cdot 10^{-5}$"],fontsize = 25)
+    ax1.set_ylim(0,0.00005)
+    ax1.set_yticks([0,0.000025,0.00005])
+    ax1.set_yticklabels([r"$0$",r"$2.5\cdot 10^{-5}$",r"$5\cdot 10^{-5}$"],fontsize = 25)
     #plt.savefig('timeStats.pdf')
     #fig.suptitle(title)
     plt.savefig('../projects/pdmmod/coll_part_del.pdf')
+    #plt.show()
     return None
 
 
-filenames = ['collPartSpecTypesDel-c0.txt']
+filenames = ['collPartSpecTypesDel-c0-old.txt']
 plotSeveralWithDel(filenames)
-filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-pssa-c0.txt','collPartSpecTypes-stochkit-c0.txt']
-plotSeveral(filenames)
+#filenames = ['collPartSpecTypes-c2.txt','collPartSpecTypes-pssa-c0.txt','collPartSpecTypes-stochkit-c0.txt']
+#plotSeveral(filenames)

@@ -3,10 +3,14 @@ import os
 import random
 import sys
 sys.path.append('../')
+import routes
 
 import libSimulate
 
 def countWeight(points):
+    '''
+    what the hell are points?
+    '''
     weight = 0
     for (seq, pop) in points.items():
         if not seq[0] =='f':
@@ -18,12 +22,17 @@ def countWeight(points):
 class Vesicle(object):
     '''class representing a vesicle containing some sequences
      * matureWeight - Int. -  weight in terms of number of monomers,
-        at which vesicles divide. They split into 2 vesicles with equal weights.
+        at which vesicles divide. 
+        They split into 2 vesicles with approximately equal weights.
      * generation - Int. - we start from mother vesicles (generation 0), 
         its daughter is generation 1, ect
      * sequences - Dict. - {sequnce name: sequnce population}#TODO SeqInClust??
+     * timeMature -- time, when it's time for vesicle to divide
+     * populationMature -- population at timeMature
      * modelNum - Int. - model, which governs chemistry in the vesicle
      * path - String. - containing folder.
+     * idInGen -- id of the vesicle among vesicles of the current generation
+     * motherIdInGen -- mother's id
     '''
     def __init__(self,generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path):
         self.idInGen = idInGen
@@ -41,17 +50,12 @@ class Vesicle(object):
             str(self.matureWeight)
         return str1
     
-    def __repr__(self):
-        str1='Vesicle '+str(self.generation)
-        return str1
-
-
     def _getInitPopFile(self):#TEST
         populFile = os.path.join(
             self.path,str("%04d" %self.generation),'initPop'+str("%05d" %self.idInGen))
         return populFile
     
-    def _findMature(self):
+    def _findMature(self):#TEST
         def line2Data(raw):
             points = {}
             for item in raw[1:len(raw)-1]:
@@ -183,11 +187,12 @@ if __name__ == "__main__":
     motherIdInGen = 0
     generation = 0
     matureWeight = 300
-    modelNum = 12
-    path = './'
+    modelNum = 18
+    path = routes.routePDM+'vesicles/'
     termTime = 5
     timeStep = 0.5
     numOfGenerations = 3
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
-    vs = v.growAndSplit(termTime,timeStep,numOfGenerations,True)
+    sAs = v.growCell(10,1)
+    #vs = v.growAndSplit(termTime,timeStep,numOfGenerations,True)
     

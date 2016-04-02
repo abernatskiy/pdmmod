@@ -1,11 +1,11 @@
 #/usr/bin/python
 """
-!!!
-This module takes in results of the *pdmmod* simulations, 
-and transforms them into desirable data. It also make various plots of data.
+This module takes in results of *pdmmod* simulations, 
+and transforms them into desirable data. 
+It also make various plots of data.
 """
 
-#format of the file is the following:
+#format of the trajectory file is the following:
 # time, specName specPopulation, specName specPopulation .....
 
 #specPop -- {name: [populations during time steps]}

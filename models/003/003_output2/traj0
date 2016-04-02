@@ -1,0 +1,6 @@
+# Model: hp-full-hydrolysis-phobicCut-phenomen.folding
+# Parameters: aggrAt=0.900000 aggregation=100.000000 degradation=0.100000 eH=2.000000 growth=1.000000 hydrolysis=0.100000 importH=1000.000000 importP=1000.000000 maxLength=25 z=1.200000
+# Command: /cavern/eliza/origins/pdmmod/models/018/pdmmod simulateTime 140 0.0001 /cavern/eliza/origins/pdmmod/models/018/018_output37/traj0 -c /cavern/eliza/origins/pdmmod/models/018/test-dhd-many/parameters37.ini -i /cavern/eliza/origins/pdmmod/models/018/test-dhd-many/populations.txt -r 5364
+0,H 50,P 50,HP 20,
+0.1,H 30,f*HPHPHPHHHHHHHHH 2,fHPPHPHPH 5,
+0.2,H 10,P 50,fHPPHPHPH 7,f*HPHPHPHHHHHHHHH 3,

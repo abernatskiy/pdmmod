@@ -179,7 +179,7 @@ class Result(object):
                 points[point[0]][fileCount-1] = int(point[1])
         return None
 
-    def _makeStatistics(self):#BUG !!! FIXME
+    def _makeStatistics(self):
         '''
         reads all the trajectory files and makes and evolutions dictionary:   
         a dictionary of populations of every specie at every moment 
@@ -367,9 +367,9 @@ class Result(object):
         #count = 0
         for line in f:
             raw = (line.rstrip('\n')).split(' ')
-            #evolutions[raw[0]] = \
-            #scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
-            evolutions[raw[0]] = np.array([float(item) for item in raw[1:]])
+            evolutions[raw[0]] = \
+            scipy.sparse.csr_matrix(np.array([float(item) for item in raw[1:]]))
+            #evolutions[raw[0]] = np.array([float(item) for item in raw[1:]])
             #count += 1
             #if count%100:
                 #print('line',count)

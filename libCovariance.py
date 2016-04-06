@@ -16,7 +16,9 @@ import hpClasses
 
 
 
-def traj2evolutions(path,trajname,startTime,finishTime,timeStep=0,numOfPoints=None):
+def traj2evolutions(
+    path,trajname,startTime,finishTime,timeStep=0,numOfPoints=None
+    ):
     trajFile = open(os.path.join(path,trajname),'r')
     def file_len(fname):
         comment = 0

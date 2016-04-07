@@ -295,7 +295,7 @@ class Trajectory(object):
         plt.savefig(os.path.join(
             self.outputDir,'scatter'+str(self.trajectory[2])+'.png'))
         
-    def getShapeTrajectories(self,seqShapeDict,natData):#TEST
+    def getShapeTrajectories(self,seqShapeDict,natData):#TESTED
         '''instead of keeping track of sequences
         this funtion produces trajectory of folds (shapes)
         Returns:
@@ -322,8 +322,20 @@ class Trajectory(object):
     
         return sTraj
 
-    def getPersistentShapes(self,minTime):#TODO
-        return None
+def getMassTrajectory(self):
+    mass = []
+    with open(self.trajFile) as infile:
+            for line in infile:
+                #skip comments
+                massAtTime = 0
+                if not line[0]=='#':
+                    dlist=line.split(',')[0:-1]
+                    time = float(dlist[0])
+                    for couple in dlist[1:]:
+                        l = len(getSeq(couple.split(' ')[0]))
+                        massAtTime += l*couple.split(' ')[1]
+                    mass.append(massAtTime)
+    return mass
 
 def getSeq(seq):
     '''

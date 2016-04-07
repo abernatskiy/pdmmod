@@ -152,7 +152,7 @@ class Vesicle(object):
         
         return daughter1, daughter2
     
-    def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):#TEST
+    def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):#BUG Init is forgoten for new daughter cells
         '''grows cells for several generation either keeping them keeping them
         all or selecting
         '''
@@ -176,6 +176,7 @@ class Vesicle(object):
                     except FileExistsError:
                         print('dir exists')
                     #os.makedirs(daughter2.outPath)
+                    #BUG somewhere here
                     init1 = open(daughter1.initFile,'w')
                     init1.close()
                     init1 = open(daughter1.initFile,'a')
@@ -211,6 +212,7 @@ class Vesicle(object):
                 except FileExistsError:
                     print('dir exists')
                 #os.makedirs(daughter2.outPath)
+                #and also BUG here. the some as above
                 init1 = open(daughter1.initFile,'w')
                 init1.close()
                 init1 = open(daughter1.initFile,'a')

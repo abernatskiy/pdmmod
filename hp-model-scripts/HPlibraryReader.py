@@ -44,7 +44,7 @@ def HPlibraryReader(maxLength):
     """
     chainDict={}
     print(routeHP)
-    for i in range(4,maxLength+1):
+    for length in range(4,maxLength+1):
         #print(routeHP+'HP_designing/HPn'+str("%02d" % i)+'.txt')
         chainDict.update(HPlengthReader(length))
                     
@@ -86,6 +86,27 @@ def HPlibrary2sequencesList(maxLength,subClasses=None,catClasses=None):
             
     return nativeList
  
+def convertShapesToNumbers(seqDict):
+    '''
+    returns dictionary:
+        { 'URDDL': i (int) ... }
+    '''
+    shapes = list(seqDict.keys())
+    shapeDict = dict(zip(shapes,list(range(len(shapes)))))
+    return shapeDict
+
+def seqs2shapes(seqDict):
+    '''returns {str string: str shape}
+    '''
+    seqShapeDict = {}
+    for (shape,value) in seqDict.items():
+        for item in value:
+            seqShapeDict[item[0]]=shape
+    return seqShapeDict
+
+def getAutoCatShapes():#TODO
+    return None
+    
 
 def print2File(nativeList,filename):
     hpFile = open(filename, mode='w')
@@ -95,9 +116,14 @@ def print2File(nativeList,filename):
     
     return None
 
-#nativeList=HPlibrary2sequencesList(12)
-#print2File(nativeList,routePDM+'nativeList12.txt')
 
+
+seqDict=HPlibraryReader(25)
+shapeDict = convertShapesToNumbers(seqDict)
+seqShapeDict = seqs2shapes(seqDict)
+#print2File(nativeList,routePDM+'nativeList12.txt')
+#length = 6
+#cd = HPlengthReader(length)
  
  
  

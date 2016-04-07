@@ -238,18 +238,26 @@ class Vesicle(object):
         
         return vesicles
     
+def readPopulations(popFile):
+    sequences = {}
+    with open(popFile) as infile:
+        for line in infile:
+            pair = line.rstrip('\n').split(' ')
+            sequences[pair[0]] = int(pair[1])
+    return sequences
+    
 if __name__ == "__main__":     
     idInGen =0
-    sequences={'H':20,'P':20}
+    sequences=readPopulations('population.txt')
     motherIdInGen = 0
     generation = 0
-    matureWeight = 1000
+    matureWeight = 6000
     modelNum = 18
     path = routes.routePDM+'vesicles/'
     termTime = 10
     timeStep = 0.1
     numOfGenerations = 3
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
-    sAs = v.growCell(termTime,timeStep)
+    #sAs = v.growCell(termTime,timeStep)
     vs = v.growAndSplit(termTime,timeStep,numOfGenerations,True)
     

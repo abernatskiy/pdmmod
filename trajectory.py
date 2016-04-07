@@ -22,10 +22,13 @@ from matplotlib import cm
 import scipy.stats
 from sklearn import cluster
 from matplotlib import colors
+import sys
 
 import hpClasses
 from result import *
 from clusteredHP import *
+
+sys.path.append('hp-model-scripts')
 
 class Trajectory(object):
     '''
@@ -68,7 +71,7 @@ class Trajectory(object):
          - minTime -- time at which we start the record
         Returns:
          - seqDict -- dict. {str sequence name: [int population]}
-         lists populations over time for all sequences even met since minTime
+         lists populations over time for all sequences ever met since minTime
          - records -- number of records
         '''
         seqDict = {}
@@ -292,16 +295,59 @@ class Trajectory(object):
         plt.savefig(os.path.join(
             self.outputDir,'scatter'+str(self.trajectory[2])+'.png'))
         
+    def getShapeTrajectories(self,seqShapeDict,natData):#TEST
+        '''instead of keeping track of sequences
+        this funtion produces trajectory of folds (shapes)
+        Returns:
+         - [[[int. shape number, int. number of realizations] ]]
+        '''
+        sTraj = []
+        with open(self.trajFile) as infile:
+            for line in infile:
+                shapes = {}
+                #skip comments
+                if not line[0]=='#':
+                    dlist=line.split(',')[0:-1]
+                    time = float(dlist[0])
+                    for couple in dlist[1:]:
+                        seq = getSeq(couple.split(' ')[0])
+                        if seq in natData:
+                            shape = seqShapeDict[seq]
+                            if shape not in shapes:
+                                shapes[shape] = 1#add shape, it has one realization
+                            else:
+                                shapes[shape] += 1
+                    
+                    sTraj.append(list(shapes.items()))
+    
+        return sTraj
+
+    def getPersistentShapes(self,minTime):#TODO
+        return None
+
+def getSeq(seq):
+    '''
+    Arguments:
+     - seq -- str. sequence as depicted in trajectory file
+    Returns:
+     - hps -- str. actual HP sequence
+    '''
+    if 'f' in seq:
+        if '*' in seq:
+            hps = seq[2:]
+        else:
+            hps = seq[1:]
+    else:
+        hps = seq
+    return hps
 
 
-
-
-
-tr = Trajectory(18,37,1)
+tr = Trajectory(3,2,1)
 natData = hpClasses.readNativeList(25)
-sds = pickle.load(open(os.path.join(tr.outputDir,'sds1.p'),'rb'))
-saa = tr.seqAvesNoFold(sds)
-tr.plotSeqsAvesLen(tr.categorizeForScatter(saa,natData))
+from HPlibraryReader import *
+#sds = pickle.load(open(os.path.join(tr.outputDir,'sds1.p'),'rb'))
+#saa = tr.seqAvesNoFold(sds)
+#tr.plotSeqsAvesLen(tr.categorizeForScatter(saa,natData))
 
 
 

@@ -96,11 +96,16 @@ def convertShapesToNumbers(seqDict):
     return shapeDict
 
 def seqs2shapes(seqDict):
+    '''returns {str string: str shape}
+    '''
     seqShapeDict = {}
     for (shape,value) in seqDict.items():
         for item in value:
             seqShapeDict[item[0]]=shape
     return seqShapeDict
+
+def getAutoCatShapes():#TODO
+    return None
     
 
 def print2File(nativeList,filename):

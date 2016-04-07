@@ -336,6 +336,29 @@ class Trajectory(object):
                         massAtTime += l*int(couple.split(' ')[1])
                     mass.append(massAtTime)
         return mass
+    
+    def getAutcatsNumber(self,natData):#TODO
+        '''
+        Arguments:
+         -natData dict. natData['HHHH'] = (1, 'N')
+
+        returns time series: 
+        [int. number of difeerent autocats at the moment]
+        '''
+        timeSteps = []
+        with open(self.trajFile) as infile:
+            for line in infile:
+                autocats = 0
+                #skip comments
+                if not line[0]=='#':
+                    dlist=line.split(',')[0:-1]
+                    for couple in dlist[1:]:
+                        seq = getSeq(couple.split(' ')[0])
+                        if seq in natData.keys():
+                            if not natData[seq][1] == 'N':
+                                autocats+=1
+                timeSteps.append(autocats)
+        return timeSteps
 
 def getSeq(seq):
     '''
@@ -353,13 +376,10 @@ def getSeq(seq):
         hps = seq
     return hps
 
-
+natData = hpClasses.readNativeList(25)
 tr = Trajectory(18,37,0)
-mass = tr.getMassTrajectory()
-print(mass[-1])
+autocats = tr.getAutcatsNumber(natData)
 
-
-#natData = hpClasses.readNativeList(25)
 #from HPlibraryReader import *
 #sds = pickle.load(open(os.path.join(tr.outputDir,'sds1.p'),'rb'))
 #saa = tr.seqAvesNoFold(sds)

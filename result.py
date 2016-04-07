@@ -74,7 +74,7 @@ class Result(object):
         print('Result.__init__ done')
 
 
-    def _makeHeader(self, numOfRuns, traj):
+    def makeHeader(self, numOfRuns, traj):
         '''
         this function reads simulation information from traj0 file
         and writes in in certain format into file parameters.txt
@@ -325,7 +325,7 @@ class Result(object):
         '''
         self.numOfRuns = numOfRuns
         self.traj = traj
-        self._makeHeader(numOfRuns, traj)
+        self.makeHeader(numOfRuns, traj)
         self._writeEvolutions()
         print('means and stds are written')
         self._writeTimes()

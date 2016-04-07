@@ -333,9 +333,9 @@ class Trajectory(object):
                     time = float(dlist[0])
                     for couple in dlist[1:]:
                         l = len(getSeq(couple.split(' ')[0]))
-                        massAtTime += int(l*couple.split(' ')[1])
+                        massAtTime += l*int(couple.split(' ')[1])
                     mass.append(massAtTime)
-    return mass
+        return mass
 
 def getSeq(seq):
     '''
@@ -354,11 +354,10 @@ def getSeq(seq):
     return hps
 
 
-tr = Trajectory(18,37,1)
+tr = Trajectory(18,37,0)
 mass = tr.getMassTrajectory()
 print(mass[-1])
-plt.plot(list(range(len(mass))),mass)
-plt.savefig('mass.png')
+
 
 #natData = hpClasses.readNativeList(25)
 #from HPlibraryReader import *

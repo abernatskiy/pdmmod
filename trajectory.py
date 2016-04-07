@@ -322,9 +322,9 @@ class Trajectory(object):
     
         return sTraj
 
-def getMassTrajectory(self):
-    mass = []
-    with open(self.trajFile) as infile:
+    def getMassTrajectory(self):
+        mass = []
+        with open(self.trajFile) as infile:
             for line in infile:
                 #skip comments
                 massAtTime = 0
@@ -333,7 +333,7 @@ def getMassTrajectory(self):
                     time = float(dlist[0])
                     for couple in dlist[1:]:
                         l = len(getSeq(couple.split(' ')[0]))
-                        massAtTime += l*couple.split(' ')[1]
+                        massAtTime += int(l*couple.split(' ')[1])
                     mass.append(massAtTime)
     return mass
 
@@ -354,9 +354,14 @@ def getSeq(seq):
     return hps
 
 
-tr = Trajectory(3,2,1)
-natData = hpClasses.readNativeList(25)
-from HPlibraryReader import *
+tr = Trajectory(18,37,1)
+mass = tr.getMassTrajectory()
+print(mass[-1])
+plt.plot(list(range(len(mass))),mass)
+plt.savefig('mass.png')
+
+#natData = hpClasses.readNativeList(25)
+#from HPlibraryReader import *
 #sds = pickle.load(open(os.path.join(tr.outputDir,'sds1.p'),'rb'))
 #saa = tr.seqAvesNoFold(sds)
 #tr.plotSeqsAvesLen(tr.categorizeForScatter(saa,natData))

@@ -58,6 +58,15 @@ class Vesicle(object):
             self.path,str("%04d" %self.generation),'initPop'+str("%05d" %self.idInGen))
         return populFile
     
+    def _makeInitPopFile(self):
+        initFile = open(self.initFile,'w')
+        initFile.close()
+        initFile = open(self.initFile,'a')
+        for (seq, pop) in self.sequencesAtBirth.items():
+            initFile.write(seq+' '+str(pop)+'\n')
+        initFile.close()
+        return None
+    
     def _findMature(self):#TEST
         def line2Data(raw):
             points = {}
@@ -117,6 +126,7 @@ class Vesicle(object):
                 log_level='WARNING')
         sDef.runSeveralSeries(paramFile=None,populFile=self.initFile)
         timeMature, sequencesAtSplit = self._findMature()#TEST
+        print('mature time is: ', timeMature)
         return sequencesAtSplit, timeMature
         
         
@@ -155,14 +165,24 @@ class Vesicle(object):
     def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):#BUG Init is forgoten for new daughter cells
         '''grows cells for several generation either keeping them keeping them
         all or selecting
+        keepAll is one of:
+         - True
+         - select
+         - random
         '''
         vesicles0 = [self]
         currGeneration = 0
         self.sequencesAtSplit, self.timeMature = \
                     self.growCell(termTime,timeStep)#TEST
         daughter1, daughter2 = self.splitCell(self.sequencesAtSplit)
-        vesicles = [daughter1, daughter2]
+        os.mkdir(daughter1.outPath)
+        daughter1._makeInitPopFile()
+        daughter2._makeInitPopFile()
+        allVesicles = [daughter1, daughter2]
+        nextGen = [daughter1, daughter2]
         while currGeneration < numOfGenerations:
+            print('generation ',currGeneration)
+            vesicles = nextGen
             nextGen = []
             if keepAll:
                 for vesicle in vesicles:
@@ -176,7 +196,6 @@ class Vesicle(object):
                     except FileExistsError:
                         print('dir exists')
                     #os.makedirs(daughter2.outPath)
-                    #BUG somewhere here
                     init1 = open(daughter1.initFile,'w')
                     init1.close()
                     init1 = open(daughter1.initFile,'a')
@@ -192,14 +211,16 @@ class Vesicle(object):
                         init2.write(seq+' '+str(pop)+'\n')
                     init2.close()
                     
+                    allVesicles.append(daughter1)
+                    allVesicles.append(daughter2)
                     nextGen.append(daughter1)
                     nextGen.append(daughter2)
                     
-            else:
-                if vesicles[0].timeMature <= vesicles[1].timeMature:
-                    choose = 0
-                else:
-                    choose = 1
+            else:#TODO fix for different selection methods
+                #if vesicles[0].timeMature <= vesicles[1].timeMature:
+                choose = 0
+                #else:
+                #    choose = 1
                 vesicle = vesicles[choose]
                 vesicle.sequencesAtSplit, vesicle.timeMature = \
                     vesicle.growCell(termTime,timeStep)#TEST
@@ -212,7 +233,6 @@ class Vesicle(object):
                 except FileExistsError:
                     print('dir exists')
                 #os.makedirs(daughter2.outPath)
-                #and also BUG here. the some as above
                 init1 = open(daughter1.initFile,'w')
                 init1.close()
                 init1 = open(daughter1.initFile,'a')
@@ -230,13 +250,15 @@ class Vesicle(object):
                 
                 nextGen.append(daughter1)
                 nextGen.append(daughter2)
+                allVesicles.append(daughter1)
+                allVesicles.append(daughter2)
                 #end of COPY of the above
                 
-            vesicles = nextGen
+            #vesicles = nextGen
             currGeneration+=1
             
         
-        return vesicles
+        return allVesicles
     
 def readPopulations(popFile):
     sequences = {}
@@ -248,16 +270,16 @@ def readPopulations(popFile):
     
 if __name__ == "__main__":     
     idInGen =0
-    sequences=readPopulations('population.txt')
+    sequences=readPopulations('populations.txt')
     motherIdInGen = 0
     generation = 0
-    matureWeight = 6000
+    matureWeight = 600
     modelNum = 18
     path = routes.routePDM+'vesicles/'
-    termTime = 20
+    termTime = 15
     timeStep = 0.1
-    numOfGenerations = 3
+    numOfGenerations = 2
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
     #sAs = v.growCell(termTime,timeStep)
-    vs = v.growAndSplit(termTime,timeStep,numOfGenerations,True)
+    vs = v.growAndSplit(termTime,timeStep,numOfGenerations,keepAll=False)
     

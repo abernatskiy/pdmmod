@@ -269,8 +269,7 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
         allReactions.push_back(catalysis);
     }
     if (common == 0){
-        std::cout << "c" <<m_catalyst << std::endl;
-        std::cout << "problem: " << m_id << std::endl;
+        std::cout << "c" <<m_catalyst << std::endl; 
         throw std::invalid_argument("common = 0");
     }
 }

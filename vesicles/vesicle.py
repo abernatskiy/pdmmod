@@ -273,12 +273,12 @@ if __name__ == "__main__":
     sequences=readPopulations('populations.txt')
     motherIdInGen = 0
     generation = 0
-    matureWeight = 600
+    matureWeight = 6000
     modelNum = 18
     path = routes.routePDM+'vesicles/'
-    termTime = 15
-    timeStep = 0.1
-    numOfGenerations = 2
+    termTime = 40
+    timeStep = 0.0001
+    numOfGenerations = 1
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
     #sAs = v.growCell(termTime,timeStep)
     vs = v.growAndSplit(termTime,timeStep,numOfGenerations,keepAll=False)

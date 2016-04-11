@@ -34,7 +34,6 @@ public:
 
     // Constructors
     Population(std::string id, int initPop);
-    std::list<Population>* m_ptrPopulationList;
 
     // Methods
     Reaction sampleReaction(PROPFLOAT remainingJuice);
@@ -97,7 +96,6 @@ private:
     PROPFLOAT m_lambda;
 
     // Methods
-//    void add
     void computeKsi(){};
     void updateKsi(){};
 };

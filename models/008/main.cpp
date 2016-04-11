@@ -105,13 +105,13 @@ int main (int argc, char** argv){
     readConfig(&configDict, configFileName);
     showConfig(&configDict);
 
-    /* Reading initial conditions from file */
-    std::cout << " before beginning" << std::endl;
-    TotalPopulation tp(randomSeed, initialPopulationFileName);
-
     /* Loading HP-model-specific data */
 //    catPatterns = readCatPatterns("nativeList.txt");
 //    wellDepths = readWellDepths("nativeList.txt");
+
+    /* Reading initial conditions from file */
+    std::cout << " before beginning" << std::endl;
+    TotalPopulation tp(randomSeed, initialPopulationFileName);
 
     /* Main loop of the simulation */
     std::cout << "beginning" << std::endl;

@@ -337,6 +337,49 @@ class Trajectory(object):
                     mass.append(massAtTime)
         return mass
     
+    def getPersistenceDistribution(self,autoOrFold,natData):
+        '''
+        caluculates distribution of frequencies of time occurances of
+        either folds or autocats
+        Arguments:
+        requires seqDict pickle in the form sd<trajNum>.p
+        autoOrFold is one of:
+         - 'auto'
+         - 'fold'
+        '''
+        def test(seq,autoOrFold,natData):
+            '''checks if the seq is either a folder or an autocat
+            '''
+            if autoOrFold == 'auto':
+                if 'f' in seq:
+                    if not natData[seq[1:]][-1] == 'N':
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            elif autoOrFold = 'fold':
+                if 'f' in seq:
+                    return True
+                else:
+                    return False
+            else:
+                raise ValueError('wrong parameter')
+        
+        sd = pickle.load(open(os.path.join(
+            self.outputDir,
+            'sd'+self.trajectory[-1]+'.p'
+            ),'rb'))
+        distribution = {}
+        for (key,value) in sd.items():
+            if test(key,autoOrFold,natData):
+                l = len(value)
+                if l in distribution.keys():
+                    distribution[l]+=1
+                else:
+                    distribution[l]=1
+        return distribution
+    
     def getAutcatsNumber(self,natData):#TODO
         '''
         Arguments:

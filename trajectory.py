@@ -358,7 +358,7 @@ class Trajectory(object):
                         return False
                 else:
                     return False
-            elif autoOrFold = 'fold':
+            elif autoOrFold == 'fold':
                 if 'f' in seq:
                     return True
                 else:
@@ -368,7 +368,7 @@ class Trajectory(object):
         
         sd = pickle.load(open(os.path.join(
             self.outputDir,
-            'sd'+self.trajectory[-1]+'.p'
+            'sd'+str(self.trajectory[-1])+'.p'
             ),'rb'))
         distribution = {}
         for (key,value) in sd.items():

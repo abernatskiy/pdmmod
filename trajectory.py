@@ -337,6 +337,22 @@ class Trajectory(object):
                     mass.append(massAtTime)
         return mass
     
+    def getTrajectory(self,timeStep):
+        '''
+        returns dict {float time: [list of present sequences]
+        '''
+        traj = {}
+        time = 0
+        with open(self.trajFile) as infile:
+            for line in infile:
+                #skip comments
+                if not line[0] == '#':
+                    dlist = line.split(',')[0:-1]
+                    traj[time] = [item.split(' ')[0] for item in dlist[1:]]
+                    time += timeStep
+        return traj
+
+    
     def getPersistenceDistribution(self,autoOrFold,natData):
         '''
         caluculates distribution of frequencies of time occurances of

@@ -23,6 +23,7 @@ import scipy.stats
 from sklearn import cluster
 from matplotlib import colors
 import sys
+from collections import Counter
 
 import hpClasses
 from result import *
@@ -353,10 +354,10 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistenceDistribution(self,autoOrFold,natData):
+    def getPersistencePh(self,autoOrFold,natData):
         '''
-        calculates distribution of frequencies of time occurrences of
-        either folds or autocats
+        calculates in how many variants either folds or autocats
+        ale present in every moment
         Arguments:
         requires seqDict pickle in the form sd<trajNum>.p
         autoOrFold is one of:
@@ -373,34 +374,38 @@ class Trajectory(object):
             representations = 0
             for seq in listOfSeq:
                 if test(testFunction(seq),natData)>=autoOrFold:
-                    #count only folded variants
-                    if 'f' in seq:
+                    #if it's an active autocat, check if there's 
+                    #an inactive version
+                    if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
+                        ('f' in seq and (not 'f*' in seq)):
                         representations+=1
+                    elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
+                        continue
+                    else:
+                        continue
             persistence.append(representations)
         return persistence
     
-    def getAutcatsNumber(self,natData):#TODO
-        '''
-        Arguments:
-         -natData dict. natData['HHHH'] = (1, 'N')
-
-        returns time series: 
-        [int. number of difeerent autocats at the moment]
-        '''
-        timeSteps = []
-        with open(self.trajFile) as infile:
-            for line in infile:
-                autocats = 0
-                #skip comments
-                if not line[0]=='#':
-                    dlist=line.split(',')[0:-1]
-                    for couple in dlist[1:]:
-                        seq = getSeq(couple.split(' ')[0])
-                        if seq in natData.keys():
-                            if not natData[seq][1] == 'N':
-                                autocats+=1
-                timeSteps.append(autocats)
-        return timeSteps
+    def getPersistenceGn(autoOrFold):
+        trajectory = pickle.load(open(os.path.join(
+            self.outputDir,
+            'traj'+str(self.trajectory[-1])+'.p'
+            ),'rb'))
+        genotypes = []
+        for (time,listOfSeq) in trajectory.items():
+            selected = []
+            for seq in listOfSeq:
+                if test(testFunction(seq),natData)>=autoOrFold:
+                    #count only folded variants
+                    if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
+                        ('f' in seq and (not 'f*' in seq)):
+                        selected.append(getSeq(seq))
+                    elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
+                        continue
+                    else:
+                        continue
+            genotypes+=selected
+        return Counter(genotypes)
 
 def getSeq(seq):
     '''

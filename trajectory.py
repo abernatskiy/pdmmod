@@ -339,7 +339,7 @@ class Trajectory(object):
     
     def getTrajectory(self,timeStep):
         '''
-        returns dict {float time: [list of present sequences]
+        returns dict {float time: [list of present sequences]}
         '''
         traj = {}
         time = 0
@@ -355,46 +355,29 @@ class Trajectory(object):
     
     def getPersistenceDistribution(self,autoOrFold,natData):
         '''
-        caluculates distribution of frequencies of time occurances of
+        calculates distribution of frequencies of time occurrences of
         either folds or autocats
         Arguments:
         requires seqDict pickle in the form sd<trajNum>.p
         autoOrFold is one of:
-         - 'auto'
-         - 'fold'
+         - 1 for 'auto'
+         - 0 for 'fold'
+         - -1 for all sequences
         '''
-        def test(seq,autoOrFold,natData):
-            '''checks if the seq is either a folder or an autocat
-            '''
-            if autoOrFold == 'auto':
-                if 'f' in seq:
-                    if not natData[seq[1:]][-1] == 'N':
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
-            elif autoOrFold == 'fold':
-                if 'f' in seq:
-                    return True
-                else:
-                    return False
-            else:
-                raise ValueError('wrong parameter')
-        
-        sd = pickle.load(open(os.path.join(
+        trajectory = pickle.load(open(os.path.join(
             self.outputDir,
-            'sd'+str(self.trajectory[-1])+'.p'
+            'traj'+str(self.trajectory[-1])+'.p'
             ),'rb'))
-        distribution = {}
-        for (key,value) in sd.items():
-            if test(key,autoOrFold,natData):
-                l = len(value)
-                if l in distribution.keys():
-                    distribution[l]+=1
-                else:
-                    distribution[l]=1
-        return distribution
+        persistence = []
+        for (time,listOfSeq) in trajectory.items():
+            representations = 0
+            for seq in listOfSeq:
+                if test(testFunction(seq),natData)>=autoOrFold:
+                    #count only folded variants
+                    if 'f' in seq:
+                        representations+=1
+            persistence.append(representations)
+        return persistence
     
     def getAutcatsNumber(self,natData):#TODO
         '''
@@ -434,6 +417,18 @@ def getSeq(seq):
     else:
         hps = seq
     return hps
+
+def testFunction(seq,natData):
+    '''checks if the seq is either a folder or an autocat
+    '''
+    hps = getSeq(seq)
+    if seq in natData.keys():
+        if not natData[seq[1:]][-1] == 'N':
+            return 1
+        else:
+            return 0
+    else:
+        return -1
 
 natData = hpClasses.readNativeList(25)
 tr = Trajectory(18,37,0)

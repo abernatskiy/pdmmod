@@ -386,25 +386,30 @@ class Trajectory(object):
             persistence.append(representations)
         return persistence
     
-    def getPersistenceGn(autoOrFold):
+    def getPersistenceGn(autoOrFold,minTime):#TODO fix for minTime
+        '''requires pickle of trajectory.
+        returns how many time each sequence (either folded or auto)
+        occurs during the 
+        '''
         trajectory = pickle.load(open(os.path.join(
             self.outputDir,
             'traj'+str(self.trajectory[-1])+'.p'
             ),'rb'))
         genotypes = []
         for (time,listOfSeq) in trajectory.items():
-            selected = []
-            for seq in listOfSeq:
-                if test(testFunction(seq),natData)>=autoOrFold:
-                    #count only folded variants
-                    if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
-                        ('f' in seq and (not 'f*' in seq)):
-                        selected.append(getSeq(seq))
-                    elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
-                        continue
-                    else:
-                        continue
-            genotypes+=selected
+            if time>=minTime:
+                selected = []
+                for seq in listOfSeq:
+                    if test(testFunction(seq),natData)>=autoOrFold:
+                        #count only folded variants
+                        if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
+                            ('f' in seq and (not 'f*' in seq)):
+                            selected.append(getSeq(seq))
+                        elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
+                            continue
+                        else:
+                            continue
+                genotypes+=selected
         return Counter(genotypes)
 
 def getSeq(seq):

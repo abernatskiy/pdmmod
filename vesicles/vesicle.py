@@ -135,7 +135,7 @@ class Vesicle(object):
             self.generation+1,
             {},
             self.idInGen*2,
-            idInGen,
+            self.idInGen,
             self.matureWeight,
             self.modelNum,
             path)
@@ -143,7 +143,7 @@ class Vesicle(object):
             self.generation+1,
             {},
             self.idInGen*2+1,
-            idInGen,
+            self.idInGen,
             self.matureWeight,
             self.modelNum,
             path)

@@ -390,7 +390,11 @@ class Trajectory(object):
     def getPersistenceGn(self,autoOrFold,trajectory,minTime):#TODO fix for minTime
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
-        occurs during the 
+        occurs during the time since minTime
+        autoOrFold is one of:
+         - 1 for 'auto'
+         - 0 for 'fold'
+         - -1 for all sequences
         '''
         #trajectory = pickle.load(open(os.path.join(
             #self.outputDir,

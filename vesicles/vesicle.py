@@ -138,7 +138,7 @@ class Vesicle(object):
             self.idInGen,
             self.matureWeight,
             self.modelNum,
-            path)
+            self.path)
         daughter2=Vesicle(
             self.generation+1,
             {},
@@ -146,7 +146,7 @@ class Vesicle(object):
             self.idInGen,
             self.matureWeight,
             self.modelNum,
-            path)
+            self.path)
         megaList = []
         for (seq, pop) in sequencesAtSplit.items():
             megaList+=[seq]*pop

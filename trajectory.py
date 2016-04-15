@@ -387,15 +387,15 @@ class Trajectory(object):
             persistence.append(representations)
         return persistence
     
-    def getPersistenceGn(autoOrFold,minTime):#TODO fix for minTime
+    def getPersistenceGn(self,autoOrFold,trajectory,minTime):#TODO fix for minTime
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
         occurs during the 
         '''
-        trajectory = pickle.load(open(os.path.join(
-            self.outputDir,
-            'traj'+str(self.trajectory[-1])+'.p'
-            ),'rb'))
+        #trajectory = pickle.load(open(os.path.join(
+            #self.outputDir,
+            #'traj'+str(self.trajectory[-1])+'.p'
+            #),'rb'))
         genotypes = []
         for (time,listOfSeq) in trajectory.items():
             if time>=minTime:

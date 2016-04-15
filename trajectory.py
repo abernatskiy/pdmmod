@@ -50,6 +50,7 @@ class Trajectory(object):
             self.modelLocation,str("%03d" %modelNum)+'_output'+str(simNum))
         self.trajFile = os.path.join(self.outputDir,'traj'+str(trajNum))
         self.trajectory = (modelNum, simNum, trajNum)
+        self.trajNum = trajNum
         #self.parameters = self.readParams()
     
     def readParams(self):

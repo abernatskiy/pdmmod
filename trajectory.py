@@ -445,9 +445,9 @@ def testFunction(seq,natData):
     else:
         return -1
 
-natData = hpClasses.readNativeList(25)
-tr = Trajectory(18,37,0)
-autocats = tr.getAutcatsNumber(natData)
+#natData = hpClasses.readNativeList(25)
+#tr = Trajectory(18,37,0)
+#autocats = tr.getAutcatsNumber(natData)
 
 #from HPlibraryReader import *
 #sds = pickle.load(open(os.path.join(tr.outputDir,'sds1.p'),'rb'))

@@ -382,7 +382,7 @@ class Trajectory(object):
                 if test(testFunction(seq),natData)>=autoOrFold:
                     #if it's an active autocat, check if there's 
                     #an inactive version
-                    if countSeqInstances(seq):
+                    if countSeqInstances(seq,listOfSeq):
                         representations+=1
                     else:
                         continue
@@ -409,7 +409,7 @@ class Trajectory(object):
                 for seq in listOfSeq:
                     if testFunction(seq,natData)>=autoOrFold:
                         #count only folded variants
-                        if countSeqInstances(seq):
+                        if countSeqInstances(seq,listOfSeq):
                             selected.append(getSeq(seq))
                         else:
                             continue
@@ -444,7 +444,7 @@ def testFunction(seq,natData):
     else:
         return -1
     
-def countSeqInstances(seq):
+def countSeqInstances(seq,listOfSeq):
     '''in time series a sequence can be present in activated form: f*<hp>,
     folded form f<hp> or unfolded form <hp>
     when we count sequences we need to account different forms as one.

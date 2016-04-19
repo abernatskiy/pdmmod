@@ -267,6 +267,7 @@ def readPopulations(popFile):
             pair = line.rstrip('\n').split(' ')
             sequences[pair[0]] = int(pair[1])
     return sequences
+
     
 if __name__ == "__main__":     
     idInGen =0

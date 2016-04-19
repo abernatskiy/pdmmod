@@ -355,7 +355,7 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistencePh(self,trajectory,autoOrFold,natData):#TEST
+    def getPersistencePh(self,autoOrFold,trajectory,natData):#TEST
         '''
         calculates in how many variants either folds or autocats
         ale present in every moment

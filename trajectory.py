@@ -379,7 +379,7 @@ class Trajectory(object):
         for (time,listOfSeq) in trajectory.items():
             representations = 0
             for seq in listOfSeq:
-                if test(testFunction(seq),natData)>=autoOrFold:
+                if testFunction(seq,natData)>=autoOrFold:
                     #if it's an active autocat, check if there's 
                     #an inactive version
                     if countSeqInstances(seq,listOfSeq):

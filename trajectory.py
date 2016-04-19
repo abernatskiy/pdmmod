@@ -383,6 +383,7 @@ class Trajectory(object):
                     #if it's an active autocat, check if there's 
                     #an inactive version
                     if countSeqInstances(seq):
+                        representations+=1
                     else:
                         continue
             persistence.append(representations)
@@ -444,12 +445,12 @@ def testFunction(seq,natData):
         return -1
     
 def countSeqInstances(seq):
-    '''in a trajectory a sequence can be present in activated form: f*<hp>,
+    '''in time series a sequence can be present in activated form: f*<hp>,
     folded form f<hp> or unfolded form <hp>
     when we count sequences we need to account different forms as one.
     This function counts only folded versions.
     Arguments:
-     - str. seq as present in the trajectory
+     - str. seq as present in trajectory
     Returns:
      - True, if add sequence to the count
      - False, if not to add

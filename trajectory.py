@@ -382,11 +382,7 @@ class Trajectory(object):
                 if test(testFunction(seq),natData)>=autoOrFold:
                     #if it's an active autocat, check if there's 
                     #an inactive version
-                    if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
-                        ('f' in seq and (not 'f*' in seq)):
-                        representations+=1
-                    elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
-                        continue
+                    if countSeqInstances(seq):
                     else:
                         continue
             persistence.append(representations)
@@ -412,11 +408,8 @@ class Trajectory(object):
                 for seq in listOfSeq:
                     if testFunction(seq,natData)>=autoOrFold:
                         #count only folded variants
-                        if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
-                            ('f' in seq and (not 'f*' in seq)):
+                        if countSeqInstances(seq):
                             selected.append(getSeq(seq))
-                        elif ('f*' in seq and ('f'+getSeq(seq) in listOfSeq)):
-                            continue
                         else:
                             continue
                 genotypes+=selected
@@ -442,13 +435,35 @@ def testFunction(seq,natData):
     '''checks if the seq is either a folder or an autocat
     '''
     hps = getSeq(seq)
-    if seq in natData.keys():
-        if not natData[seq[1:]][-1] == 'N':
+    if hps in natData.keys():
+        if not natData[hps][-1] == 'N':
             return 1
         else:
             return 0
     else:
         return -1
+    
+def countSeqInstances(seq):
+    '''in a trajectory a sequence can be present in activated form: f*<hp>,
+    folded form f<hp> or unfolded form <hp>
+    when we count sequences we need to account different forms as one.
+    This function counts only folded versions.
+    Arguments:
+     - str. seq as present in the trajectory
+    Returns:
+     - True, if add sequence to the count
+     - False, if not to add
+    '''
+    if (
+        ('f*' in seq) or
+            (
+            (('f' in seq) and (not 'f*' in seq)) and
+            (not 'f*'+getSeq(seq) in listOfSeq)
+            )
+        ):
+        return True
+    else:
+        return False
 
 #natData = hpClasses.readNativeList(25)
 #tr = Trajectory(18,37,0)

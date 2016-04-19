@@ -368,7 +368,8 @@ class Trajectory(object):
         Returns:
          - persistence: 
         Notes:
-         - requires seqDict pickle in the form sd<trajNum>.p
+         - requires trajectory pickle in the form traj<trajNum>.p
+          {time: [hpseq1, hpseq2 ...]}
         '''
         trajectory = pickle.load(open(os.path.join(
             self.outputDir,
@@ -391,7 +392,7 @@ class Trajectory(object):
             persistence.append(representations)
         return persistence
     
-    def getPersistenceGn(self,autoOrFold,trajectory,minTime):#TEST
+    def getPersistenceGn(self,autoOrFold,trajectory,natData,minTime):#TEST
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
         occurs during the time since minTime

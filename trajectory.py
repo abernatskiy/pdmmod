@@ -355,16 +355,20 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistencePh(self,autoOrFold,natData):
+    def getPersistencePh(self,autoOrFold,natData):#TEST
         '''
         calculates in how many variants either folds or autocats
         ale present in every moment
         Arguments:
-        requires seqDict pickle in the form sd<trajNum>.p
-        autoOrFold is one of:
-         - 1 for 'auto'
-         - 0 for 'fold'
-         - -1 for all sequences
+         - autoOrFold is one of:
+          * 1 for autocats
+          * 0 for folders
+          * -1 for all sequences
+         - natData: dict {str. hpseq: (int. nativeEnergy, str. catPattern)}
+        Returns:
+         - persistence: 
+        Notes:
+         - requires seqDict pickle in the form sd<trajNum>.p
         '''
         trajectory = pickle.load(open(os.path.join(
             self.outputDir,
@@ -387,7 +391,7 @@ class Trajectory(object):
             persistence.append(representations)
         return persistence
     
-    def getPersistenceGn(self,autoOrFold,trajectory,minTime):#TODO fix for minTime
+    def getPersistenceGn(self,autoOrFold,trajectory,minTime):#TEST
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
         occurs during the time since minTime
@@ -405,7 +409,7 @@ class Trajectory(object):
             if time>=minTime:
                 selected = []
                 for seq in listOfSeq:
-                    if test(testFunction(seq),natData)>=autoOrFold:
+                    if testFunction(seq,natData)>=autoOrFold:
                         #count only folded variants
                         if ('f*' in seq and (not 'f'+getSeq(seq) in listOfSeq)) or\
                             ('f' in seq and (not 'f*' in seq)):

@@ -355,7 +355,7 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistencePh(self,autoOrFold,natData):#TEST
+    def getPersistencePh(self,trajectory,autoOrFold,natData):#TEST
         '''
         calculates in how many variants either folds or autocats
         ale present in every moment
@@ -371,10 +371,10 @@ class Trajectory(object):
          - requires trajectory pickle in the form traj<trajNum>.p
           {time: [hpseq1, hpseq2 ...]}
         '''
-        trajectory = pickle.load(open(os.path.join(
-            self.outputDir,
-            'traj'+str(self.trajectory[-1])+'.p'
-            ),'rb'))
+        #trajectory = pickle.load(open(os.path.join(
+            #self.outputDir,
+            #'traj'+str(self.trajectory[-1])+'.p'
+            #),'rb'))
         persistence = []
         for (time,listOfSeq) in trajectory.items():
             representations = 0

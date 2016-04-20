@@ -339,7 +339,7 @@ class Trajectory(object):
                     mass.append(massAtTime)
         return mass
     
-    def getTrajectory(self,timeStep):
+    def getTrajectory(self):
         '''
         returns dict {float time: [list of present sequences]}
         '''
@@ -354,7 +354,7 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistencePh(self,autoOrFold,trajectory,natData):#TEST
+    def getPersistencePh(self,autoOrFold,trajectory,natData,minTime):#TEST
         '''
         calculates in how many variants either folds or autocats
         ale present in every moment
@@ -376,16 +376,18 @@ class Trajectory(object):
             #),'rb'))
         persistence = []
         for (time,listOfSeq) in trajectory.items():
-            representations = 0
-            for seq in listOfSeq:
-                if testFunction(seq,natData)>=autoOrFold:
-                    #if it's an active autocat, check if there's 
-                    #an inactive version
-                    if countSeqInstances(seq,listOfSeq):
-                        representations+=1
-                    else:
-                        continue
-            persistence.append(representations)
+            if time>=minTime:
+                representations = 0
+                for seq in listOfSeq:
+                    if testFunction(seq,natData)>=autoOrFold:
+                        #print(time,seq)
+                        #if it's an active autocat, check if there's 
+                        #an inactive version
+                        if countSeqInstances(seq,listOfSeq):
+                            representations+=1
+                        else:
+                            continue
+                persistence.append(representations)
         return persistence
     
     def getPersistenceGn(self,autoOrFold,trajectory,natData,minTime):#TEST
@@ -465,8 +467,10 @@ def countSeqInstances(seq,listOfSeq):
     else:
         return False
 
-#natData = hpClasses.readNativeList(25)
-#tr = Trajectory(18,71,30)
+natData = hpClasses.readNativeList(25)
+tr = Trajectory(18,71,30)
+x = tr.getTrajectory()
+pa = tr.getPersistencePh(0,x,natData,3)
 #autocats = tr.getAutcatsNumber(natData)
 
 #from HPlibraryReader import *

@@ -344,14 +344,13 @@ class Trajectory(object):
         returns dict {float time: [list of present sequences]}
         '''
         traj = {}
-        time = 0
         with open(self.trajFile) as infile:
             for line in infile:
                 #skip comments
                 if not line[0] == '#':
                     dlist = line.split(',')[0:-1]
+                    time = float(dlist[0])
                     traj[time] = [item.split(' ')[0] for item in dlist[1:]]
-                    time += timeStep
         return traj
 
     
@@ -467,7 +466,7 @@ def countSeqInstances(seq,listOfSeq):
         return False
 
 #natData = hpClasses.readNativeList(25)
-#tr = Trajectory(18,37,0)
+#tr = Trajectory(18,71,30)
 #autocats = tr.getAutcatsNumber(natData)
 
 #from HPlibraryReader import *

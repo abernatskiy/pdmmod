@@ -136,10 +136,11 @@ class VTrajectory(Trajectory):
         plt.title('Number of '+af+' phenotype variants for different generations')
         plt.savefig(os.path.join(self.path,'pheno-'+af+str(scaled)+'.png'))
 
-    def generaationGenotypes(gas):#TODO
+    def generationGnFreqDistr(gas):#TODO
         theSet = set([])
         for ga in gas:
             theSet.union(ga)
+        for 
         return None
 
     def generationPhenotypes(pas):#TODO
@@ -211,14 +212,17 @@ if __name__ == "__main__":
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    pickle.dump(vt.getPhenotypesChildren(1,numGen),open(os.path.join(vt.path,'pas.p'),'wb'))
-    pickle.dump(vt.getPhenotypesChildren(0,numGen),open(os.path.join(vt.path,'pfs.p'),'wb'))
     pas = pickle.load(open(os.path.join(vt.path,'pas.p'),'rb'))
     pfs = pickle.load(open(os.path.join(vt.path,'pfs.p'),'rb'))
+    plt.clf()
     vt.plotPhenoChildren(pas,1,True)
+    plt.clf()
     vt.plotPhenoChildren(pfs,0,True)
+    plt.clf()
     vt.plotPhenoChildren(pas,1,False)
+    plt.clf()
     vt.plotPhenoChildren(pfs,0,False)
+    plt.clf()
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

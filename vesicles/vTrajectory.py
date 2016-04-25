@@ -84,6 +84,46 @@ class VTrajectory(Trajectory):
             gas.append(ga)
             
         return gas
+    
+    def getPhenotypesChildren(self,autoOrFold,numGen):
+        pas = []
+        for generation in range(numGen):
+            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            if autoOrFold == 1:
+                gen = pickle.load(open(os.path.join(outputDir,'pa.p'),'rb'))
+            elif autoOrFold == 0:
+                gen = pickle.load(open(os.path.join(outputDir,'pf.p'),'rb'))
+            else:
+                raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+            
+            pas.append(pa)
+            
+        return pas
+    
+    def plotGnNumChildren(self,gas,autoOrFold):
+        counts = [len(ga) for ga in gas]
+        plt.plot(list(range(len(gas))),counts,linewidth=4)
+        if autoOrFold == 1:
+            af = 'autocatalytic'
+        elif autoOrFold == 0:
+            af = 'foldarmeric'
+        else:
+            raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+        plt.title('Number of '+af+' genotypes for different generations')
+        plt.savefig(os.path.join(self.path,'geno-quant-'+af+'.png'))
+        
+
+    def generaationGenotypes(gas):#TODO
+        theSet = set([])
+        for ga in gas:
+            theSet.union(ga)
+        return None
+
+    def generationPhenotypes(pas):#TODO
+        return None
+
+    def generationShapes(shapes):#TODO
+        return None
 
 def getSeq(seq):
     '''
@@ -135,17 +175,7 @@ def countSeqInstances(seq,listOfSeq):
     else:
         return False
 
-def generaationGenotypes(gas):#TODO
-    theSet = set([])
-    for ga in gas:
-        theSet.union(ga)
-    return None
 
-def generationPhenotypes(pas):#TODO
-    return None
-
-def generationShapes(shapes):#TODO
-    return None
         
 if __name__ == "__main__":     
     idInGen =0
@@ -158,8 +188,12 @@ if __name__ == "__main__":
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    pickle.dump(vt.getGenotypesChildren(1,numGen),open(os.path.join(vt.path,'gas.p'),'wb'))
-    pickle.dump(vt.getGenotypesChildren(0,numGen),open(os.path.join(vt.path,'gfs.p'),'wb'))
+    pickle.dump(vt.getPhenotypesChildren(1,numGen),open(os.path.join(vt.path,'pas.p'),'wb'))
+    pickle.dump(vt.getPhenotypesChildren(0,numGen),open(os.path.join(vt.path,'pfs.p'),'wb'))
+    gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
+    gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
+    vt.plotGnNumChildren(gas,1)
+    vt.plotGnNumChildren(gfs,0)
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

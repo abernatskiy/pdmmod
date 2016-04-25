@@ -120,7 +120,7 @@ if __name__ == "__main__":
         pickle.dump(getPersistenceGn(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'gf.p'),'wb'))
         pickle.dump(getPersistencePh(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pa.p'),'wb'))
         pickle.dump(getPersistencePh(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pf.p'),'wb'))
-        pickle.dump(getShapeTrajectories(seqShapeDict,natData),open(vt.outputDir
+        pickle.dump(getShapeTrajectories(seqShapeDict,natData),open(os.path.join(vt.outputDir,'sTraj.p'),'wb'))
 
 
 

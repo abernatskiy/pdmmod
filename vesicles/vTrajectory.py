@@ -109,18 +109,18 @@ if __name__ == "__main__":
     natData = hpClasses.readNativeList(25)
     seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
     for generation in range(genNum):
-        vt = vTrajectory.VTrajectory(
+        vt = VTrajectory(
             modelNum, generation,idInGen,0,matureWeight,path
         )
         mt = getMassTrajectory()
-        pickle.dump(trajectory,open(os.path.join(vt.outputDir,'mt.p'),'wb'))
+        pickle.dump(mt,open(os.path.join(vt.outputDir,'mt.p'),'wb'))
         trajectory = getTrajectory()
         pickle.dump(trajectory,open(os.path.join(vt.outputDir,'traj.p'),'wb'))
-        pickle.dump(getPersistenceGn(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'ga.p'),'wb'))
-        pickle.dump(getPersistenceGn(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'gf.p'),'wb'))
-        pickle.dump(getPersistencePh(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pa.p'),'wb'))
-        pickle.dump(getPersistencePh(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pf.p'),'wb'))
-        pickle.dump(getShapeTrajectories(seqShapeDict,natData),open(os.path.join(vt.outputDir,'sTraj.p'),'wb'))
+        pickle.dump(trajectory.getPersistenceGn(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'ga.p'),'wb'))
+        pickle.dump(trajectory.getPersistenceGn(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'gf.p'),'wb'))
+        pickle.dump(trajectory.getPersistencePh(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pa.p'),'wb'))
+        pickle.dump(trajectory.getPersistencePh(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pf.p'),'wb'))
+        pickle.dump(trajectory.getShapeTrajectories(seqShapeDict,natData),open(os.path.join(vt.outputDir,'sTraj.p'),'wb'))
 
 
 

@@ -129,7 +129,7 @@ class VTrajectory(Trajectory):
                 timepoints = [i/time for i in range(time)]
             else:
                 timepoints = list(range(time))
-            plt.plot(list(range(time)),pa,linewidth=4,label=str(generation))
+            plt.plot(timepoints,pa,linewidth=2,label=str(generation))
             generation+=1
         
         
@@ -142,9 +142,13 @@ class VTrajectory(Trajectory):
         for ga in gas:
             theSet.union(ga)
         for seq in theSet:
+            states = []
             for ga in gas:
                 if seq in ga:
-                    continue
+                    states.append(1)
+                else:
+                    states.append(0)
+                    
         return None
 
     def generationPhenotypes(pas):#TODO

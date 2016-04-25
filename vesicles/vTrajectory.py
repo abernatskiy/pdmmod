@@ -132,10 +132,26 @@ class VTrajectory(Trajectory):
             plt.plot(timepoints,pa,linewidth=2,label=str(generation))
             generation+=1
         
-        
         plt.title('Number of '+af+' phenotype variants for different generations')
         plt.legend()
         plt.savefig(os.path.join(self.path,'pheno-'+af+str(scaled)+'.png'))
+    
+    def plotPhenoGenerations(self,pas,autoOrFold):
+        plt.clf()
+        if autoOrFold == 1:
+            af = 'autocatalytic'
+        elif autoOrFold == 0:
+            af = 'foldarmeric'
+        else:
+            raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+        numGen = len(pas)
+        mins = [min(pa) for pa in pas]
+        plt.plot(list(range(numGen)),mins)
+        plt.title('Minimum number of '+af+' phenotype variants vs generations')
+        plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'
+        
+        
+        
 
     def generationGnFreqDistr(gas):#TODO
         theSet = set([])

@@ -90,9 +90,9 @@ class VTrajectory(Trajectory):
         for generation in range(numGen):
             outputDir = os.path.join(vt.path,str("%04d" %generation))
             if autoOrFold == 1:
-                gen = pickle.load(open(os.path.join(outputDir,'pa.p'),'rb'))
+                pa = pickle.load(open(os.path.join(outputDir,'pa.p'),'rb'))
             elif autoOrFold == 0:
-                gen = pickle.load(open(os.path.join(outputDir,'pf.p'),'rb'))
+                pa = pickle.load(open(os.path.join(outputDir,'pf.p'),'rb'))
             else:
                 raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
             

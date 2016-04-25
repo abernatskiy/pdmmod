@@ -140,6 +140,12 @@ def generaationGenotypes(gas):#TODO
     for ga in gas:
         theSet.union(ga)
     return None
+
+def generationPhenotypes(pas):#TODO
+    return None
+
+def generationShapes(shapes):#TODO
+    return None
         
 if __name__ == "__main__":     
     idInGen =0
@@ -152,8 +158,8 @@ if __name__ == "__main__":
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    vt.plotMasesChildren(numGen,True)
-    vt.plotMasesChildren(numGen,False)
+    pickle.dump(vt.getGenotypesChildren(1,numGen),open(os.path.join(vt.path,'gas.p'),'wb'))
+    pickle.dump(vt.getGenotypesChildren(0,numGen),open(os.path.join(vt.path,'gas.p'),'wb'))
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

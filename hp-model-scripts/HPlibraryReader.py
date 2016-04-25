@@ -2,6 +2,7 @@
 
 import sys
 import os
+import pickle
 from routes import *
 import nativeChain
 
@@ -118,10 +119,12 @@ def print2File(nativeList,filename):
 
 
 
-seqDict=HPlibraryReader(25)
-shapeDict = convertShapesToNumbers(seqDict)
-seqShapeDict = seqs2shapes(seqDict)
+#seqDict=HPlibraryReader(25)
+#shapeDict = convertShapesToNumbers(seqDict)
+#seqShapeDict = seqs2shapes(seqDict)
+#pickle.dump(seqShapeDict,open('../seqShapeDict.p','wb'))
 #print2File(nativeList,routePDM+'nativeList12.txt')
+
 #length = 6
 #cd = HPlengthReader(length)
  

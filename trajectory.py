@@ -33,7 +33,7 @@ sys.path.append('hp-model-scripts')
 
 class Trajectory(object):
     '''
-    This class analyzes various aspects of stochastic simulations
+    This class analyzes various aspe        cts of stochastic simulations
     in the pdmmod framework
     '''
     def __init__(self, modelNum, simNum,trajNum):
@@ -354,7 +354,7 @@ class Trajectory(object):
         return traj
 
     
-    def getPersistencePh(self,autoOrFold,trajectory,natData,minTime):#TEST
+    def getPersistencePh(self,autoOrFold,trajectory,natData,minTime):
         '''
         calculates in how many variants either folds or autocats
         ale present in every moment
@@ -390,7 +390,7 @@ class Trajectory(object):
                 persistence.append(representations)
         return persistence
     
-    def getPersistenceGn(self,autoOrFold,trajectory,natData,minTime):#TEST
+    def getPersistenceGn(self,autoOrFold,trajectory,natData,minTime):
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
         occurs during the time since minTime
@@ -467,10 +467,10 @@ def countSeqInstances(seq,listOfSeq):
     else:
         return False
 
-natData = hpClasses.readNativeList(25)
-tr = Trajectory(18,71,30)
-x = tr.getTrajectory()
-pa = tr.getPersistencePh(0,x,natData,3)
+#natData = hpClasses.readNativeList(25)
+#tr = Trajectory(18,71,30)
+#x = tr.getTrajectory()
+#pa = tr.getPersistencePh(0,x,natData,3)
 #autocats = tr.getAutcatsNumber(natData)
 
 #from HPlibraryReader import *

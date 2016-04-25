@@ -112,6 +112,27 @@ class VTrajectory(Trajectory):
         plt.title('Number of '+af+' genotypes for different generations')
         plt.savefig(os.path.join(self.path,'geno-quant-'+af+'.png'))
         
+    def plotPhenoChildren(self,pas,autoOrFold,scaled=False):
+        plt.clf()
+        if autoOrFold == 1:
+            af = 'autocatalytic'
+        elif autoOrFold == 0:
+            af = 'foldarmeric'
+        else:
+            raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+        generation = 0
+        for pa is pas:
+            time = len(pa)
+            if scaled:
+                timepoints = [i/time for i in range(time)]
+            else:
+                timepoints = list(range(time))
+            plt.plot(list(range(time)),pa,linewidth=4,label=str(generation))
+            generation+=1
+        
+        
+        plt.title('Number of '+af+' phenotype variants for different generations')
+        plt.savefig(os.path.join(self.path,'pheno-'+af+str(scaled)+'.png'))
 
     def generaationGenotypes(gas):#TODO
         theSet = set([])

@@ -34,7 +34,7 @@ class VTrajectory(Trajectory):
     #getPersistencePh(autoOrFold,trajectory,natData,minTime)
     #getShapeTrajectories(seqShapeDict,natData)
     
-    def getPersistentShapes(self,shapeTraj,minTimeStep):#TODO
+    def getPersistentShapes(self,shapeTraj,minTimeStep):
         '''self.shapeTraj -- list:
             [[('URD', 4), ('URULLD', 2),...],...]
         '''
@@ -51,7 +51,40 @@ class VTrajectory(Trajectory):
             if sign == True:
                 persistent.append(shape[0])
         return persistent
-    
+
+    def plotMasesChildren(self,numGen,scaled=False):
+        mts = []
+        for generation in range(numGen):
+            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
+            time = len(mt)
+            if scaled:
+                timepoints = [i/time for i in range(time)]
+            else:
+                timepoints = list(range(time))
+            plt.plot(timepoints,mt,linewidth=4,label=str(generation))
+            plt.legend()
+            plt.savefig(os.path.join(vt.path,'masses'+str(scaled)+'.png'))
+
+    def getGenotypesChildren(self,autoOrFold,numGen):
+        gas = []
+        for generation in range(numGen):
+            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            if autoOrFold == 1:
+                gen = pickle.load(open(os.path.join(outputDir,'ga.p'),'rb'))
+            elif autoOrFold == 0:
+                gen = pickle.load(open(os.path.join(outputDir,'gf.p'),'rb'))
+            else:
+                raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+            time = max(gen.values())
+            ga = []
+            for (seq,freq) in gen.items():
+                if freq==time:
+                    ga.append(seq)
+            gas.append(ga)
+            
+        return gas
+
 def getSeq(seq):
     '''
     Arguments:
@@ -102,26 +135,18 @@ def countSeqInstances(seq,listOfSeq):
     else:
         return False
 
-    def plotMasesChildren(self,numGen,scaled=False):
-        mts = []
-        for generation in range(genNum):
-            outputDir = os.path.join(vt.path,str("%04d" %generation))
-            mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
-            time = len(mt)
-            if scaled:
-                timepoints = [i/time for i in range(time)]
-            else:
-                timepoints = list(range(time))
-            plt.plot(timepoints,mt,linewidth=4,label=str(generation))
-            plt.legend()
-            plt.savefig(os.path.join(vt.path,'masses'+str(scaled)+'.png'))
-
+def generaationGenotypes(gas):#TODO
+    theSet = set([])
+    for ga in gas:
+        theSet.union(ga)
+    return None
+        
 if __name__ == "__main__":     
     idInGen =0
     matureWeight = 6000
     modelNum = 18
     path = routes.routePDM+'vesicles/secondTrial'
-    genNum = 10
+    numGen = 10
     natData = hpClasses.readNativeList(25)
     seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
     vt = VTrajectory(

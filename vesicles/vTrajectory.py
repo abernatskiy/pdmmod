@@ -53,6 +53,7 @@ class VTrajectory(Trajectory):
         return persistent
 
     def plotMasesChildren(self,numGen,scaled=False):
+        plt.clf()
         mts = []
         for generation in range(numGen):
             outputDir = os.path.join(vt.path,str("%04d" %generation))
@@ -101,6 +102,7 @@ class VTrajectory(Trajectory):
         return pas
     
     def plotGnNumChildren(self,gas,autoOrFold):
+        plt.clf()
         counts = [len(ga) for ga in gas]
         plt.plot(list(range(len(gas))),counts,linewidth=4)
         if autoOrFold == 1:
@@ -121,7 +123,7 @@ class VTrajectory(Trajectory):
         else:
             raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
         generation = 0
-        for pa is pas:
+        for pa in pas:
             time = len(pa)
             if scaled:
                 timepoints = [i/time for i in range(time)]
@@ -211,10 +213,12 @@ if __name__ == "__main__":
         )
     pickle.dump(vt.getPhenotypesChildren(1,numGen),open(os.path.join(vt.path,'pas.p'),'wb'))
     pickle.dump(vt.getPhenotypesChildren(0,numGen),open(os.path.join(vt.path,'pfs.p'),'wb'))
-    gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
-    gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
-    vt.plotGnNumChildren(gas,1)
-    vt.plotGnNumChildren(gfs,0)
+    pas = pickle.load(open(os.path.join(vt.path,'pas.p'),'rb'))
+    pfs = pickle.load(open(os.path.join(vt.path,'pfs.p'),'rb'))
+    vt.plotPhenoChildren(pas,1,True)
+    vt.plotPhenoChildren(pfs,0,True)
+    vt.plotPhenoChildren(pas,1,False)
+    vt.plotPhenoChildren(pfs,0,False)
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

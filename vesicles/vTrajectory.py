@@ -157,7 +157,7 @@ class VTrajectory(Trajectory):
         theSet = set([])
         freqDict = {}
         for ga in gas:
-            theSet.union(ga)
+            theSet= theSet | set(ga)
         for seq in theSet:
             states = []
             for ga in gas:
@@ -181,12 +181,15 @@ class VTrajectory(Trajectory):
         freqDict = self.generationGnFreqDistr(gas)
         seqGenCount = {}
         persistent = []
-        for (seq, distr) in freqDict:
+        for (seq, distr) in freqDict.items():
             seqGenCount[seq]=sum(freqDict[seq])
             if sum(freqDict[seq])==numGen:
                 persistent.append(seq)
         
-        plt.hist(list(seqGenCount.values()),10)
+        values = list(seqGenCount.values())
+        theSum = sum(values)
+        hst = [val/len(gas) for val in values]
+        plt.hist(hst,100,cumulative=False,normed=False)
         plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png'))
         return persistent
 

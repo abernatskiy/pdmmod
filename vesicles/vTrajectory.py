@@ -114,7 +114,7 @@ def countSeqInstances(seq,listOfSeq):
                 timepoints = list(range(time))
             plt.plot(timepoints,mt,linewidth=4,label=str(generation))
             plt.legend()
-            plt.savefig(os.path.join(vt.path,'masses.png'))
+            plt.savefig(os.path.join(vt.path,'masses'+str(scaled)+'.png'))
 
 if __name__ == "__main__":     
     idInGen =0
@@ -124,7 +124,12 @@ if __name__ == "__main__":
     genNum = 10
     natData = hpClasses.readNativeList(25)
     seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
-    for generation in range(genNum):
+    vt = VTrajectory(
+            modelNum, 0,idInGen,0,matureWeight,path
+        )
+    vt.plotMasesChildren(numGen,True)
+    vt.plotMasesChildren(numGen,False)
+    #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path
         #)

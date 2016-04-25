@@ -134,13 +134,17 @@ class VTrajectory(Trajectory):
         
         
         plt.title('Number of '+af+' phenotype variants for different generations')
+        plt.legend()
         plt.savefig(os.path.join(self.path,'pheno-'+af+str(scaled)+'.png'))
 
     def generationGnFreqDistr(gas):#TODO
         theSet = set([])
         for ga in gas:
             theSet.union(ga)
-        for 
+        for seq in theSet:
+            for ga in gas:
+                if seq in ga:
+                    continue
         return None
 
     def generationPhenotypes(pas):#TODO

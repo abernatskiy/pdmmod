@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import os
 import random
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import sys
 sys.path.append('../')
@@ -100,6 +102,20 @@ def countSeqInstances(seq,listOfSeq):
     else:
         return False
 
+    def plotMasesChildren(self,numGen,scaled=False):
+        mts = []
+        for generation in range(genNum):
+            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
+            time = len(mt)
+            if scaled:
+                timepoints = [i/time for i in range(time)]
+            else:
+                timepoints = list(range(time))
+            plt.plot(timepoints,mt,linewidth=4,label=str(generation))
+            plt.legend()
+            plt.savefig(os.path.join(vt.path,'masses.png'))
+
 if __name__ == "__main__":     
     idInGen =0
     matureWeight = 6000
@@ -109,18 +125,16 @@ if __name__ == "__main__":
     natData = hpClasses.readNativeList(25)
     seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
     for generation in range(genNum):
-        vt = VTrajectory(
-            modelNum, generation,idInGen,0,matureWeight,path
-        )
-        mt = vt.getMassTrajectory()
-        pickle.dump(mt,open(os.path.join(vt.outputDir,'mt.p'),'wb'))
-        trajectory = getTrajectory()
-        pickle.dump(trajectory,open(os.path.join(vt.outputDir,'traj.p'),'wb'))
-        pickle.dump(vt.getPersistenceGn(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'ga.p'),'wb'))
-        pickle.dump(vt.getPersistenceGn(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'gf.p'),'wb'))
-        pickle.dump(vt.getPersistencePh(1,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pa.p'),'wb'))
-        pickle.dump(vt.getPersistencePh(0,trajectory,natData,0)  ,open(os.path.join(vt.outputDir,'pf.p'),'wb'))
-        pickle.dump(vt.getShapeTrajectories(seqShapeDict,natData),open(os.path.join(vt.outputDir,'sTraj.p'),'wb'))
+        #vt = VTrajectory(
+            #modelNum, generation,idInGen,0,matureWeight,path
+        #)
+        #mt = pickle.load(open(os.path.join(vt.outputDir,'mt.p'),'rb'))
+        #traj = pickle.load(open(os.path.join(vt.outputDir,'traj.p'),'rb'))
+        #ga = pickle.load(open(os.path.join(vt.outputDir,'ga.p'),'rb'))
+        #gf = pickle.load(open(os.path.join(vt.outputDir,'gf.p'),'rb'))
+        #pa = pickle.load(open(os.path.join(vt.outputDir,'pa.p'),'rb'))
+        #pf = pickle.load(open(os.path.join(vt.outputDir,'pf.p'),'rb'))
+        #sTraj  =  pickle.load(open(os.path.join(vt.outputDir,'sTraj.p'),'rb'))
 
 
 

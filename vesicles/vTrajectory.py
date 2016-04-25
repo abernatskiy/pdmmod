@@ -153,8 +153,9 @@ class VTrajectory(Trajectory):
         
         
 
-    def generationGnFreqDistr(gas):#TODO
+    def generationGnFreqDistr(self,gas):#TEST
         theSet = set([])
+        freqDict = {}
         for ga in gas:
             theSet.union(ga)
         for seq in theSet:
@@ -164,8 +165,30 @@ class VTrajectory(Trajectory):
                     states.append(1)
                 else:
                     states.append(0)
+            freqDict[seq] = states
                     
-        return None
+        return freqDict
+    
+    def plotGnFreqDistr(self,gas,autoOrFold):
+        plt.clf()
+        if autoOrFold == 1:
+            af = 'autocatalytic'
+        elif autoOrFold == 0:
+            af = 'foldarmeric'
+        else:
+            raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
+        numGen = len(gas)
+        freqDict = self.generationGnFreqDistr(gas)
+        seqGenCount = {}
+        persistent = []
+        for (seq, distr) in freqDict:
+            seqGenCount[seq]=sum(freqDict[seq])
+            if sum(freqDict[seq])==numGen:
+                persistent.append(seq)
+        
+        plt.hist(list(seqGenCount.values()),10)
+        plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png')
+        return persistent
 
     def generationPhenotypes(pas):#TODO
         return None
@@ -239,9 +262,11 @@ if __name__ == "__main__":
     pas = pickle.load(open(os.path.join(vt.path,'pas.p'),'rb'))
     pfs = pickle.load(open(os.path.join(vt.path,'pfs.p'),'rb'))
     plt.clf()
-    vt.plotPhenoGenerations(pas,1)
+    p1= vt.plotGnFreqDistr(gas,1)
+    print(p1)
     plt.clf()
-    vt.plotPhenoGenerations(pfs,0)
+    p2= vt.plotGnFreqDistr(gas,0)
+    print(p2)
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

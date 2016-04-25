@@ -159,7 +159,7 @@ if __name__ == "__main__":
             modelNum, 0,idInGen,0,matureWeight,path
         )
     pickle.dump(vt.getGenotypesChildren(1,numGen),open(os.path.join(vt.path,'gas.p'),'wb'))
-    pickle.dump(vt.getGenotypesChildren(0,numGen),open(os.path.join(vt.path,'gas.p'),'wb'))
+    pickle.dump(vt.getGenotypesChildren(0,numGen),open(os.path.join(vt.path,'gfs.p'),'wb'))
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

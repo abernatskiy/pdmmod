@@ -187,7 +187,7 @@ class VTrajectory(Trajectory):
                 persistent.append(seq)
         
         plt.hist(list(seqGenCount.values()),10)
-        plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png')
+        plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png'))
         return persistent
 
     def generationPhenotypes(pas):#TODO
@@ -259,13 +259,13 @@ if __name__ == "__main__":
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    pas = pickle.load(open(os.path.join(vt.path,'pas.p'),'rb'))
-    pfs = pickle.load(open(os.path.join(vt.path,'pfs.p'),'rb'))
+    gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
+    gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
     plt.clf()
     p1= vt.plotGnFreqDistr(gas,1)
     print(p1)
     plt.clf()
-    p2= vt.plotGnFreqDistr(gas,0)
+    p2= vt.plotGnFreqDistr(gfs,0)
     print(p2)
     #for generation in range(genNum):
         #vt = VTrajectory(

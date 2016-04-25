@@ -148,7 +148,7 @@ class VTrajectory(Trajectory):
         mins = [min(pa) for pa in pas]
         plt.plot(list(range(numGen)),mins)
         plt.title('Minimum number of '+af+' phenotype variants vs generations')
-        plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'
+        plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'))
         
         
         
@@ -239,14 +239,9 @@ if __name__ == "__main__":
     pas = pickle.load(open(os.path.join(vt.path,'pas.p'),'rb'))
     pfs = pickle.load(open(os.path.join(vt.path,'pfs.p'),'rb'))
     plt.clf()
-    vt.plotPhenoChildren(pas,1,True)
+    vt.plotPhenoGenerations(pas,1)
     plt.clf()
-    vt.plotPhenoChildren(pfs,0,True)
-    plt.clf()
-    vt.plotPhenoChildren(pas,1,False)
-    plt.clf()
-    vt.plotPhenoChildren(pfs,0,False)
-    plt.clf()
+    vt.plotPhenoGenerations(pfs,0)
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

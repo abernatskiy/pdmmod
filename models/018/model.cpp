@@ -209,21 +209,44 @@ void Specie::unfoldIt(std::list<Reaction>& allReactions,Specie specie,
     }
     allReactions.push_back(unfold);
 }
+// OLD
+// void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
+//                     float alpha, int maxLength){
+//     Reaction growth(m_id,1,specie.m_id,1,alpha);
+//     if (m_length<maxLength){
+//         growth.addProduct(m_id+specie.m_id,1);
+//     }
+//     allReactions.push_back(growth);
+// }
 
+//Now chains shorter than maxLength grow
 void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
                     float alpha, int maxLength){
-    Reaction growth(m_id,1,specie.m_id,1,alpha);
     if (m_length<maxLength){
+        Reaction growth(m_id,1,specie.m_id,1,alpha);
         growth.addProduct(m_id+specie.m_id,1);
     }
     allReactions.push_back(growth);
 }
 
+/* OLD
 void Specie::growOther(std::list<Reaction>& allReactions,Specie specie,
-                    float alpha, int maxLength){
+                       float alpha, int maxLength){
     
     Reaction growth(m_id,1,specie.m_id,1,alpha);
     if (specie.m_length<maxLength){
+        growth.addProduct(specie.m_id+m_id,1);
+    }
+    allReactions.push_back(growth);
+}*/
+
+//Now chains shorter than maxLength grow
+void Specie::growOther(std::list<Reaction>& allReactions,Specie specie,
+                    float alpha, int maxLength){
+    
+    
+    if (specie.m_length<maxLength){
+        Reaction growth(m_id,1,specie.m_id,1,alpha);
         growth.addProduct(specie.m_id+m_id,1);
     }
     allReactions.push_back(growth);
@@ -242,6 +265,7 @@ void Specie::chargeOther(std::list<Reaction>& allReactions,Specie specie,
         allReactions.push_back(charge);
 }
 
+/* OLD
 void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
                          float alpha, float eH, int maxLength){
     //how many H's are attracted to each other?
@@ -272,7 +296,40 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
         std::cout << "c" <<m_catalyst << std::endl; 
         throw std::invalid_argument("common = 0");
     }
-}
+}*/
+
+//Now only sequences shorter than maxLength are catalyzed
+void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
+                        float alpha, float eH, int maxLength){
+    //how many H's are attracted to each other?
+    int common;
+    if (specie.m_folded && (not m_folded)){
+        //         std::cout << "other is folded " << std::endl;
+        if (m_length<maxLength){
+            common = std::min(specie.m_catalyst.length(),m_substrate.length());
+            float rate = exp(eH*common);
+            Reaction catalysis(m_id,1,specie.m_id,1,rate);
+            catalysis.addProduct(specie.m_id,1);
+            catalysis.addProduct(m_id+std::string("H"),1);
+        }
+        allReactions.push_back(catalysis);
+    }
+    else{
+        //         std::cout << "self is folded " << std::endl;
+        if (specie.m_length<maxLength){
+            common = std::min(m_catalyst.length(),specie.m_substrate.length());
+            float rate = exp(eH*common);
+            Reaction catalysis(m_id,1,specie.m_id,1,rate);
+            catalysis.addProduct(m_id,1);
+            catalysis.addProduct(specie.m_id+std::string("H"),1);
+        }
+        allReactions.push_back(catalysis);
+    }
+    if (common == 0){
+        std::cout << "c" <<m_catalyst << std::endl; 
+        throw std::invalid_argument("common = 0");
+    }
+                        }
 
 
 //Defining reactions here

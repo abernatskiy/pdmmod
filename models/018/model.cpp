@@ -307,8 +307,8 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
     int common;
     if (specie.m_folded && (not m_folded)){
         //         std::cout << "other is folded " << std::endl;
+        common = std::min(specie.m_catalyst.length(),m_substrate.length());
         if (m_length<maxLength){
-            common = std::min(specie.m_catalyst.length(),m_substrate.length());
             float rate = exp(eH*common);
             Reaction catalysis(m_id,1,specie.m_id,1,rate);
             catalysis.addProduct(specie.m_id,1);
@@ -319,8 +319,8 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
     }
     else{
         //         std::cout << "self is folded " << std::endl;
+        common = std::min(m_catalyst.length(),specie.m_substrate.length());
         if (specie.m_length<maxLength){
-            common = std::min(m_catalyst.length(),specie.m_substrate.length());
             float rate = exp(eH*common);
             Reaction catalysis(m_id,1,specie.m_id,1,rate);
             catalysis.addProduct(m_id,1);

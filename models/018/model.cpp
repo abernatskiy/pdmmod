@@ -225,8 +225,9 @@ void Specie::growIt(std::list<Reaction>& allReactions,Specie specie,
     if (m_length<maxLength){
         Reaction growth(m_id,1,specie.m_id,1,alpha);
         growth.addProduct(m_id+specie.m_id,1);
+        allReactions.push_back(growth);
     }
-    allReactions.push_back(growth);
+    
 }
 
 /* OLD
@@ -248,8 +249,9 @@ void Specie::growOther(std::list<Reaction>& allReactions,Specie specie,
     if (specie.m_length<maxLength){
         Reaction growth(m_id,1,specie.m_id,1,alpha);
         growth.addProduct(specie.m_id+m_id,1);
+        allReactions.push_back(growth);
     }
-    allReactions.push_back(growth);
+    
 }
 
 void Specie::chargeIt(std::list<Reaction>& allReactions,Specie specie,
@@ -311,8 +313,9 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
             Reaction catalysis(m_id,1,specie.m_id,1,rate);
             catalysis.addProduct(specie.m_id,1);
             catalysis.addProduct(m_id+std::string("H"),1);
+            allReactions.push_back(catalysis);
         }
-        allReactions.push_back(catalysis);
+        
     }
     else{
         //         std::cout << "self is folded " << std::endl;
@@ -322,8 +325,9 @@ void Specie::catalyzeIt(std::list<Reaction>& allReactions,Specie specie,
             Reaction catalysis(m_id,1,specie.m_id,1,rate);
             catalysis.addProduct(m_id,1);
             catalysis.addProduct(specie.m_id+std::string("H"),1);
+            allReactions.push_back(catalysis);
         }
-        allReactions.push_back(catalysis);
+        
     }
     if (common == 0){
         std::cout << "c" <<m_catalyst << std::endl; 

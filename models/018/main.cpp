@@ -111,6 +111,7 @@ int main (int argc, char** argv){
 
     /* Reading initial conditions from file */
     std::cout << " before beginning" << std::endl;
+    std::count << " Simulation is modified! Be careful!!!!!!!"
     TotalPopulation tp(randomSeed, initialPopulationFileName);
 
     /* Main loop of the simulation */

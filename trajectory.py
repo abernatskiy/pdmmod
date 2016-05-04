@@ -1,6 +1,6 @@
 #/usr/bin/python
 """
-This module takes in results of *pdmmod* simulations, 
+This module takes in results of *pdmmod* simulations,
 and transforms them into desirable data. It also make various plots of data.
 """
 
@@ -42,7 +42,8 @@ class Trajectory(object):
           - modelNum -- int, number of the model
           - simuNum -- int, number of the simulation, simulations within
           one model are usually differ by different parameters
-          - trajNum -- int, number of trajectory. A simulation with a given set of the parameters can be run for several times to form an ensemble
+          - trajNum -- int, number of trajectory. A simulation with a given set
+          of the parameters can be run for several times to form an ensemble
         '''
         self.modelLocation = os.path.join(
              routes.routePDM , 'models', str("%03d" %modelNum))
@@ -52,7 +53,7 @@ class Trajectory(object):
         self.trajectory = (modelNum, simNum, trajNum)
         self.trajNum = trajNum
         #self.parameters = self.readParams()
-    
+
     def readParams(self):
         '''reads parameters from the header of the trajectory file
         '''
@@ -66,7 +67,7 @@ class Trajectory(object):
                         parameters = data[2:]
                 else:
                     return parameters
-    
+
     def seqDict(self,minTime):
         '''
         Arguments:
@@ -114,7 +115,7 @@ class Trajectory(object):
         records = len(times)
         print('number of records: ',records)
         return seqDict, records
-    
+
     def aveSeqDict(self,seqDict,records):
         '''caluculates average over the time records for every population
         Arguments: (outputs of self.seqDict(minTime)
@@ -128,7 +129,7 @@ class Trajectory(object):
         for seq in seqDict.keys():
             aveSeqDict[seq]=sum(seqDict[seq])/records
         return aveSeqDict
-    
+
     def getFreqs(self,seqAveDict,maxLength):
         '''returns a distribution of populations for every length up to
         maxLength, and an integral of it
@@ -164,11 +165,11 @@ class Trajectory(object):
                 f = list(fr.keys())
                 i = f.index(freq)
                 intFr[l][freq]=sum(counts[i:])
-        
+
         return freqs, intFr
-    
+
     def fitInLen(self,intFr):
-        '''fits integrals of frequencies from 
+        '''fits integrals of frequencies from
         self.getFreqs(aveSeqDict,maxLength) to polynomial functions
         '''
         fits = {}
@@ -214,14 +215,14 @@ class Trajectory(object):
                 #axes[int((index)/nc),(index)%(nc)].legend()
                 axes[int((index)/nc),(index)%(nc)].set_title(str(length)+'-mers')
                 index+=1
-        
+
         plt.suptitle(title,fontsize=25)
         plt.savefig(os.path.join(
             self.outputDir,'inlen'+str(self.trajectory[2])+'.pdf'))
         plt.savefig(os.path.join(self.outputDir,'inlen'+str(self.trajectory[2])+'.png'))
 
     def seqAvesNoFold(self,aveSeqDict):
-        '''unites folded and unfolded versions of the sequences 
+        '''unites folded and unfolded versions of the sequences
         in the same key of the dictionary
         '''
         saa = {}
@@ -239,7 +240,7 @@ class Trajectory(object):
             else:
                 saa[hps]=pop
         return saa
-    
+
     def categorizeForScatter(self,saa,natData):
         autox = []
         autoy = []
@@ -264,7 +265,7 @@ class Trajectory(object):
                 regy.append(pop)
                     #ax.scatter(l,pop,color='0.75')
         return autox,autoy,foldx,foldy,regx,regy
-    
+
     def plotSeqsAvesLen(self,categories):
         (autox,autoy,foldx,foldy,regx,regy) = categories
         plt.gcf().subplots_adjust(bottom=0.15)
@@ -296,7 +297,7 @@ class Trajectory(object):
             self.outputDir,'scatter'+str(self.trajectory[2])+'.pdf'))
         plt.savefig(os.path.join(
             self.outputDir,'scatter'+str(self.trajectory[2])+'.png'))
-        
+
     def getShapeTrajectories(self,seqShapeDict,natData):#TESTED
         '''instead of keeping track of sequences
         this funtion produces trajectory of folds (shapes)
@@ -319,9 +320,9 @@ class Trajectory(object):
                                 shapes[shape] = 1#add shape, it has one realization
                             else:
                                 shapes[shape] += 1
-                    
+
                     sTraj.append(list(shapes.items()))
-    
+
         return sTraj
 
     def getMassTrajectory(self):
@@ -338,7 +339,7 @@ class Trajectory(object):
                         massAtTime += l*int(couple.split(' ')[1])
                     mass.append(massAtTime)
         return mass
-    
+
     def getTrajectory(self):
         '''
         returns dict {float time: [list of present sequences]}
@@ -353,7 +354,7 @@ class Trajectory(object):
                     traj[time] = [item.split(' ')[0] for item in dlist[1:]]
         return traj
 
-    
+
     def getPersistencePh(self,autoOrFold,trajectory,natData,minTime):
         '''
         calculates in how many variants either folds or autocats
@@ -365,7 +366,7 @@ class Trajectory(object):
           * -1 for all sequences
          - natData: dict {str. hpseq: (int. nativeEnergy, str. catPattern)}
         Returns:
-         - persistence: 
+         - persistence:
         Notes:
          - requires trajectory pickle in the form traj<trajNum>.p
           {time: [hpseq1, hpseq2 ...]}
@@ -381,7 +382,7 @@ class Trajectory(object):
                 for seq in listOfSeq:
                     if testFunction(seq,natData)>=autoOrFold:
                         #print(time,seq)
-                        #if it's an active autocat, check if there's 
+                        #if it's an active autocat, check if there's
                         #an inactive version
                         if countSeqInstances(seq,listOfSeq):
                             representations+=1
@@ -389,7 +390,7 @@ class Trajectory(object):
                             continue
                 persistence.append(representations)
         return persistence
-    
+
     def getPersistenceGn(self,autoOrFold,trajectory,natData,minTime):
         '''requires pickle of trajectory.
         returns how many time each sequence (either folded or auto)
@@ -444,7 +445,7 @@ def testFunction(seq,natData):
             return 0
     else:
         return -1
-    
+
 def countSeqInstances(seq,listOfSeq):
     '''in time series a sequence can be present in activated form: f*<hp>,
     folded form f<hp> or unfolded form <hp>

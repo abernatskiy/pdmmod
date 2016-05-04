@@ -20,7 +20,8 @@ class ShapeTrajectory(object):
           - modelNum -- int, number of the model
           - simuNum -- int, number of the simulation, simulations within
           one model are usually differ by different parameters
-          - trajNum -- int, number of trajectory. A simulation with a given set of the parameters can be run for several times to form an ensemble
+          - trajNum -- int, number of trajectory. A simulation with a given set
+          of the parameters can be run for several times to form an ensemble
         '''
         self.modelLocation = os.path.join(
              routes.routePDM , 'models', str("%03d" %modelNum))

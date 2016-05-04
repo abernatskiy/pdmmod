@@ -26,14 +26,14 @@ class VTrajectory(Trajectory):
         self.path = path
         self.outputDir=os.path.join(self.path,str("%04d" %self.generation))
         self.trajFile = os.path.join(self.outputDir,'growth'+str("%05d" %self.idInGen))
-    
+
     #seqDict(self,minTime)
     #getMassTrajectory()
     #getTrajectory()
     #getPersistenceGn(autoOrFold,trajectory,natData,minTime)
     #getPersistencePh(autoOrFold,trajectory,natData,minTime)
     #getShapeTrajectories(seqShapeDict,natData)
-    
+
     def getPersistentShapes(self,shapeTraj,minTimeStep):
         '''self.shapeTraj -- list:
             [[('URD', 4), ('URULLD', 2),...],...]
@@ -83,9 +83,9 @@ class VTrajectory(Trajectory):
                 if freq==time:
                     ga.append(seq)
             gas.append(ga)
-            
+
         return gas
-    
+
     def getPhenotypesChildren(self,autoOrFold,numGen):
         pas = []
         for generation in range(numGen):
@@ -96,11 +96,11 @@ class VTrajectory(Trajectory):
                 pa = pickle.load(open(os.path.join(outputDir,'pf.p'),'rb'))
             else:
                 raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
-            
+
             pas.append(pa)
-            
+
         return pas
-    
+
     def plotGnNumChildren(self,gas,autoOrFold):
         plt.clf()
         counts = [len(ga) for ga in gas]
@@ -113,7 +113,7 @@ class VTrajectory(Trajectory):
             raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
         plt.title('Number of '+af+' genotypes for different generations')
         plt.savefig(os.path.join(self.path,'geno-quant-'+af+'.png'))
-        
+
     def plotPhenoChildren(self,pas,autoOrFold,scaled=False):
         plt.clf()
         if autoOrFold == 1:
@@ -131,11 +131,11 @@ class VTrajectory(Trajectory):
                 timepoints = list(range(time))
             plt.plot(timepoints,pa,linewidth=2,label=str(generation))
             generation+=1
-        
+
         plt.title('Number of '+af+' phenotype variants for different generations')
         plt.legend()
         plt.savefig(os.path.join(self.path,'pheno-'+af+str(scaled)+'.png'))
-    
+
     def plotPhenoGenerations(self,pas,autoOrFold):
         plt.clf()
         if autoOrFold == 1:
@@ -149,9 +149,9 @@ class VTrajectory(Trajectory):
         plt.plot(list(range(numGen)),mins)
         plt.title('Minimum number of '+af+' phenotype variants vs generations')
         plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'))
-        
-        
-        
+
+
+
 
     def generationGnFreqDistr(self,gas):#TEST
         theSet = set([])
@@ -166,9 +166,9 @@ class VTrajectory(Trajectory):
                 else:
                     states.append(0)
             freqDict[seq] = states
-                    
+
         return freqDict
-    
+
     def plotGnFreqDistr(self,gas,autoOrFold):
         plt.clf()
         if autoOrFold == 1:
@@ -185,7 +185,7 @@ class VTrajectory(Trajectory):
             seqGenCount[seq]=sum(freqDict[seq])
             if sum(freqDict[seq])==numGen:
                 persistent.append(seq)
-        
+
         values = list(seqGenCount.values())
         theSum = sum(values)
         hst = [val/len(gas) for val in values]
@@ -193,10 +193,26 @@ class VTrajectory(Trajectory):
         plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png'))
         return persistent
 
+    def getShapesChildren(self,numGen):#TEST
+        '''for every generation reads shape trajectory pickle sTraj.p
+        calculates persistent shapes for this generation and adds to the list
+        Arguments:
+         - numGen: int
+        Returns:
+         - []
+        '''
+        persistChildren = []
+        for gen in range(numGen):
+            shapeTraj = pickle.load(open(os.path.join(self.outputDir,'sTraj.p),'rb'))
+            persistChildren.append(self.getPersistentShapes(shapeTraj,0))
+        return persistChildren
+
     def generationPhenotypes(pas):#TODO
         return None
 
     def generationShapes(shapes):#TODO
+        '''
+        '''
         return None
 
 def getSeq(seq):
@@ -226,7 +242,7 @@ def testFunction(seq,natData):
             return 0
     else:
         return -1
-    
+
 def countSeqInstances(seq,listOfSeq):
     '''in time series a sequence can be present in activated form: f*<hp>,
     folded form f<hp> or unfolded form <hp>
@@ -250,8 +266,8 @@ def countSeqInstances(seq,listOfSeq):
         return False
 
 
-        
-if __name__ == "__main__":     
+
+if __name__ == "__main__":
     idInGen =0
     matureWeight = 6000
     modelNum = 18

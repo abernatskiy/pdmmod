@@ -203,7 +203,7 @@ class VTrajectory(Trajectory):
         '''
         persistChildren = []
         for gen in range(numGen):
-            shapeTraj = pickle.load(open(os.path.join(self.outputDir,'sTraj.p),'rb'))
+            shapeTraj = pickle.load(open(os.path.join(self.outputDir,'sTraj.p'),'rb'))
             persistChildren.append(self.getPersistentShapes(shapeTraj,0))
         return persistChildren
 
@@ -274,18 +274,22 @@ if __name__ == "__main__":
     path = routes.routePDM+'vesicles/secondTrial'
     numGen = 10
     natData = hpClasses.readNativeList(25)
-    seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
+    #seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
-    gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
-    plt.clf()
-    p1= vt.plotGnFreqDistr(gas,1)
-    print(p1)
-    plt.clf()
-    p2= vt.plotGnFreqDistr(gfs,0)
-    print(p2)
+    shapes = getShapesChildren(self,numGen)
+    pickle.dump(shapes,open(route.routePDM+'vesicles/secondTrial','wb'))
+#==============================================================================
+#     gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
+#     gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
+#     plt.clf()
+#     p1= vt.plotGnFreqDistr(gas,1)
+#     print(p1)
+#     plt.clf()
+#     p2= vt.plotGnFreqDistr(gfs,0)
+#     print(p2)
+#==============================================================================
     #for generation in range(genNum):
         #vt = VTrajectory(
             #modelNum, generation,idInGen,0,matureWeight,path

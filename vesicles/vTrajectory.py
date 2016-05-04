@@ -210,10 +210,24 @@ class VTrajectory(Trajectory):
     def generationPhenotypes(pas):#TODO
         return None
 
-    def generationShapes(shapes):#TODO
+    def geneShapesFreqs(self,shapes):#TODO
+        '''returns distribution of number of persistent shapes
+        across generations
         '''
-        '''
-        return None
+        theSet = set([])
+        freqDict = {}
+        for listShape in shapes:
+            theSet = theSet | set(listShape)
+        for shape in theSet:
+            states = []
+            for listShape in shapes:
+                if shape in listShape:
+                    states.append(1)
+                else:
+                    states.append(0)
+            freqDict[shape] = states
+
+        return freqDict
 
 def getSeq(seq):
     '''
@@ -278,8 +292,8 @@ if __name__ == "__main__":
     vt = VTrajectory(
             modelNum, 0,idInGen,0,matureWeight,path
         )
-    shapes = getShapesChildren(self,numGen)
-    pickle.dump(shapes,open(route.routePDM+'vesicles/secondTrial','wb'))
+    shapes = vt.getShapesChildren(numGen)
+    pickle.dump(shapes,open(routes.routePDM+'vesicles/secondTrial','wb'))
 #==============================================================================
 #     gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
 #     gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))

@@ -193,7 +193,7 @@ class VTrajectory(Trajectory):
         plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png'))
         return persistent
 
-    def getShapesChildren(self,numGen):#TEST
+    def getShapesChildren(self,numGen):#BUG
         '''for every generation reads shape trajectory pickle sTraj.p
         calculates persistent shapes for this generation and adds to the list
         Arguments:

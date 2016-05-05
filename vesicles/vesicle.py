@@ -221,7 +221,7 @@ class Vesicle(object):
             print('generation ',currGeneration)
             vesicles = nextGen
             nextGen = []
-            if keepAll=True:
+            if keepAll==True:
                 #for every vesicle do a procedure
                 for vesicle in vesicles:
                     vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)

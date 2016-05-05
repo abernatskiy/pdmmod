@@ -196,7 +196,7 @@ class Vesicle(object):
         allVesicles.append(daughter2)
         
         
-    
+    #BUG AttributeError: 'Vesicle' object has no attribute 'timeMature'
     def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):
         '''grows cells for several generation either keeping them keeping them
         all or selecting

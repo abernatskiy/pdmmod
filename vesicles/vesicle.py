@@ -221,7 +221,7 @@ class Vesicle(object):
             print('generation ',currGeneration)
             vesicles = nextGen
             nextGen = []
-            if keepAll:
+            if keepAll=True:
                 #for every vesicle do a procedure
                 for vesicle in vesicles:
                     vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
@@ -238,6 +238,8 @@ class Vesicle(object):
                     choose = 1
                 vesicle = vesicles[choose]
                 vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
+            else:
+                raise ValueError('keepAll is either True, "random" or "select"')
             
             
             #vesicles = nextGen

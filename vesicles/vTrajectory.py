@@ -229,7 +229,7 @@ class VTrajectory(Trajectory):
 
         return freqDict
     
-    def pickleGenaration(self,output,name):
+    def pickleGeneration(self,output,name):
         pickle.dump(output,open(
             os.path.join(self.outputDir,name+'.p'),'wb'
             ))

@@ -162,7 +162,42 @@ class Vesicle(object):
         
         return daughter1, daughter2
     
-    def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):#BUG Init is forgoten for new daughter cells
+    def produceInitFolder(self):#TEST
+        '''checks if the outputPath created and creates it
+        initializes and fills out init populations
+        '''
+        try:
+            os.makedirs(self.outPath)
+        except FileExistsError:
+            print('dir exists')
+        init1 = open(self.initFile,'w')
+        init1.close()
+        init1 = open(self.initFile,'a')
+        for (seq, pop) in self.sequencesAtBirth.items():
+            init1.write(seq+' '+str(pop)+'\n')
+        init1.close()
+        
+    def _procreateVesicle(self,termTime,timeStep,nextGen,allVesicles):#TEST
+        '''
+        helper function for growAndSplit
+        grows vesicles and produces two daughter cells ready to procreate
+        '''
+        self.sequencesAtSplit, self.timeMature = \
+            self.growCell(termTime,timeStep)#TEST
+        daughter1, daughter2 = \
+            self.splitCell(self.sequencesAtSplit)
+        
+        daughter1.produceInitFolder()
+        daughter2.produceInitFolder()
+        
+        nextGen.append(daughter1)
+        nextGen.append(daughter2)
+        allVesicles.append(daughter1)
+        allVesicles.append(daughter2)
+        
+        
+    
+    def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):
         '''grows cells for several generation either keeping them keeping them
         all or selecting
         keepAll is one of:
@@ -173,11 +208,13 @@ class Vesicle(object):
         vesicles0 = [self]
         currGeneration = 0
         self.sequencesAtSplit, self.timeMature = \
-                    self.growCell(termTime,timeStep)#TEST
+                    self.growCell(termTime,timeStep)
+        #two daughter cells produced
         daughter1, daughter2 = self.splitCell(self.sequencesAtSplit)
         os.mkdir(daughter1.outPath)
         daughter1._makeInitPopFile()
         daughter2._makeInitPopFile()
+        #now we have two daughters
         allVesicles = [daughter1, daughter2]
         nextGen = [daughter1, daughter2]
         while currGeneration < numOfGenerations:
@@ -185,75 +222,24 @@ class Vesicle(object):
             vesicles = nextGen
             nextGen = []
             if keepAll:
+                #for every vesicle do a procedure
                 for vesicle in vesicles:
-                    vesicle.sequencesAtSplit, vesicle.timeMature = \
-                        vesicle.growCell(termTime,timeStep)#TEST
-                    daughter1, daughter2 = \
-                        vesicle.splitCell(vesicle.sequencesAtSplit)
-                    #return daughter1, daughter2
-                    try:
-                        os.makedirs(daughter1.outPath)
-                    except FileExistsError:
-                        print('dir exists')
-                    #os.makedirs(daughter2.outPath)
-                    init1 = open(daughter1.initFile,'w')
-                    init1.close()
-                    init1 = open(daughter1.initFile,'a')
-                    for (seq, pop) in daughter1.sequencesAtBirth.items():
-                        init1.write(seq+' '+str(pop)+'\n')
-                    init1.close()
+                    vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
                     
-                    init2 = open(daughter2.initFile,'w')
-                    init2.close()
-                    init2 = open(daughter2.initFile,'a')
-                
-                    for (seq, pop) in daughter2.sequencesAtBirth.items():
-                        init2.write(seq+' '+str(pop)+'\n')
-                    init2.close()
-                    
-                    allVesicles.append(daughter1)
-                    allVesicles.append(daughter2)
-                    nextGen.append(daughter1)
-                    nextGen.append(daughter2)
-                    
-            else:#TODO fix for different selection methods
-                #if vesicles[0].timeMature <= vesicles[1].timeMature:
+            elif keepAll == 'random':#TEST
                 choose = 0
-                #else:
-                #    choose = 1
                 vesicle = vesicles[choose]
-                vesicle.sequencesAtSplit, vesicle.timeMature = \
-                    vesicle.growCell(termTime,timeStep)#TEST
-                daughter1, daughter2 = \
-                    vesicle.splitCell(vesicle.sequencesAtSplit)
+                vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
                 
-                #COPY of the above
-                try:
-                    os.makedirs(daughter1.outPath)
-                except FileExistsError:
-                    print('dir exists')
-                #os.makedirs(daughter2.outPath)
-                init1 = open(daughter1.initFile,'w')
-                init1.close()
-                init1 = open(daughter1.initFile,'a')
-                for (seq, pop) in daughter1.sequencesAtBirth.items():
-                    init1.write(seq+' '+str(pop)+'\n')
-                init1.close()
-                
-                init2 = open(daughter2.initFile,'w')
-                init2.close()
-                init2 = open(daughter2.initFile,'a')
+            elif keepAll == 'select':#TEST
+                if vesicles[0].timeMature <= vesicles[1].timeMature:
+                    choose = 0
+                else:
+                    choose = 1
+                vesicle = vesicles[choose]
+                vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
             
-                for (seq, pop) in daughter2.sequencesAtBirth.items():
-                    init2.write(seq+' '+str(pop)+'\n')
-                init2.close()
-                
-                nextGen.append(daughter1)
-                nextGen.append(daughter2)
-                allVesicles.append(daughter1)
-                allVesicles.append(daughter2)
-                #end of COPY of the above
-                
+            
             #vesicles = nextGen
             currGeneration+=1
             

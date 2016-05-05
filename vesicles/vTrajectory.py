@@ -228,6 +228,12 @@ class VTrajectory(Trajectory):
             freqDict[shape] = states
 
         return freqDict
+    
+    def pickleGenaration(self,output,name):
+        pickle.dump(output,open(
+            os.path.join(self.outputDir,name+'.p'),'wb'
+            ))
+    
 
 def getSeq(seq):
     '''
@@ -281,48 +287,11 @@ def countSeqInstances(seq,listOfSeq):
 
 
 
-if __name__ == "__main__":
-    idInGen =0
-    matureWeight = 6000
-    modelNum = 18
-    path = routes.routePDM+'vesicles/secondTrial'
-    numGen = 10
-    natData = hpClasses.readNativeList(25)
-    #seqShapeDict = pickle.load(open('../seqShapeDict.p','rb'))
-    vt = VTrajectory(
-            modelNum, 0,idInGen,0,matureWeight,path
-        )
-    shapes = vt.getShapesChildren(numGen)
-    pickle.dump(shapes,open(routes.routePDM+'vesicles/secondTrial','wb'))
-#==============================================================================
-#     gas = pickle.load(open(os.path.join(vt.path,'gas.p'),'rb'))
-#     gfs = pickle.load(open(os.path.join(vt.path,'gfs.p'),'rb'))
-#     plt.clf()
-#     p1= vt.plotGnFreqDistr(gas,1)
-#     print(p1)
-#     plt.clf()
-#     p2= vt.plotGnFreqDistr(gfs,0)
-#     print(p2)
-#==============================================================================
-    #for generation in range(genNum):
-        #vt = VTrajectory(
-            #modelNum, generation,idInGen,0,matureWeight,path
-        #)
-        #mt = pickle.load(open(os.path.join(vt.outputDir,'mt.p'),'rb'))
-        #traj = pickle.load(open(os.path.join(vt.outputDir,'traj.p'),'rb'))
-        #ga = pickle.load(open(os.path.join(vt.outputDir,'ga.p'),'rb'))
-        #gf = pickle.load(open(os.path.join(vt.outputDir,'gf.p'),'rb'))
-        #pa = pickle.load(open(os.path.join(vt.outputDir,'pa.p'),'rb'))
-        #pf = pickle.load(open(os.path.join(vt.outputDir,'pf.p'),'rb'))
-        #sTraj  =  pickle.load(open(os.path.join(vt.outputDir,'sTraj.p'),'rb'))
-
-
-
-
-
-
-
-
-
-
+#if __name__ == "__main__":
+    #seqDict(self,minTime)
+    #getMassTrajectory()
+    #getTrajectory()
+    #getPersistenceGn(autoOrFold,trajectory,natData,minTime)
+    #getPersistencePh(autoOrFold,trajectory,natData,minTime)
+    #getShapeTrajectories(seqShapeDict,natData)
 

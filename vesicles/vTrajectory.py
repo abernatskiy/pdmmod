@@ -56,7 +56,7 @@ class VTrajectory(Trajectory):
         plt.clf()
         mts = []
         for generation in range(numGen):
-            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            outputDir = os.path.join(self.path,str("%04d" %generation))
             mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
             time = len(mt)
             if scaled:
@@ -65,12 +65,12 @@ class VTrajectory(Trajectory):
                 timepoints = list(range(time))
             plt.plot(timepoints,mt,linewidth=4,label=str(generation))
             plt.legend()
-            plt.savefig(os.path.join(vt.path,'masses'+str(scaled)+'.png'))
+            plt.savefig(os.path.join(self.path,'masses'+str(scaled)+'.png'))
 
     def getGenotypesChildren(self,autoOrFold,numGen):
         gas = []
         for generation in range(numGen):
-            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            outputDir = os.path.join(self.path,str("%04d" %generation))
             if autoOrFold == 1:
                 gen = pickle.load(open(os.path.join(outputDir,'ga.p'),'rb'))
             elif autoOrFold == 0:
@@ -89,7 +89,7 @@ class VTrajectory(Trajectory):
     def getPhenotypesChildren(self,autoOrFold,numGen):
         pas = []
         for generation in range(numGen):
-            outputDir = os.path.join(vt.path,str("%04d" %generation))
+            outputDir = os.path.join(self.path,str("%04d" %generation))
             if autoOrFold == 1:
                 pa = pickle.load(open(os.path.join(outputDir,'pa.p'),'rb'))
             elif autoOrFold == 0:

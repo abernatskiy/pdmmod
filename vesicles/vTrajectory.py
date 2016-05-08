@@ -249,7 +249,7 @@ class VTrajectory(Trajectory):
         seqD2 = readPopulations(
             os.path.join(d2.outputDir,'initPop'+str("%05d" %d2.idInGen))
             )
-        for (seq,pop) in seqD2:
+        for (seq,pop) in seqD2.items():
             if seq in seqD1.keys():
                 seqD1[seq]+=pop
             else:
@@ -258,7 +258,7 @@ class VTrajectory(Trajectory):
         with open(self.trajFile, 'r') as fh:
             for line in fh:
                 pass
-            last = line.split(',')[0:-1]
+            last = line.split(',')[1:-1]
         mPop = {}
         for couple in last:
             pair = couple.split(' ')

@@ -129,6 +129,18 @@ class Vesicle(object):
         print('mature time is: ', timeMature)
         return sequencesAtSplit, timeMature
 
+    def getSeqsAtSplit(self):
+        self.trajFile = os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen))
+        with open(self.trajFile, 'r') as fh:
+            for line in fh:
+                pass
+            last = line.split(',')[1:-1]
+        mPop = {}
+        for couple in last:
+            pair = couple.split(' ')
+            mPop[pair[0]]=int(pair[1])
+        return mPop
+
 
     def splitCell(self,sequencesAtSplit):#TESTED
         daughter1=Vesicle(

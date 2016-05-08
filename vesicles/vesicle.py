@@ -75,9 +75,9 @@ class Vesicle(object):
                 point=item.split(' ')
                 points[point[0]]=int(point[1])
             return points
-        weights = open(os.path.join(self.outPath,'weights.txt'),'w')
+        weights = open(os.path.join(self.outPath,'weights'+str("%05d" %self.idInGen)+'.txt'),'w')
         weights.close()
-        weights = open(os.path.join(self.outPath,'weights.txt'),'a')
+        weights = open(os.path.join(self.outPath,'weights'+str("%05d" %self.idInGen)+'.txt'),'a')
 
         simRes = open(os.path.join(self.outPath,'traj0'),'r')
 
@@ -234,7 +234,7 @@ class Vesicle(object):
             elif keepAll == 'select':#TEST
                 #first, grow both
                 for vesicle in vesicles:
-                    vesicle.sequencesAtSplit, self.timeMature = \
+                    vesicle.sequencesAtSplit, vesicle.timeMature = \
                         vesicle.growCell(termTime,timeStep)
                 #then choose one which procreates faster
                 if vesicles[0].timeMature <= vesicles[1].timeMature:

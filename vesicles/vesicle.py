@@ -256,7 +256,7 @@ class Vesicle(object):
                 vesicle = vesicles[choose]
                 #her daugheters are being produced
                 daughter1, daughter2 = \
-                    vesicle.splitCell(self.sequencesAtSplit)
+                    vesicle.splitCell(vesicle.sequencesAtSplit)
                 daughter1.produceInitFolder()
                 daughter2.produceInitFolder()
 
@@ -281,6 +281,28 @@ def readPopulations(popFile):
             pair = line.rstrip('\n').split(' ')
             sequences[pair[0]] = int(pair[1])
     return sequences
+
+def getSeq(seq):
+    '''
+    Arguments:
+     - seq -- str. sequence as depicted in trajectory file
+    Returns:
+     - hps -- str. actual HP sequence
+    '''
+    if 'f' in seq:
+        if '*' in seq:
+            hps = seq[2:]
+        else:
+            hps = seq[1:]
+    else:
+        hps = seq
+    return hps
+
+def getWeight(populationDict):
+    weight = 0
+    for (seq,pop) in populationDict.items():
+        weight += len(getSeq(seq))*pop
+    return weight
 
 
 if __name__ == "__main__":

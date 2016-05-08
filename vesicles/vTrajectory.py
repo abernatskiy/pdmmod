@@ -234,6 +234,39 @@ class VTrajectory(Trajectory):
             os.path.join(self.outputDir,name+'.p'),'wb'
             ))
 
+    def checkIfDaughters(self,d1Id,d2Id):
+        '''
+        checks if the last population of mother
+        splits into the init populations of the two daughters
+        '''
+        d1 = VTrajectory(self.modelNum,self.generation+1,d1Id,
+                         self.idInGen,self.matureWeight,self.path)
+        d2 = VTrajectory(self.modelNum,self.generation+1,d2Id,
+                         self.idInGen,self.matureWeight,self.path)
+        seqD1 = readPopulations(
+            os.path.join(d1.outputDir,'initPop'+str("%05d" %d1.idInGen))
+            )
+        seqD2 = readPopulations(
+            os.path.join(d2.outputDir,'initPop'+str("%05d" %d2.idInGen))
+            )
+        for (seq,pop) in seqD2:
+            if seq in seqD1.keys():
+                seqD1[seq]+=pop
+            else:
+                seqD1[seq]=pop
+
+        with open(self.trajFile, 'r') as fh:
+            for line in fh:
+                pass
+            last = line.split(',')[0:-1]
+        mPop = {}
+        for couple in last:
+            pair = couple.split(' ')
+            mPop[pair[0]]=int(pair[1])
+
+        return seqD1==mPop, seqD1, mPop
+
+
 
 def getSeq(seq):
     '''
@@ -284,6 +317,7 @@ def countSeqInstances(seq,listOfSeq):
         return True
     else:
         return False
+
 
 
 

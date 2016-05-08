@@ -25,9 +25,9 @@ def countWeight(points):
 class Vesicle(object):
     '''class representing a vesicle containing some sequences
      * matureWeight - Int. -  weight in terms of number of monomers,
-        at which vesicles divide. 
+        at which vesicles divide.
         They split into 2 vesicles with approximately equal weights.
-     * generation - Int. - we start from mother vesicles (generation 0), 
+     * generation - Int. - we start from mother vesicles (generation 0),
         its daughter is generation 1, ect
      * sequences - Dict. - {sequnce name: sequnce population}#TODO SeqInClust??
      * timeMature -- time, when it's time for vesicle to divide
@@ -47,17 +47,17 @@ class Vesicle(object):
         self.path = path
         self.outPath=os.path.join(self.path,str("%04d" %self.generation))
         self.initFile = self._getInitPopFile()
-        
+
     def __str__(self):
         str1='Vesicle '+str(self.generation)+' of mature weight '+\
             str(self.matureWeight)
         return str1
-    
+
     def _getInitPopFile(self):#TEST
         populFile = os.path.join(
             self.path,str("%04d" %self.generation),'initPop'+str("%05d" %self.idInGen))
         return populFile
-    
+
     def _makeInitPopFile(self):
         initFile = open(self.initFile,'w')
         initFile.close()
@@ -66,7 +66,7 @@ class Vesicle(object):
             initFile.write(seq+' '+str(pop)+'\n')
         initFile.close()
         return None
-    
+
     def _findMature(self):#TEST
         def line2Data(raw):
             points = {}
@@ -78,13 +78,13 @@ class Vesicle(object):
         weights = open(os.path.join(self.outPath,'weights.txt'),'w')
         weights.close()
         weights = open(os.path.join(self.outPath,'weights.txt'),'a')
-        
+
         simRes = open(os.path.join(self.outPath,'traj0'),'r')
-        
+
         growth = open(os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen)),'w')
         growth.close()
         growth = open(os.path.join(self.outPath,'growth'+str("%05d" %self.idInGen)),'a')
-        
+
         timeMature = -1
         for line in simRes:
             if line[0]=="#":
@@ -105,8 +105,8 @@ class Vesicle(object):
         if timeMature == -1:
             raise ValueError("Simulation was too short to get to mature weight")
         return timeMature,points
-        
-        
+
+
 
     def growCell(self,termTime,timeStep):#TESTED
         '''
@@ -128,8 +128,8 @@ class Vesicle(object):
         timeMature, sequencesAtSplit = self._findMature()#TEST
         print('mature time is: ', timeMature)
         return sequencesAtSplit, timeMature
-        
-        
+
+
     def splitCell(self,sequencesAtSplit):#TESTED
         daughter1=Vesicle(
             self.generation+1,
@@ -159,9 +159,9 @@ class Vesicle(object):
             daughter2.sequencesAtBirth[item]=list2.count(item)
         print('d1 weight: '+str(countWeight(daughter1.sequencesAtBirth)))
         print('d2 weight: '+str(countWeight(daughter2.sequencesAtBirth)))
-        
+
         return daughter1, daughter2
-    
+
     def produceInitFolder(self):#TEST
         '''checks if the outputPath created and creates it
         initializes and fills out init populations
@@ -176,26 +176,26 @@ class Vesicle(object):
         for (seq, pop) in self.sequencesAtBirth.items():
             init1.write(seq+' '+str(pop)+'\n')
         init1.close()
-        
+
     def _procreateVesicle(self,termTime,timeStep,nextGen,allVesicles):#TEST
         '''
         helper function for growAndSplit
         grows vesicles and produces two daughter cells ready to procreate
         '''
         self.sequencesAtSplit, self.timeMature = \
-            self.growCell(termTime,timeStep)#TEST
+            self.growCell(termTime,timeStep)
         daughter1, daughter2 = \
             self.splitCell(self.sequencesAtSplit)
-        
+
         daughter1.produceInitFolder()
         daughter2.produceInitFolder()
-        
+
         nextGen.append(daughter1)
         nextGen.append(daughter2)
         allVesicles.append(daughter1)
         allVesicles.append(daughter2)
-        
-        
+
+
     #BUG AttributeError: 'Vesicle' object has no attribute 'timeMature'
     def growAndSplit(self,termTime,timeStep,numOfGenerations,keepAll):
         '''grows cells for several generation either keeping them keeping them
@@ -205,7 +205,7 @@ class Vesicle(object):
          - select
          - random
         '''
-        vesicles0 = [self]
+#        vesicles0 = [self]
         currGeneration = 0
         self.sequencesAtSplit, self.timeMature = \
                     self.growCell(termTime,timeStep)
@@ -225,29 +225,43 @@ class Vesicle(object):
                 #for every vesicle do a procedure
                 for vesicle in vesicles:
                     vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
-                    
+
             elif keepAll == 'random':#TEST
                 choose = 0
                 vesicle = vesicles[choose]
                 vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
-                
+
             elif keepAll == 'select':#TEST
+                #first, grow both
+                for vesicle in vesicles:
+                    vesicle.sequencesAtSplit, self.timeMature = \
+                        vesicle.growCell(termTime,timeStep)
+                #then choose one which procreates faster
                 if vesicles[0].timeMature <= vesicles[1].timeMature:
                     choose = 0
                 else:
                     choose = 1
                 vesicle = vesicles[choose]
-                vesicle._procreateVesicle(termTime,timeStep,nextGen,allVesicles)
+                #her daugheters are being produced
+                daughter1, daughter2 = \
+                    vesicle.splitCell(self.sequencesAtSplit)
+                daughter1.produceInitFolder()
+                daughter2.produceInitFolder()
+
+                nextGen.append(daughter1)
+                nextGen.append(daughter2)
+                allVesicles.append(daughter1)
+                allVesicles.append(daughter2)
             else:
                 raise ValueError('keepAll is either True, "random" or "select"')
-            
-            
+
+
             #vesicles = nextGen
             currGeneration+=1
-            
-        
+
+
         return allVesicles
-    
+
 def readPopulations(popFile):
     sequences = {}
     with open(popFile) as infile:
@@ -256,8 +270,8 @@ def readPopulations(popFile):
             sequences[pair[0]] = int(pair[1])
     return sequences
 
-    
-if __name__ == "__main__":     
+
+if __name__ == "__main__":
     idInGen =0
     sequences=readPopulations('populations.txt')
     motherIdInGen = 0
@@ -271,4 +285,4 @@ if __name__ == "__main__":
     v = Vesicle(generation,sequences,idInGen,motherIdInGen,matureWeight,modelNum,path)
     #sAs = v.growCell(termTime,timeStep)
     vs = v.growAndSplit(termTime,timeStep,numOfGenerations,keepAll=False)
-    
+

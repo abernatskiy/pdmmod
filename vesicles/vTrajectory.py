@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-import random
+import pickle
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -10,7 +10,7 @@ import routes
 
 from vesicle import *
 from trajectory import *
-import hpClasses
+
 
 class VTrajectory(Trajectory):
     '''
@@ -54,7 +54,7 @@ class VTrajectory(Trajectory):
 
     def plotMasesChildren(self,numGen,scaled=False):
         plt.clf()
-        mts = []
+#        mts = []
         for generation in range(numGen):
             outputDir = os.path.join(self.path,str("%04d" %generation))
             mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
@@ -187,7 +187,7 @@ class VTrajectory(Trajectory):
                 persistent.append(seq)
 
         values = list(seqGenCount.values())
-        theSum = sum(values)
+#        theSum = sum(values)
         hst = [val/len(gas) for val in values]
         plt.hist(hst,100,cumulative=False,normed=False)
         plt.savefig(os.path.join(self.path,'genoFreq'+af    +'.png'))
@@ -228,12 +228,12 @@ class VTrajectory(Trajectory):
             freqDict[shape] = states
 
         return freqDict
-    
+
     def pickleGeneration(self,output,name):
         pickle.dump(output,open(
             os.path.join(self.outputDir,name+'.p'),'wb'
             ))
-    
+
 
 def getSeq(seq):
     '''

@@ -321,6 +321,7 @@ def countSeqInstances(seq,listOfSeq):
 
 
 
+
 #if __name__ == "__main__":
     #seqDict(self,minTime)
     #getMassTrajectory()

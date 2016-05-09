@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from os import system as system
 import numpy as np
-#import scipy
-#import math
+import scipy
+import math
 import glob
 import os
 import subprocess

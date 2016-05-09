@@ -7,10 +7,11 @@ import routes
 
 import libSimulate
 
+
 def countWeight(points):
-    '''
+    """
     what the hell are points?
-    '''
+    """
     weight = 0
     for (seq, pop) in points.items():
         if not seq[0] =='f':

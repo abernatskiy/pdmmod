@@ -276,18 +276,25 @@ class VTrajectory(Trajectory):
             divTimeEvo: list(int) -- division times for every generation
         """
         divTimeEvo = []
-        for generation in range(numGen):
+        idInGen = 0
+        for generation in range(1,numGen):
             outDir = os.path.join(self.path,str("%04d" %generation))
-            d1file = os.path.join(outDir,'weights'+str("%05d" %(self.idInGen*2))+'.txt')
-            d2file = os.path.join(outDir, 'weights' + str("%05d" % (self.idInGen * 2 +1)) + '.txt')
+            d1file = os.path.join(outDir,'weights'+str("%05d" %(idInGen*2))+'.txt')
+            d2file = os.path.join(outDir, 'weights' + str("%05d" % (idInGen * 2 +1)) + '.txt')
             with open(d1file, 'r') as fh:
                 for line in fh:
                     pass
-                last1 = int((line.rstrip('\n').split(' '))[0])
+                last1 = float((line.rstrip('\n').split(' '))[0])
+                idTmp1 = idInGen * 2
             with open(d2file, 'r') as fh:
                 for line in fh:
                     pass
-                last2 = int((line.rstrip('\n').split(' '))[0])
+                last2 = float((line.rstrip('\n').split(' '))[0])
+                idTmp2 = idInGen * 2 + 1
+            if last1 <= last2:
+                idInGen = idTmp1
+            else:
+                idInGen = idTmp2
             divTimeEvo.append(min(last1,last2))
 
         return divTimeEvo

@@ -266,6 +266,31 @@ class VTrajectory(Trajectory):
 
         return seqD1==mPop, seqD1, mPop
 
+    def getDivisionTimeEvolution(self,numGen):
+        """
+        reads division times for all generations, returns a list
+        Args:
+            numGen: int -- number of the genarations of daughtres
+
+        Returns:
+            divTimeEvo: list(int) -- division times for every generation
+        """
+        divTimeEvo = []
+        for generation in range(numGen):
+            outDir = os.path.join(self.path,str("%04d" %generation))
+            d1file = os.path.join(outDir,'weights'+str("%05d" %(self.idInGen*2))+'.txt')
+            d2file = os.path.join(outDir, 'weights' + str("%05d" % (self.idInGen * 2 +1)) + '.txt')
+            with open(d1file, 'r') as fh:
+                for line in fh:
+                    pass
+                last1 = int((line.rstrip('\n').split(' '))[0])
+            with open(d2file, 'r') as fh:
+                for line in fh:
+                    pass
+                last2 = int((line.rstrip('\n').split(' '))[0])
+            divTimeEvo.append(min(last1,last2))
+
+        return divTimeEvo
 
 
 def getSeq(seq):

@@ -276,6 +276,7 @@ class VTrajectory(Trajectory):
             divTimeEvo: list(int) -- division times for every generation
         """
         divTimeEvo = []
+        selectedIDs = []
         idInGen = 0
         for generation in range(1,numGen):
             outDir = os.path.join(self.path,str("%04d" %generation))
@@ -295,6 +296,7 @@ class VTrajectory(Trajectory):
                 idInGen = idTmp1
             else:
                 idInGen = idTmp2
+            selectedIDs.append(idInGen)
             divTimeEvo.append(min(last1,last2))
 
         return divTimeEvo

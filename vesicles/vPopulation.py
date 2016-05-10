@@ -37,6 +37,49 @@ class VPopulation(object):
 
         """
 
+
         return None
+
+    def runSimulations(self):
+
+        return None
+
+    def trackDaughters(self):
+        return None
+
+    def producePickles(self):
+        return None
+
+    def plotGraphics(self):
+        return None
+
+
+def runInitSimulation(modelNum, path, endTime, timeStep=0.0001):
+    """
+    helper function, which runs simulation to produce different starters initPopulation files
+    Args:
+        modelNum: int. - number of the epdm model
+        path: str. - folder where simulation results will be located
+        endTime: float - time to end simulation
+        timeStep: flota - time step of the simulation
+
+    Returns:
+        None
+    """
+    sDef = libSimulate.Simulation(
+        modelNum,
+        termCond=('simulateTime', endTime, timeStep),
+        rewrite=False,
+        specialPath=path,
+        numOfRuns=1,
+        traj=True,
+        log_level='WARNING')
+    sDef.runSeveralSeries(paramFile=None, populFile=None)
+
+    return None
+
+if __name__ == "__main__":
+    runInitSimulation(18, 'test', 1, 0.1)
+
 
 

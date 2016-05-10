@@ -55,7 +55,7 @@ class VTrajectory(Trajectory):
     def plotMasesChildren(self,numGen,scaled=False):
         plt.clf()
 #        mts = []
-        for generation in range(numGen):
+        for generation in range(1,numGen):
             outputDir = os.path.join(self.path,str("%04d" %generation))
             mt = pickle.load(open(os.path.join(outputDir,'mt.p'),'rb'))
             time = len(mt)
@@ -69,7 +69,7 @@ class VTrajectory(Trajectory):
 
     def getGenotypesChildren(self,autoOrFold,numGen):
         gas = []
-        for generation in range(numGen):
+        for generation in range(1,numGen):
             outputDir = os.path.join(self.path,str("%04d" %generation))
             if autoOrFold == 1:
                 gen = pickle.load(open(os.path.join(outputDir,'ga.p'),'rb'))
@@ -88,7 +88,7 @@ class VTrajectory(Trajectory):
 
     def getPhenotypesChildren(self,autoOrFold,numGen):
         pas = []
-        for generation in range(numGen):
+        for generation in range(1,numGen):
             outputDir = os.path.join(self.path,str("%04d" %generation))
             if autoOrFold == 1:
                 pa = pickle.load(open(os.path.join(outputDir,'pa.p'),'rb'))
@@ -146,7 +146,7 @@ class VTrajectory(Trajectory):
             raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
         numGen = len(pas)
         mins = [min(pa) for pa in pas]
-        plt.plot(list(range(numGen)),mins)
+        plt.plot(list(range(1,numGen)),mins)
         plt.title('Minimum number of '+af+' phenotype variants vs generations')
         plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'))
 
@@ -202,7 +202,7 @@ class VTrajectory(Trajectory):
          - []
         '''
         persistChildren = []
-        for gen in range(numGen):
+        for gen in range(1,numGen):
             shapeTraj = pickle.load(open(os.path.join(self.outputDir,'sTraj.p'),'rb'))
             persistChildren.append(self.getPersistentShapes(shapeTraj,0))
         return persistChildren
@@ -299,7 +299,7 @@ class VTrajectory(Trajectory):
             selectedIDs.append(idInGen)
             divTimeEvo.append(min(last1,last2))
 
-        return divTimeEvo
+        return divTimeEvo, selectedIDs
 
 
 def getSeq(seq):

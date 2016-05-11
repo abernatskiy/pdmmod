@@ -15,6 +15,7 @@ sys.path.append('../')
 import vesicle
 import helperFunctions
 import vTrajectory
+from subprocess import call
 
 
 class VPopulation(object):
@@ -42,7 +43,7 @@ class VPopulation(object):
         self.termTime = termTime
         self.timeStep = timeStep
 
-    def initPopFiles(self, endTime):  #TEST
+    def initPopFiles(self, endTime):  #TESTED
         """
         Initializes initPopFiles in the right directories for the future simulation runs
         All the init trajectories must be in the self.path/test
@@ -63,11 +64,18 @@ class VPopulation(object):
             )
             # make an output directory
             outputDir = os.path.join(self.path, 'l' + str("%04d" % i))
-            os.mkdir(outputDir)
+            try:
+                os.mkdir(outputDir)
+            except FileExistsError:
+                print('dir ' + outputDir + ' exists')
+                call(['rm', '-r', outputDir])
+                os.mkdir(outputDir)
+            os.mkdir(os.path.join(outputDir,'0000'))
             # make a initial populations file
             inF = os.path.join(outputDir, '0000', 'initPop00000')
             initFiles.append(inF)
             helperFunctions.makeInitPopFile(seqsAtTime, inF)
+            print('file ' + inF + ' created')
             os.remove(trFile)
 
         return initFiles
@@ -102,18 +110,19 @@ class VPopulation(object):
 
     def producePickles(self, allVesicles):
         for vs in allVesicles:
-            for v is vs:
-                pass 
+            for v in vs:
+                pass
         return None
 
     def plotGraphics(self):
         return None
 
-#### Vesicle Attributes ####
+# Vesicle Attributes ####
 # self.idInGen,  self.sequencesAtBirth, self.motherIdInGen,
 # self.generation, self.matureWeight = matureWeight, self.modelNum,
 # self.path, self.outPath, self.initFile
 ############################
 
 if __name__ == "__main__":
-    helperFunctions.runInitSimulation(18, 'test', 1, 0.1)
+    vp = VPopulation(2,2,18,600,1,0.0001,'./test')
+    initFiles = vp.initPopFiles(1)

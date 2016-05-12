@@ -8,3 +8,4 @@ routeHP=routePDM+'hp-model-scripts/'
 routeResults=routePDM+'sim-results/'
 path2python = pythonBin
 routeStochKit = routePDM+'stochKit/'
+routeVesicles = routePDM + 'vesicles/'

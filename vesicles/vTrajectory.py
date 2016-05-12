@@ -146,7 +146,7 @@ class VTrajectory(Trajectory):
             raise ValueError('autoOrFold must be either 0 or 1, but it is '+str(autoOrFold))
         numGen = len(pas)
         mins = [min(pa) for pa in pas]
-        plt.plot(list(range(1,numGen)),mins)
+        plt.plot(list(range(len(mins))),mins)
         plt.title('Minimum number of '+af+' phenotype variants vs generations')
         plt.savefig(os.path.join(self.path,'pheno-'+af+'min.png'))
 

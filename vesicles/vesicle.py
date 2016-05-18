@@ -251,7 +251,7 @@ class Vesicle(object):
 
         return allVesicles
 
-    def readParamFile2List(self):#TEST
+    def readParamFile2List(self):#TESTED
         """
         Read file with parameters
         Returns:
@@ -263,12 +263,12 @@ class Vesicle(object):
                 parLines.append(line)
         return parLines
 
-    def changeParamFile(self,listOfPars,listOfVals):#TEST
+    def changeParamFile(self,listOfPars,listOfVals):#TESTED
         parLines = self.readParamFile2List()
         for iLine in range(len(parLines)):
-            for iPar in lange(len(listOfPars)):
+            for iPar in range(len(listOfPars)):
                 if listOfPars[iPar] in parLines[iLine]:
-                    parLines[iLine] = par + ' = ' + str(listOfVals[iPar])+'\n'
+                    parLines[iLine] = listOfPars[iPar] + ' = ' + str(listOfVals[iPar])+'\n'
 
         dummy = open(self.paramFile, 'w')
         dummy.close()
@@ -353,6 +353,7 @@ def getWeight(populationDict):
 if __name__ == "__main__":
     idInGen = 0
     sequences = readPopulations('populations.txt')
+    paramFile = 'parameters.ini'
     motherIdInGen = 0
     generation = 0
     matureWeight = 6000
@@ -361,6 +362,6 @@ if __name__ == "__main__":
     termTime = 40
     timeStep = 0.0001
     numOfGenerations = 1
-    v = Vesicle(generation, sequences, idInGen, motherIdInGen, matureWeight, modelNum, path)
+    v = Vesicle(generation, sequences, idInGen, motherIdInGen, matureWeight, modelNum, path,paramFile)
     # sAs = v.growCell(termTime,timeStep)
-    vs = v.growAndSplit(termTime, timeStep, numOfGenerations, keepAll=False)
+    # vs = v.growAndSplit(termTime, timeStep, numOfGenerations, keepAll=False)

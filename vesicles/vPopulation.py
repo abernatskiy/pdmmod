@@ -142,6 +142,14 @@ class VPopulation(object):
         return headVTrajectories
 
     def plotGraphics(self, headVTrajectories):
+        """
+
+        Args:
+            headVTrajectories:
+
+        Returns:
+
+        """
         for vt in headVTrajectories:
             vt.plotMasesChildren(self.numGen, scaled=True)
             plt.clf()

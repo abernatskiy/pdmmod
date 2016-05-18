@@ -41,7 +41,7 @@ class Vesicle(object):
      * motherIdInGen -- mother's id
     '''
 
-    def __init__(self, generation, sequences, idInGen, motherIdInGen, matureWeight, modelNum, path):
+    def __init__(self, generation, sequences, idInGen, motherIdInGen, matureWeight, modelNum, path, paramFile=None):
         self.idInGen = idInGen
         self.sequencesAtBirth = sequences
         self.motherIdInGen = motherIdInGen
@@ -51,6 +51,7 @@ class Vesicle(object):
         self.path = path
         self.outPath = os.path.join(self.path, str("%04d" % self.generation))
         self.initFile = self._getInitPopFile()
+        self.paramFile = paramFile
 
     def __str__(self):
         str1 = 'Vesicle ' + str(self.generation) + ' of mature weight ' + \
@@ -127,7 +128,7 @@ class Vesicle(object):
             numOfRuns=1,
             traj=True,
             log_level='WARNING')
-        sDef.runSeveralSeries(paramFile=None, populFile=self.initFile)
+        sDef.runSeveralSeries(paramFile=self.paramFile, populFile=self.initFile)
         timeMature, sequencesAtSplit = self._findMature()  # TEST
         print('mature time is: ', timeMature)
         return sequencesAtSplit, timeMature
@@ -191,7 +192,7 @@ class Vesicle(object):
             init1.write(seq + ' ' + str(pop) + '\n')
         init1.close()
 
-    def _procreateVesicle(self, termTime, timeStep, nextGen, allVesicles):  # TEST
+    def _procreateVesicle(self, termTime, timeStep, nextGen, allVesicles):
         '''
         helper function for growAndSplit
         grows vesicles and produces two daughter cells ready to procreate
@@ -209,14 +210,12 @@ class Vesicle(object):
         allVesicles.append(daughter1)
         allVesicles.append(daughter2)
 
-    # BUG AttributeError: 'Vesicle' object has no attribute 'timeMature'
     def growAndSplit(self, termTime, timeStep, numOfGenerations, keepAll):
         '''grows cells for several generation either keeping them keeping them
         all or selecting
         keepAll is one of:
          - True
-         - select
-         - random
+         - False (selects 1st vesicle)
         '''
         #        vesicles0 = [self]
         currGeneration = 0
@@ -239,31 +238,11 @@ class Vesicle(object):
                 for vesicle in vesicles:
                     vesicle._procreateVesicle(termTime, timeStep, nextGen, allVesicles)
 
-            elif keepAll == 'random':  # TEST
+            elif keepAll == False:  # TEST
                 choose = 0
                 vesicle = vesicles[choose]
                 vesicle._procreateVesicle(termTime, timeStep, nextGen, allVesicles)
 
-            elif keepAll == 'select':  # TEST
-                # first, grow both
-                for vesicle in vesicles:
-                    vesicle.sequencesAtSplit, vesicle.timeMature = \
-                        vesicle.growCell(termTime, timeStep)
-                # then choose one which procreates faster
-                if vesicles[0].timeMature <= vesicles[1].timeMature:
-                    choose = 0
-                else:
-                    choose = 1
-                vesicle = vesicles[choose]
-                # her daugheters are being produced
-                daughter1, daughter2 = \
-                    vesicle.splitCell(vesicle.sequencesAtSplit)
-                daughter1.produceInitFolder()
-                daughter2.produceInitFolder()
-
-                nextGen.append(daughter1)
-                nextGen.append(daughter2)
-                allVesicles.append(vesicle)
             else:
                 raise ValueError('keepAll is either True, "random" or "select"')
 
@@ -271,6 +250,71 @@ class Vesicle(object):
             currGeneration += 1
 
         return allVesicles
+
+    def readParamFile2List(self):#TEST
+        """
+        Read file with parameters
+        Returns:
+            parLines: list [str]
+        """
+        parLines = []
+        with open(self.paramFile, 'r') as pf:
+            for line in pf:
+                parLines.append(line)
+        return parLines
+
+    def changeParamFile(self,listOfPars,listOfVals):#TEST
+        parLines = self.readParamFile2List()
+        for iLine in range(len(parLines)):
+            for iPar in lange(len(listOfPars)):
+                if listOfPars[iPar] in parLines[iLine]:
+                    parLines[iLine] = par + ' = ' + str(listOfVals[iPar])+'\n'
+
+        dummy = open(self.paramFile, 'w')
+        dummy.close()
+        with open(self.paramFile, 'a') as pf:
+            for line in parLines:
+                pf.write(line)
+
+        return parLines
+
+    def growSelectTime(self, termTime, timeStep, numOfGenerations):#TEST
+        currGeneration = 0
+        self.sequencesAtSplit, self.timeMature = \
+            self.growCell(termTime, timeStep)
+        # two daughter cells produced
+        daughter1, daughter2 = self.splitCell(self.sequencesAtSplit)
+        os.mkdir(daughter1.outPath)
+        daughter1._makeInitPopFile()
+        daughter2._makeInitPopFile()
+        # now we have two daughters
+        allVesicles = []
+        nextGen = [daughter1, daughter2]
+        while currGeneration < numOfGenerations:
+            print('generation ', currGeneration)
+            vesicles = nextGen
+            nextGen = []
+            # first, grow both
+            for vesicle in vesicles:
+                vesicle.sequencesAtSplit, vesicle.timeMature = \
+                    vesicle.growCell(termTime, timeStep)
+            # then choose one which procreates faster
+            if vesicles[0].timeMature <= vesicles[1].timeMature:
+                choose = 0
+            else:
+                choose = 1
+            vesicle = vesicles[choose]
+            # her daugheters are being produced
+            daughter1, daughter2 = \
+                vesicle.splitCell(vesicle.sequencesAtSplit)
+            daughter1.produceInitFolder()
+            daughter2.produceInitFolder()
+
+            nextGen.append(daughter1)
+            nextGen.append(daughter2)
+            allVesicles.append(vesicle)
+            newImportRate = vesicle.matureWeight / vesicle.timeMature /4
+            self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
 
 
 def readPopulations(popFile):

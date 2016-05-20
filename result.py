@@ -57,7 +57,7 @@ class Result(object):
         #the following 3 attributes aren't part of self.parameters
         self.records = None#defined in _makeHeader and _readSimData
         self.howTerm = None#defined in _makeHeader and _readSimData
-        self.whenTerm = None#defined in _makeHeader and _readSimData
+        self.whenTerm = None#defined in _makeHeader and _readSimDat
         self.modelNum = modelNum
         self.simNum = simNum
         self.path2Folder = routes.routePDM + 'models/' + str("%03d" %self.modelNum) + '/'

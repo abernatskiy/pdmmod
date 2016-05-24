@@ -127,7 +127,7 @@ class VPopulation(object):
                 wrp(pf,
                     '\t'+'allVesicles.append(v.growSelectTime(' +
                     str(self.termTime) + ', ' +
-                    str(self.timeStep) + ', ' + str(self.numGen) + ')'
+                    str(self.timeStep) + ', ' + str(self.numGen) + '))'
                     )
                 wrp(pf,'pickle.dump(allVesicles, open(os.path.join("' +
                     str(lineagePath) + '", "allVesicles.p"), "wb"))')

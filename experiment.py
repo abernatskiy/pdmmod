@@ -262,7 +262,14 @@ class Experiment(object):
         return params
 
     def getExptParameters(self,dataBasePickle):#TEST
+        """
 
+        Args:
+            dataBasePickle: path to data base pickle where it is or where it should be
+
+        Returns:
+
+        """
         try:
             dataBase = pickle.load(dataBasePickle,'rb')
         except FileNotFoundError:
@@ -273,7 +280,7 @@ class Experiment(object):
             print('data base pickle loaded')
 
         for trialNum in range(self.firstSim, self.firstSim+self.numOfExperiments):
-            trialDict = pn.DataFrame(self._getTrialParameters(trialNum), index=currIndx+1)
+            trialDict = pn.DataFrame(self._getTrialParameters(trialNum), index=[currIndx+1])
             pn.concat([dataBase,trialDict], axis=0)
             currIndx+=1
 

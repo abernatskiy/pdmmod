@@ -281,7 +281,7 @@ class Experiment(object):
 
         for trialNum in range(self.firstSim, self.firstSim+self.numOfExperiments):
             trialDict = pn.DataFrame(self._getTrialParameters(trialNum), index=[currIndx+1])
-            pn.concat([dataBase,trialDict], axis=0)
+            dataBase = pn.concat([dataBase,trialDict], axis=0)
             currIndx+=1
 
         pickle.dump(dataBase,open(dataBasePickle,'wb'))

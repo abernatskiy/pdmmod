@@ -271,7 +271,7 @@ class Experiment(object):
 
         """
         try:
-            dataBase = pickle.load(dataBasePickle,'rb')
+            dataBase = pickle.load(open(dataBasePickle,'rb'))
         except FileNotFoundError:
             dataBase = pn.DataFrame({},index=[])
             currIndx = -1

@@ -86,6 +86,13 @@ class VPopulation(object):
 
         return initFiles
 
+    def restoreInitFiles(self):
+        initFiles = []
+        for i in range(self.numInstance):
+            outputDir = os.path.join(self.path, 'l' + str("%04d" % i))
+            initFiles.append(os.path.join(outputDir, '0000', 'initPop00000'))
+        return initFiles
+
     def writePythonFiles(self,initFiles): #TESTED
         def wrp(infile,string):
             return infile.write(string+'\n')
@@ -171,7 +178,7 @@ class VPopulation(object):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
             out, err = p.communicate()
-            time.sleep(1)
+            #time.sleep(1)
             output = out.decode().split(' ')
             print(output)
             jobsRun.append(int(output[2]))

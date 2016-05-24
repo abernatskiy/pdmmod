@@ -101,29 +101,29 @@ class VPopulation(object):
                 wrp(pf,'import pickle')
                 wrp(pf,'import sys')
                 wrp(pf,'import os')
-                wrp(pf,'sys.path.add(' + str(routes.routeVesicles) + ')')
-                wrp(pf, 'sys.path.add(' + str(routes.routePDM) + ')')
+                wrp(pf,'sys.path.add("' + str(routes.routeVesicles) + '")')
+                wrp(pf, 'sys.path.add("' + str(routes.routePDM) + '")')
                 wrp(pf, 'import helperFunctions')
                 wrp(pf,'from vesicles import vesicle')
                 wrp(pf,'allVesicles = []')
                 wrp(pf,'for i in range(' + str(self.numInstance) + '):')
-                wrp(pf,'\t'+'seqs = helperFunctions.readPopulations(' +
+                wrp(pf,'\t'+'seqs = helperFunctions.readPopulations("' +
                     str(initFiles[i]) +
-                                   ')')
+                                   '")')
                 wrp(pf,
                     '\t'+'v=vesicle.Vesicle('+
                         'generation=0, sequences=seqs, idInGen=0, motherIdInGen=0,' +
                         'matureWeight=' + str(self.matureWeight) + ', modelNum=' + str(self.modelNum) + ',' +
-                        'path=' + str(lineagePath) +
-                        ')'
+                        'path="' + str(lineagePath) +
+                        '")'
                     )
                 wrp(pf,
                     '\t'+'allVesicles.append(v.growSelectTime(' +
                     str(self.termTime) + ', ' +
                     str(self.timeStep) + ', ' + str(self.numGen) + ')'
                     )
-                wrp(pf,'pickle.dump(allVesicles, open(os.path.join(' +
-                    str(lineagePath) + ', "allVesicles.p"), "wb"))')
+                wrp(pf,'pickle.dump(allVesicles, open(os.path.join("' +
+                    str(lineagePath) + '", "allVesicles.p"), "wb"))')
         return pythonFiles
 
     def writeShells(self,pythonFiles,onNode=0):#TESTED

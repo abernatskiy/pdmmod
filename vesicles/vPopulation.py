@@ -86,6 +86,7 @@ class VPopulation(object):
 
         return initFiles
 
+
     def restoreInitFiles(self):
         initFiles = []
         for i in range(self.numInstance):
@@ -122,8 +123,11 @@ class VPopulation(object):
                         'generation=0, sequences=seqs, idInGen=0, motherIdInGen=0,' +
                         'matureWeight=' + str(self.matureWeight) + ', modelNum=' + str(self.modelNum) + ',' +
                         'path="' + str(lineagePath) +
-                        '")'
+                        '", paramFile="'+
+                        str(os.path.join(lineagePath,'parameters.ini')) + '")'
                     )
+                wrp(pf,
+                    'v.makeInitParamFile()')
                 wrp(pf,
                     '\t'+'allVesicles.append(v.growSelectTime(' +
                     str(self.termTime) + ', ' +

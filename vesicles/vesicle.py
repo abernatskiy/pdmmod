@@ -2,6 +2,7 @@
 import os
 import random
 import sys
+import shutil
 
 sys.path.append('../')
 import routes
@@ -250,6 +251,12 @@ class Vesicle(object):
             currGeneration += 1
 
         return allVesicles
+
+    def makeInitParamFile(self):
+        shutil.copyfile(os.path.join(routes.routePDM,'models',str("%03d" % self.modelNum),'parameters.ini'),
+                        os.path.join(self.paramFile))
+        # self.paramFile = os.path.join(destinationFolder,'parameters.ini')
+
 
     def readParamFile2List(self):#TESTED
         """

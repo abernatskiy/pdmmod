@@ -127,7 +127,7 @@ class VPopulation(object):
                         str(os.path.join(lineagePath,'parameters.ini')) + '")'
                     )
                 wrp(pf,
-                    'v.makeInitParamFile()')
+                    '\t'+'v.makeInitParamFile()')
                 wrp(pf,
                     '\t'+'allVesicles.append(v.growSelectTime(' +
                     str(self.termTime) + ', ' +

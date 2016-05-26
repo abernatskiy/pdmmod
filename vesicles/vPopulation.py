@@ -114,6 +114,8 @@ class VPopulation(object):
                 wrp(pf, 'import helperFunctions')
                 wrp(pf,'from vesicles import vesicle')
                 wrp(pf,'allVesicles = []')
+                wrp(pf,'importRates = []')
+                wrp(pf,'totalRates = []')
                 wrp(pf,'for i in range(' + str(self.numInstance) + '):')
                 wrp(pf,'\t'+'seqs = helperFunctions.readPopulations("' +
                     str(initFiles[i]) +
@@ -126,15 +128,22 @@ class VPopulation(object):
                         '", paramFile="'+
                         str(os.path.join(lineagePath,'parameters.ini')) + '")'
                     )
+                #wrp(pf,
+                #    '\t'+'v.makeInitParamFile()')
                 wrp(pf,
-                    '\t'+'v.makeInitParamFile()')
-                wrp(pf,
-                    '\t'+'allVesicles.append(v.growSelectTime(' +
+                    '\t'+'vs, ir, tr = v.growSelectTime(' +
                     str(self.termTime) + ', ' +
-                    str(self.timeStep) + ', ' + str(self.numGen) + '))'
+                    str(self.timeStep) + ', ' + str(self.numGen) + ')'
                     )
+                wrp(pf,'allVesicles.append(vs)')
+                wrp(pf,'importRates.append(ir)')
+                wrp(pf,'totalRates.append(tr)')
                 wrp(pf,'pickle.dump(allVesicles, open(os.path.join("' +
                     str(lineagePath) + '", "allVesicles.p"), "wb"))')
+                wrp(pf, 'pickle.dump(importRates, open(os.path.join("' +
+                    str(lineagePath) + '", "importRates.p"), "wb"))')
+                wrp(pf, 'pickle.dump(totalRates, open(os.path.join("' +
+                    str(lineagePath) + '", "totalRates.p"), "wb"))')
         return pythonFiles
 
     def writeShells(self,pythonFiles,onNode=0):#TESTED

@@ -189,7 +189,24 @@ class VPopulation(object):
 
         return jobsRun
 
-    def producePickles(self, allVesicles):
+    def produceHeadTrajectories(self): #TEST
+        """
+        Produces head trajectories if allVesicles haven't been given
+        Returns:
+            [VTrajectory]
+        """
+        headVTrajectories = []
+        for i in range(self.numInstance):
+            path = os.path.join(self.path, 'l' + str("%04d" % i))
+            vt = vTrajectory.VTrajectory(
+                self.modelNum, 0, 0, 0, self.matureWeight, path
+            )
+            headVTrajectories.append(vt)
+
+
+        return headVTrajectories
+
+    def producePickles(self, allVesicles): #TEST
         """
         goes through all the vesicles produced and selected
         analyzes data and creates pickles
@@ -202,8 +219,12 @@ class VPopulation(object):
         seqShapeDict = pickle.load(open('../seqShapeDict.p', 'rb'))
         headVTrajectories = []
         for vs in allVesicles:
-            headVTrajectories.append(vTrajectory.VTrajectory(
-                self.modelNum, 0, 0, 0, self.matureWeight, vs[0].path))
+            headVT = vTrajectory.VTrajectory(
+                self.modelNum, 0, 0, 0, self.matureWeight, vs[0].path)
+            headVTrajectories.append(headVT)
+            timeEvo, selected = headVT.getDivisionTimeEvolution(self.numGen)
+            pickle.dump(timeEvo,open(os.path.join(vs[0].path,'divTimeEvo.p'),'wb'))
+            pickle.dump(selected, open(os.path.join(vs[0].path, 'selected.p'), 'wb'))
             for v in vs:
                 vt = vTrajectory.VTrajectory(
                     v.modelNum, v.generation, v.idInGen, v.motherIdInGen, v.matureWeight, v.path
@@ -220,11 +241,11 @@ class VPopulation(object):
         pickle.dump(headVTrajectories, open(os.path.join(self.path, 'headVts.p'), 'wb'))
         return headVTrajectories
 
-    def plotGraphics(self, headVTrajectories):
+    def plotIndividualGraphs(self, headVTrajectories): #TEST
         """
 
         Args:
-            headVTrajectories:
+            headVTrajectories: [VTrajectory]
 
         Returns:
 
@@ -260,6 +281,17 @@ class VPopulation(object):
             plt.clf()
 
         return None
+
+    def plotDivTimeEvolutions(self): #TODO
+        plt.clf()
+        for expt in range(self.numInstance):
+            path = os.path.join(self.path, 'l' + str("%04d" % i))
+            evolution = pickle.load(open(os.path.join(path, 'divTimeEvo.p'),'rb'))
+            plt.plot(list(range(len(evolution))),evolution,label='expt '+str(expt))
+
+        plt.legend(loc='best',fontsize=8)
+        plt.savefig(os.path.join(self.path),'timeEvo.png')
+
 
 
 # Inits and Attributes #

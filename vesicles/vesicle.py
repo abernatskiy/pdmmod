@@ -300,6 +300,7 @@ class Vesicle(object):
         # now we have two daughters
         allVesicles = []
         importRates = []
+        totalImportRates = []
         nextGen = [daughter1, daughter2]
         while currGeneration < numOfGenerations:
             print('generation ', currGeneration)
@@ -315,6 +316,7 @@ class Vesicle(object):
             else:
                 choose = 1
             vesicle = vesicles[choose]
+            otherVesicle = vesicle[choose-1]
             # her daugheters are being produced
             daughter1, daughter2 = \
                 vesicle.splitCell(vesicle.sequencesAtSplit)
@@ -324,14 +326,17 @@ class Vesicle(object):
             nextGen.append(daughter1)
             nextGen.append(daughter2)
             allVesicles.append(vesicle)
-            newImportRate = vesicle.matureWeight / vesicle.timeMature /4
+            newImportRate = vesicle.matureWeight / vesicle.timeMature / 4
+            otherImportRate = otherVesicle.matureWeight / otherVesicle.timeMature / 4
+            totalImportRate = newImportRate + otherImportRate
+            totalImportRates.append(totalImportRate)
             print('At generation ' + str(currGeneration+1) + 'New import rate will be: ',str(newImportRate))
             importRates.append(newImportRate)
             parLines = self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
             # print(parLines)
             currGeneration += 1
 
-        return allVesicles, importRates
+        return allVesicles, importRates, totalImportRates
 
 
 def readPopulations(popFile):

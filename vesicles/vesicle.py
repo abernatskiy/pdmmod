@@ -296,6 +296,7 @@ class Vesicle(object):
         daughter2._makeInitPopFile()
         # now we have two daughters
         allVesicles = []
+        importRates = []
         nextGen = [daughter1, daughter2]
         while currGeneration < numOfGenerations:
             print('generation ', currGeneration)
@@ -321,8 +322,11 @@ class Vesicle(object):
             nextGen.append(daughter2)
             allVesicles.append(vesicle)
             newImportRate = vesicle.matureWeight / vesicle.timeMature /4
+            importRates.append(newImportRate)
             self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
             currGeneration += 1
+
+        return allVesicles, importRates
 
 
 def readPopulations(popFile):
@@ -360,13 +364,14 @@ def getWeight(populationDict):
 
 if __name__ == "__main__":
     idInGen = 0
-    sequences = readPopulations('multirun2/l0000/0000/initPop00000')
-    paramFile = 'multirun2/l0000/parameters.ini'
+    path = routes.routePDM + 'vesicles/multirun2/l0000/'
+    sequences = readPopulations(path+'0000/initPop00000')
+    paramFile = path+'parameters.ini'
     motherIdInGen = 0
     generation = 0
     matureWeight = 6000
     modelNum = 18
-    path = routes.routePDM + 'vesicles/'
+
     termTime = 40
     timeStep = 0.0001
     numOfGenerations = 1

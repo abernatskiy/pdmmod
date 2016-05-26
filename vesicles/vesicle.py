@@ -154,7 +154,8 @@ class Vesicle(object):
             self.idInGen,
             self.matureWeight,
             self.modelNum,
-            self.path)
+            self.path,
+            self.paramFile)
         daughter2 = Vesicle(
             self.generation + 1,
             {},
@@ -162,7 +163,8 @@ class Vesicle(object):
             self.idInGen,
             self.matureWeight,
             self.modelNum,
-            self.path)
+            self.path,
+            self.paramFile)
         megaList = []
         for (seq, pop) in sequencesAtSplit.items():
             megaList += [seq] * pop
@@ -252,10 +254,10 @@ class Vesicle(object):
 
         return allVesicles
 
-    def makeInitParamFile(self):
-        shutil.copyfile(os.path.join(routes.routePDM,'models',str("%03d" % self.modelNum),'parameters.ini'),
-                        os.path.join(self.paramFile))
-        # self.paramFile = os.path.join(destinationFolder,'parameters.ini')
+    # def makeInitParamFile(self):
+    #     shutil.copyfile(os.path.join(routes.routePDM,'models',str("%03d" % self.modelNum),'parameters.ini'),
+    #                     os.path.join(self.paramFile))
+    #     # self.paramFile = os.path.join(destinationFolder,'parameters.ini')
 
 
     def readParamFile2List(self):#TESTED
@@ -276,12 +278,13 @@ class Vesicle(object):
             for iPar in range(len(listOfPars)):
                 if listOfPars[iPar] in parLines[iLine]:
                     parLines[iLine] = listOfPars[iPar] + ' = ' + str(listOfVals[iPar])+'\n'
-
+        # print('before file open' + self.paramFile)
         dummy = open(self.paramFile, 'w')
         dummy.close()
         with open(self.paramFile, 'a') as pf:
             for line in parLines:
                 pf.write(line)
+            # print('after file writing' +self.paramFile)
 
         return parLines
 
@@ -322,8 +325,10 @@ class Vesicle(object):
             nextGen.append(daughter2)
             allVesicles.append(vesicle)
             newImportRate = vesicle.matureWeight / vesicle.timeMature /4
+            print('At generation ' + str(currGeneration+1) + 'New import rate will be: ',str(newImportRate))
             importRates.append(newImportRate)
-            self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
+            parLines = self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
+            # print(parLines)
             currGeneration += 1
 
         return allVesicles, importRates

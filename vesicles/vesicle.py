@@ -288,7 +288,7 @@ class Vesicle(object):
 
         return parLines
 
-    def growSelectTime(self, termTime, timeStep, numOfGenerations):#TEST
+    def growSelectTime(self, termTime, timeStep, numOfGenerations,maxImportRate):#TEST
         currGeneration = 0
         self.sequencesAtSplit, self.timeMature = \
             self.growCell(termTime, timeStep)
@@ -329,8 +329,14 @@ class Vesicle(object):
             newImportRate = vesicle.matureWeight / vesicle.timeMature / 4
             otherImportRate = otherVesicle.matureWeight / otherVesicle.timeMature / 4
             totalImportRate = newImportRate + otherImportRate
+            if totalImportRate <= maxImportRate:
+                continue
+            else:
+                newImportRate = newImportRate / totalImportRate * maxImportRate
+                totalImportRate = maxImportRate
+
             totalImportRates.append(totalImportRate)
-            print('At generation ' + str(currGeneration+1) + 'New import rate will be: ',str(newImportRate))
+            print('At generation ' + str(currGeneration + 1) + 'New import rate will be: ', str(newImportRate))
             importRates.append(newImportRate)
             parLines = self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
             # print(parLines)

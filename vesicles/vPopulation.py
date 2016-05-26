@@ -94,7 +94,7 @@ class VPopulation(object):
             initFiles.append(os.path.join(outputDir, '0000', 'initPop00000'))
         return initFiles
 
-    def writePythonFiles(self,initFiles): #TESTED
+    def writePythonFiles(self,initFiles,maxImportRate): #TESTED
         def wrp(infile,string):
             return infile.write(string+'\n')
 
@@ -133,7 +133,7 @@ class VPopulation(object):
                 wrp(pf,
                     '\t'+'vs, ir, tr = v.growSelectTime(' +
                     str(self.termTime) + ', ' +
-                    str(self.timeStep) + ', ' + str(self.numGen) + ')'
+                    str(self.timeStep) + ', ' + str(self.numGen) + ',' + str(maxImportRate) + '')'
                     )
                 wrp(pf,'allVesicles.append(vs)')
                 wrp(pf,'importRates.append(ir)')

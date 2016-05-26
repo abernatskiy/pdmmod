@@ -150,7 +150,7 @@ class Vesicle(object):
         daughter1 = Vesicle(
             self.generation + 1,
             {},
-            self.idInGen * 2,
+            0,
             self.idInGen,
             self.matureWeight,
             self.modelNum,
@@ -158,7 +158,7 @@ class Vesicle(object):
         daughter2 = Vesicle(
             self.generation + 1,
             {},
-            self.idInGen * 2 + 1,
+            1,
             self.idInGen,
             self.matureWeight,
             self.modelNum,
@@ -322,6 +322,7 @@ class Vesicle(object):
             allVesicles.append(vesicle)
             newImportRate = vesicle.matureWeight / vesicle.timeMature /4
             self.changeParamFile(['importH','importP'],[newImportRate,newImportRate])
+            currGeneration += 1
 
 
 def readPopulations(popFile):

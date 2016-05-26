@@ -285,12 +285,12 @@ class VPopulation(object):
     def plotDivTimeEvolutions(self): #TODO
         plt.clf()
         for expt in range(self.numInstance):
-            path = os.path.join(self.path, 'l' + str("%04d" % i))
+            path = os.path.join(self.path, 'l' + str("%04d" % expt))
             evolution = pickle.load(open(os.path.join(path, 'divTimeEvo.p'),'rb'))
             plt.plot(list(range(len(evolution))),evolution,label='expt '+str(expt))
 
         plt.legend(loc='best',fontsize=8)
-        plt.savefig(os.path.join(self.path),'timeEvo.png')
+        plt.savefig(os.path.join(self.path,'timeEvo.png'))
 
 
 

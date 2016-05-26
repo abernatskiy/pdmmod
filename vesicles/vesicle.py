@@ -360,8 +360,8 @@ def getWeight(populationDict):
 
 if __name__ == "__main__":
     idInGen = 0
-    sequences = readPopulations('populations.txt')
-    paramFile = 'parameters.ini'
+    sequences = readPopulations('multirun2/l0000/0000/initPop00000')
+    paramFile = 'multirun2/l0000/parameters.ini'
     motherIdInGen = 0
     generation = 0
     matureWeight = 6000

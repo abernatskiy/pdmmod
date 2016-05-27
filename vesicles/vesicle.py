@@ -394,3 +394,4 @@ if __name__ == "__main__":
     v = Vesicle(generation, sequences, idInGen, motherIdInGen, matureWeight, modelNum, path,paramFile)
     # sAs = v.growCell(termTime,timeStep)
     # vs = v.growAndSplit(termTime, timeStep, numOfGenerations, keepAll=False)
+

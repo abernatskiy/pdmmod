@@ -280,8 +280,8 @@ class VTrajectory(Trajectory):
         idInGen = 0
         for generation in range(1,numGen):
             outDir = os.path.join(self.path,str("%04d" %generation))
-            d1file = os.path.join(outDir,'weights'+str("%05d" %(idInGen*2))+'.txt')
-            d2file = os.path.join(outDir, 'weights' + str("%05d" % (idInGen * 2 +1)) + '.txt')
+            d1file = os.path.join(outDir,'weights'+str("%05d" % 0)+'.txt')
+            d2file = os.path.join(outDir, 'weights' + str("%05d" % 1) + '.txt')
             with open(d1file, 'r') as fh:
                 for line in fh:
                     pass

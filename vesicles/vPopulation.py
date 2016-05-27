@@ -133,7 +133,7 @@ class VPopulation(object):
                 wrp(pf,
                     '\t'+'vs, ir, tr = v.growSelectTime(' +
                     str(self.termTime) + ', ' +
-                    str(self.timeStep) + ', ' + str(self.numGen) + ',' + str(maxImportRate) + '')'
+                    str(self.timeStep) + ', ' + str(self.numGen) + ',' + str(maxImportRate) + ')'
                     )
                 wrp(pf,'allVesicles.append(vs)')
                 wrp(pf,'importRates.append(ir)')

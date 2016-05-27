@@ -316,7 +316,7 @@ class Vesicle(object):
             else:
                 choose = 1
             vesicle = vesicles[choose]
-            otherVesicle = vesicle[choose-1]
+            otherVesicle = vesicles[choose-1]
             # her daugheters are being produced
             daughter1, daughter2 = \
                 vesicle.splitCell(vesicle.sequencesAtSplit)

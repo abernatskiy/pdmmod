@@ -116,12 +116,11 @@ class VPopulation(object):
                 wrp(pf,'allVesicles = []')
                 wrp(pf,'importRates = []')
                 wrp(pf,'totalRates = []')
-                wrp(pf,'for i in range(' + str(self.numInstance) + '):')
-                wrp(pf,'\t'+'seqs = helperFunctions.readPopulations("' +
+                wrp(pf,'seqs = helperFunctions.readPopulations("' +
                     str(initFiles[i]) +
                                    '")')
                 wrp(pf,
-                    '\t'+'v=vesicle.Vesicle('+
+                    'v=vesicle.Vesicle('+
                         'generation=0, sequences=seqs, idInGen=0, motherIdInGen=0,' +
                         'matureWeight=' + str(self.matureWeight) + ', modelNum=' + str(self.modelNum) + ',' +
                         'path="' + str(lineagePath) +
@@ -131,7 +130,7 @@ class VPopulation(object):
                 #wrp(pf,
                 #    '\t'+'v.makeInitParamFile()')
                 wrp(pf,
-                    '\t'+'vs, ir, tr = v.growSelectTime(' +
+                    'vs, ir, tr = v.growSelectTime(' +
                     str(self.termTime) + ', ' +
                     str(self.timeStep) + ', ' + str(self.numGen) + ',' + str(maxImportRate) + ')'
                     )

@@ -330,7 +330,7 @@ class Vesicle(object):
             otherImportRate = otherVesicle.matureWeight / otherVesicle.timeMature / 4
             totalImportRate = newImportRate + otherImportRate
             if totalImportRate <= maxImportRate:
-                continue
+                pass
             else:
                 newImportRate = newImportRate / totalImportRate * maxImportRate
                 totalImportRate = maxImportRate

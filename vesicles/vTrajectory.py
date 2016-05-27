@@ -286,12 +286,12 @@ class VTrajectory(Trajectory):
                 for line in fh:
                     pass
                 last1 = float((line.rstrip('\n').split(' '))[0])
-                idTmp1 = idInGen * 2
+                idTmp1 = 0
             with open(d2file, 'r') as fh:
                 for line in fh:
                     pass
                 last2 = float((line.rstrip('\n').split(' '))[0])
-                idTmp2 = idInGen * 2 + 1
+                idTmp2 = 1
             if last1 <= last2:
                 idInGen = idTmp1
             else:

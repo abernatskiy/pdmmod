@@ -125,10 +125,10 @@ class VPopulation(object):
                         'matureWeight=' + str(self.matureWeight) + ', modelNum=' + str(self.modelNum) + ',' +
                         'path="' + str(lineagePath) +
                         '", paramFile="'+
-                        str(os.path.join(lineagePath,'0000','parameters.ini')) + '")'
+                        str(os.path.join(lineagePath,'parameters.ini')) + '")'
                     )
-                #wrp(pf,
-                #    '\t'+'v.makeInitParamFile()')
+                wrp(pf,
+                    'v.makeInitParamFile()')
                 wrp(pf,
                     'vs, ir, tr = v.growSelectTime(' +
                     str(self.termTime) + ', ' +

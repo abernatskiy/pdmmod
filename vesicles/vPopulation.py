@@ -125,7 +125,7 @@ class VPopulation(object):
                         'matureWeight=' + str(self.matureWeight) + ', modelNum=' + str(self.modelNum) + ',' +
                         'path="' + str(lineagePath) +
                         '", paramFile="'+
-                        str(os.path.join(lineagePath,'parameters.ini')) + '")'
+                        str(os.path.join(lineagePath,'0000','parameters.ini')) + '")'
                     )
                 #wrp(pf,
                 #    '\t'+'v.makeInitParamFile()')

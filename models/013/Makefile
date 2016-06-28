@@ -2,7 +2,7 @@
 modelObjects    = model.o nativeListLoader.o main.o
 
 # Path to the libpdmmod directory
-libPdmmodDir    = ../../libpdmmod
+libPdmmodDir    = ../../epdm
 CFLAGS          = -std=c++11 -g -ggdb -Wall -I"." -I"${libPdmmodDir}" -O2
 
 # Loading list of library objects and prepending the libpdmmod directory to each entry

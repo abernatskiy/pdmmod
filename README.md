@@ -1,7 +1,11 @@
 Partial-propensity Direct Method redesigned with heteropolymerization in mind
 
-Requires inih (http://code.google.com/p/inih/) to load parameters from config 
-files. Unpack the downloaded zip into libpdmmod/inih.
+Dependencies:
 
-Config input tested for inih_r29.
+inih: https://github.com/benhoyt/inih.git
+epdm: https://github.com/abernatskiy/epdm.git
+
+To pull the dependencies, run
+
+$ git submodule update --init --recursive
 

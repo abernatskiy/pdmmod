@@ -311,14 +311,11 @@ class VPopulation(object):
 ############################
 
 if __name__ == "__main__":
-    vp = VPopulation(44, 30, 18, 20000, 5, 0.0001, os.path.join(routes.routeVesicles,'multirun1'))
-    vp.plotDivTimeEvolutions()
+    vp = VPopulation(50, 25, 18, 20000, 3, 0.0001, os.path.join(routes.routeVesicles,'multirun2'))
+    #vp.plotDivTimeEvolutions()
     # initFiles = vp.initPopFiles(endTime=7)
-    # initFiles = ['1','2','3']
-    # pfs = vp.writePythonFiles(initFiles)
-    # shellFiles = vp.writeShells(pfs,0)
-    # vp.runSimulations(shellFiles)
-    # allVesicles = vp.runSimulations(initFiles, 'select')
-    #allVesicles = pickle.load(open(os.path.join(vp.path, 'allVesicles.p'), 'rb'))
-    # headTraj = vp.producePickles(allVesicles)
-    #headTraj = pickle.load(open(os.path.join(vp.path, 'headVts.p'), 'rb'))
+    initFiles = vp.restoreInitFiles()
+    pfs = vp.writePythonFiles(initFiles,20000)
+    shellFiles = vp.writeShells(pfs,0)
+    vp.runSimulations(shellFiles)
+

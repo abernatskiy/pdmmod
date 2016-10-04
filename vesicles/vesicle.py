@@ -326,6 +326,8 @@ class Vesicle(object):
             nextGen.append(daughter1)
             nextGen.append(daughter2)
             allVesicles.append(vesicle)
+            # here we evolve import rate 
+            # 
             newImportRate = vesicle.matureWeight / vesicle.timeMature / 4
             otherImportRate = otherVesicle.matureWeight / otherVesicle.timeMature / 4
             totalImportRate = newImportRate + otherImportRate

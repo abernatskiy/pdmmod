@@ -216,8 +216,8 @@ class VPopulation(object):
 
     def restoreAllVesicles(self):
         def selectWinner(currFolder):
-            out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000')])
-            out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001')])
+            out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000.txt')])
+            out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
             print(out0,out1)
         return None
 

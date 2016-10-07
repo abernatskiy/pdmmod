@@ -225,7 +225,7 @@ class VPopulation(object):
         for linage in range(self.numInstance):
             headFolder = os.path.join(self.path,'l'+str("%04d" % linage))
             for generation in range(self.numGen):
-                currFolder = os.path.join(headFolder,str("%04d" % generation)):
+                currFolder = os.path.join(headFolder,str("%04d" % generation))
                 winner = selectWinner(currFolder)
 
     def producePickles(self, allVesicles): #TEST

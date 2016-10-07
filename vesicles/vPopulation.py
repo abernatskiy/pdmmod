@@ -311,15 +311,16 @@ class VPopulation(object):
 ############################
 
 if __name__ == "__main__":
-    vp = VPopulation(numGen=44, numInstance=30, modelNum=18, matureWeight=20000, termTime=5, timeStep=0.0001, path=os.path.join(routes.routeVesicles,'multirun1'))
+    vp = VPopulation(numGen=25, numInstance=30, modelNum=18, matureWeight=20000, termTime=4, timeStep=0.0001,
+                     path=os.path.join(routes.routeVesicles,'multirun2'))
     #vp.plotDivTimeEvolutions()
-    initFiles = vp.initPopFiles(endTime=7)
-    initFiles = ['1','2','3']
-    pfs = vp.writePythonFiles(initFiles,maxImportRate=10000)
-    shellFiles = vp.writeShells(pfs,0)
+    # initFiles = vp.initPopFiles(endTime=7)
+    # initFiles = ['1','2','3']
+    # pfs = vp.writePythonFiles(initFiles,maxImportRate=10000)
+    # shellFiles = vp.writeShells(pfs,0)
     #vp.runSimulations(shellFiles)
-    allVesicles = vp.runSimulations(initFiles)
-    pickle.dump(allVesicles,open('allVesicles1.p','wb'))
+    # allVesicles = vp.runSimulations(initFiles)
+    # pickle.dump(allVesicles,open('allVesicles1.p','wb'))
     #allVesicles = pickle.load(open(os.path.join(vp.path, 'allVesicles.p'), 'rb'))
-    # headTraj = vp.producePickles(allVesicles)
+    headTraj = vp.produceHeadTrajectories()
     #headTraj = pickle.load(open(os.path.join(vp.path, 'headVts.p'), 'rb'))

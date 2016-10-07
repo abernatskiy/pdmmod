@@ -215,17 +215,25 @@ class VPopulation(object):
         return headVTrajectories
 
     def restoreAllVesicles(self):
-        def selectWinner(currFolder):
+        def selectWinner(currFolder, generation):
             out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000.txt')])
-            out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
-            print(out0,out1)
-            return None
+            if not generation == 0:
+                out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
+            else:
+                return 0
+            splitTime0 = float(out0.split(' ')[0])
+            splitTime1 = float(out1.split(' ')[0])
+            if splitTime0 < splitTime1:
+                return 0
+            else:
+                return 1
 
         for linage in range(self.numInstance):
             headFolder = os.path.join(self.path,'l'+str("%04d" % linage))
             for generation in range(self.numGen):
                 currFolder = os.path.join(headFolder,str("%04d" % generation))
                 winner = selectWinner(currFolder)
+                print(winner)
 
     def producePickles(self, allVesicles): #TEST
         """

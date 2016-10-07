@@ -214,6 +214,20 @@ class VPopulation(object):
 
         return headVTrajectories
 
+    def restoreAllVesicles(self):
+        def selectWinner(currFolder):
+            out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000')])
+            out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001')])
+            print(out0,out1)
+        return None
+
+
+        for linage in range(self.numInstance):
+            headFolder = os.path.join(self.path,'l'+str("%04d" % linage))
+            for generation in range(self.numGen):
+                currFolder = os.path.join(headFolder,str("%04d" % generation)):
+                winner = selectWinner(currFolder)
+
     def producePickles(self, allVesicles): #TEST
         """
         goes through all the vesicles produced and selected

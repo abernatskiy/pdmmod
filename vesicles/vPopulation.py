@@ -219,8 +219,7 @@ class VPopulation(object):
             out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000.txt')])
             out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
             print(out0,out1)
-        return None
-
+            return None
 
         for linage in range(self.numInstance):
             headFolder = os.path.join(self.path,'l'+str("%04d" % linage))

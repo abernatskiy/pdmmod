@@ -221,7 +221,7 @@ class VPopulation(object):
             if not generation == 0:
                 out1 = subprocess.check_output(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
             else:
-                return 0
+                return [1, 0], (float(str(out0).split(' ')[0][2:]), float(str(out0).split(' ')[0][2:]))
             splitTime0 = float(str(out0).split(' ')[0][2:])
             splitTime1 = float(str(out1).split(' ')[0][2:])
             if splitTime0 < splitTime1:

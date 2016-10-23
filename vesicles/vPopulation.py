@@ -217,13 +217,13 @@ class VPopulation(object):
 
     def restoreAllVesicles(self):
         def selectWinner(currFolder, generation):
-            out0, err0 = call(['tail','-1',os.path.join(currFolder,'weights00000.txt')])
+            out0 = subprocess.check_output(['tail','-1',os.path.join(currFolder,'weights00000.txt')])
             if not generation == 0:
-                out1, err1 = call(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
+                out1 = subprocess.check_output(['tail','-1',os.path.join(currFolder,'weights00001.txt')])
             else:
                 return 0
-            splitTime0 = float(out0.split(' ')[0])
-            splitTime1 = float(out1.split(' ')[0])
+            splitTime0 = float(str(out0).split(' ')[0][2:])
+            splitTime1 = float(str(out1).split(' ')[0][2:])
             if splitTime0 < splitTime1:
                 return 0
             else:
@@ -236,7 +236,7 @@ class VPopulation(object):
             for generation in range(self.numGen):
                 # find the folder which belongs to this generation
                 currFolder = os.path.join(headFolder,str("%04d" % generation))
-                winner = selectWinner(currFolder)
+                winner = selectWinner(currFolder,generation)
                 print(winner)
 
     def producePickles(self, allVesicles): #TEST

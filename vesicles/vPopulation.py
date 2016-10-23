@@ -249,7 +249,7 @@ class VPopulation(object):
                                                      'path_traj': [os.path.join(currFolder,'growth00000.txt'),
                                                                      os.path.join(currFolder, 'growth00001.txt')],
                                                      'path_weight': [os.path.join(currFolder,'weights00000.txt'),
-                                                                     os.path.join(currFolder, 'weights00001.txt')
+                                                                     os.path.join(currFolder, 'weights00001.txt')]
                                                      }, index=[currId,currId+1]
                                                     )
                 vesiclesDF = pd.concat(vesiclesDF,currentDF,axis=1)

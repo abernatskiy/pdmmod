@@ -12,6 +12,7 @@ import sys
 import pickle
 import matplotlib.pyplot as plt
 import subprocess
+import pandas as pd
 
 sys.path.append('../')
 import routes
@@ -227,10 +228,13 @@ class VPopulation(object):
                 return 0
             else:
                 return 1
-
+        # for every vesicle lineage
         for linage in range(self.numInstance):
+            # find the head folder
             headFolder = os.path.join(self.path,'l'+str("%04d" % linage))
+            # for every generation
             for generation in range(self.numGen):
+                # find the folder which belongs to this generation
                 currFolder = os.path.join(headFolder,str("%04d" % generation))
                 winner = selectWinner(currFolder)
                 print(winner)

@@ -225,9 +225,13 @@ class VPopulation(object):
             splitTime0 = float(str(out0).split(' ')[0][2:])
             splitTime1 = float(str(out1).split(' ')[0][2:])
             if splitTime0 < splitTime1:
-                return 0
+                return [1,0], (splitTime0, splitTime1)
             else:
-                return 1
+                return [0,1], (splitTime0, splitTime1)
+
+        vesiclesDF = pd.DataFrame({'ves_id':[],'linegae': [],'generation': [],'splitTime': [],'winner':[],
+                                   'path_traj':[],'path_weight':[],'mother_id':[]},index=[])
+        currId = 0
         # for every vesicle lineage
         for linage in range(self.numInstance):
             # find the head folder
@@ -236,8 +240,21 @@ class VPopulation(object):
             for generation in range(self.numGen):
                 # find the folder which belongs to this generation
                 currFolder = os.path.join(headFolder,str("%04d" % generation))
-                winner = selectWinner(currFolder,generation)
-                print(winner)
+                winner, (splitTime0, splitTime1) = selectWinner(currFolder,generation)
+                currentDF = pd.DataFrame({'ves_id': [currId,currId+1],
+                                                     'linegae': [linage,linage],
+                                                     'generation': [generation,generation],
+                                                     'splitTime': [splitTime0,splitTime1],
+                                                     'winner': winner,
+                                                     'path_traj': [os.path.join(currFolder,'growth00000.txt'),
+                                                                     os.path.join(currFolder, 'growth00001.txt')],
+                                                     'path_weight': [os.path.join(currFolder,'weights00000.txt'),
+                                                                     os.path.join(currFolder, 'weights00001.txt')
+                                                     }, index=[currId,currId+1]
+                                                    )
+                vesiclesDF = pd.concat(vesiclesDF,currentDF,axis=1)
+                currId+=2
+        return vesiclesDF
 
     def producePickles(self, allVesicles): #TEST
         """

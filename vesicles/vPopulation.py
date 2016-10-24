@@ -232,8 +232,10 @@ class VPopulation(object):
         vesiclesDF = pd.DataFrame({'ves_id':[],'linegae': [],'generation': [],'splitTime': [],'winner':[],
                                    'path_traj':[],'path_weight':[],'mother_id':[]},index=[])
         currId = 0
+        allVesicles = []
         # for every vesicle lineage
         for linage in range(self.numInstance):
+            vs = []
             # find the head folder
             headFolder = os.path.join(self.path,'l'+str("%04d" % linage))
             # for every generation
@@ -252,9 +254,13 @@ class VPopulation(object):
                                                                      os.path.join(currFolder, 'weights00001.txt')]
                                                      }, index=[currId,currId+1]
                                                     )
-                vesiclesDF = pd.concat(vesiclesDF,currentDF,axis=1)
+                vesiclesDF = pd.concat([vesiclesDF,currentDF],axis=1)
                 currId+=2
-        return vesiclesDF
+                vs.append(vesicle.Vesicle(generation,[],winner.index(1),None,self.matureWeight,self.modelNum,
+                                    currFolder,None))
+            allVesicles.append(vs)
+
+        return vesiclesDF, allVesicles
 
     def producePickles(self, allVesicles): #TEST
         """

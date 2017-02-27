@@ -1,6 +1,19 @@
 Notes on libpssa-1.0.0RC
 ========================
 
+The version that was actually used in EPDM testing was slightly modified by
+me in the past to reduce memory bloat. The bloat was due to the trajectories
+being saved in RAM; consequently, emergency-fixing the memory broke the
+trajectory output.
+
+Another difference is switching from MONOTONIC clock to CPUTIME_ID, apparently
+to get a more precise estimation of CPU run time.
+
+Modified files are available at libpssa-1.0.0RC directory of the present
+repository.
+
+--------
+
 Had to deduce the format of the trajectories again and it took a while. Writing
 it down this time:
 
@@ -23,6 +36,8 @@ unknown. What is known is that it is not the classical time keeping error with
 floating point nonassociativity (a + b - b =/= a, especially if there are many
 bs): increasing the simulation time by 10-50% of dt does not fix the problem.
 
+Somehow this problem only affects Homoreaction.sbml but not Heteroreaction.sbml.
+
 The reason for duplicating every line after the first and adding newlines is
 also unknown. In any code using these trajectories, the assumption that the
 lines come in pairs should be explicitly checked. So far I found no exceptions.
@@ -32,5 +47,13 @@ System state is represented as follows:
 <n0c0>,<n1c0>,..,<nNc0> <tab symbol> <n0c1>,<n1c1>,..,<nNc1> <tab symbol> ...
 
 where nIcJ is the number of molecules of specie I in compartment J.
+
+--------
+
+Regarding the statistical mode output: see comment at
+694-704@libpssa/src/PSSA.cpp. Basically it says that the specie distribution is
+the distribution of molecular counts at last time step. This is confirmed by the
+experiments: the distribution becomes increasingly skewed toward initial
+conditions as tend decreases.
 
 --------------------------------------------------------------------------------

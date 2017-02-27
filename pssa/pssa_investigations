@@ -1,0 +1,36 @@
+Notes on libpssa-1.0.0RC
+========================
+
+Had to deduce the format of the trajectories again and it took a while. Writing
+it down this time:
+
+<system state at T=0>
+<system state at T=dt>
+<system state at T=dt>
+<newline>
+<system state at T=2*dt>
+<system state at T=2*dt>
+<newline>
+...
+<system state at T=n*dt>
+<system state at T=n*dt>
+<newline>
+
+Here, n is the max number of records. About 80% of the time it is
+floor(t_max/dt) and 20% of the time it is floor(t_max/dt)-1. Obvously there is
+an off-by-one error somewhere in the record-keeping code, but its nature is
+unknown. What is known is that it is not the classical time keeping error with
+floating point nonassociativity (a + b - b =/= a, especially if there are many
+bs): increasing the simulation time by 10-50% of dt does not fix the problem.
+
+The reason for duplicating every line after the first and adding newlines is
+also unknown. In any code using these trajectories, the assumption that the
+lines come in pairs should be explicitly checked. So far I found no exceptions.
+
+System state is represented as follows:
+
+<n0c0>,<n1c0>,..,<nNc0> <tab symbol> <n0c1>,<n1c1>,..,<nNc1> <tab symbol> ...
+
+where nIcJ is the number of molecules of specie I in compartment J.
+
+--------------------------------------------------------------------------------
